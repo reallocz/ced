@@ -1,0 +1,7 @@
+tags
+*.swp
+cscope.out
+build/
+.ycm_*
+Doxyfile
+tmp/
