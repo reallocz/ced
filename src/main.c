@@ -10,6 +10,10 @@
 #include "line.h"
 #include "menu.h"
 
+enum main_mode {
+	DEBUG,
+	NORMAL
+};
 
 static struct {
 	const char* tag;
@@ -55,7 +59,7 @@ void printmenu(hWindow win)
 
 
 /** input handler callback */
-void main_input_handler(inpev ev)
+void main_normal_input_handler(inpev ev)
 {
 	static int x= 0, y = 0;
 	WINDOW* nwin = win_getnwin(ev.win);
@@ -74,11 +78,29 @@ void main_input_handler(inpev ev)
 }
 
 
+// Draw bottom status line
+void drawstatus(hWindow win)
+{
+	WINDOW* w = win_getnwin(win);
+	int x, y, rows, cols;
+	win_getcur(win, &y, &x);
+	win_getsize(win, &rows, &cols);
+	wmove(w, rows - 2, 0);
+	log_l(G.tag, "moving row:%d->%d, col:%d", y, rows - 2, x);
+	log_l(G.tag, "Drawing status row=%d, col=%d", rows, cols);
+	whline(w, ACS_HLINE, cols);
+	wrefresh(w);
+	wmove(w, y, x);
+	return;
+}
+
+
 void mainloop(hWindow win)
 {
 	inpev ev;
 	while(!G.quit) {
 		inp_poll();
+		drawstatus(win);
 		wrefresh(win_getnwin(win));
 	}
 }
@@ -94,8 +116,8 @@ int main()
 	hBuffer b = buf_create(SCRATCH);
 	win_setbuffer(w, b);
 	// set input handler
-	inp_sethandler(w, main_input_handler);
+	inp_sethandler(w, main_normal_input_handler);
 
-	printmenu(w);
+	/*printmenu(w);*/
 	mainloop(w);
 }
