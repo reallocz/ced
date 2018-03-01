@@ -8,10 +8,16 @@
 
 #define WINDOW_DEFCAP 4
 
+/** Bring struct window* alias of id x into scope */
+#define SW(alias, hWindow) \
+	struct window* alias = _get_win(hWindow)
+
 struct window {
 	int id;
 	int flags;
         WINDOW* nwin;
+	int x;
+	int y;
         int rows;
         int cols;
         int curx;
@@ -27,6 +33,16 @@ static struct {
 } G;
 
 
+static struct window* _get_win(hWindow win)
+{
+	if(win >= G.wincount && win != 0) {
+		log_e(G.tag, "%s: invalid window - %d",
+				__func__, win);
+		exit(1);
+	}
+	return &G.windows[win];
+}
+
 void win_init()
 {
 	/// Initialize globals
@@ -36,6 +52,9 @@ void win_init()
         /// Initialize ncurses
         setlocale(LC_ALL, ""); // Required
         G.stdscr.nwin = initscr();
+	getmaxyx(G.stdscr.nwin, G.stdscr.rows, G.stdscr.cols);
+	log_l(G.tag, "STDSCR: rows=%d, cols=%d",
+			G.stdscr.rows, G.stdscr.cols);
 
         /// Set char buffered instead of line buffered input
         cbreak();
@@ -43,19 +62,27 @@ void win_init()
         keypad(G.stdscr.nwin, TRUE);
 }
 
-hWindow win_create()
+
+void win_exit()
 {
-        struct window* w = &G.windows[G.wincount];
+        endwin();
+}
 
-	w->id = 0;
-	w->flags =0;
+hWindow win_create(int y, int x, int rows, int cols)
+{
+	SW(w, G.wincount);
+
+	w->id = G.wincount;
+	w->flags = 0;
         w->nwin = NULL;
-        w->rows = 0;
-        w->cols = 0;
-        w->curx = 0;
+        w->rows = rows;
+        w->cols = cols;
+	w->y = y;
+	w->x = x;
         w->cury = 0;
+        w->curx = 0;
 
-        w->nwin = newwin(0,0,0,0);
+        w->nwin = newwin(w->rows, w->cols, w->y, w->x);
         assert(w->nwin);
         keypad(w->nwin, TRUE);
 
@@ -63,12 +90,15 @@ hWindow win_create()
         return w->id;
 }
 
-WINDOW* win_getnwin(hWindow w)
+WINDOW* win_getnwin(hWindow win)
 {
-        return G.windows[w].nwin;
+	SW(w, win);
+        return w->nwin;
 }
 
-void win_exit()
+
+void win_pprint(hWindow win)
 {
-        endwin();
+	SW(w, win);
+	log_l(G.tag, "Window {id=%d, y=%d, x=%d, rows=%d, cols=%d}", w->id, w->y, w->x, w->rows, w->cols);
 }

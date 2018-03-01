@@ -76,7 +76,7 @@ void mainloop(hWindow win)
 int main()
 {
 	init();
-	hWindow w = win_create();
+	hWindow w = win_create(0, 0, 0, 0);
 	printmenu(w);
 	mainloop(w);
 	onexit();
