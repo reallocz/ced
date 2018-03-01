@@ -17,6 +17,7 @@ union inp_payload {
 };
 
 typedef struct {
+	hWindow win;	// Handle to window
         enum inp_type type;
         union inp_payload data;
 } inpev;
@@ -26,8 +27,18 @@ typedef struct {
 int inp_init();
 int inp_exit();
 
-/** Poll ncurses for input */
-inpev inp_poll(hWindow win);
+/** Poll ncurses for input for the set window.
+ * The input event is passed on to the set window handler
+ */
+void inp_poll();
+
+/** Poll ncurses for input for a window */
+inpev inp_winpoll(hWindow win);
+
+/** Set an input handler function */
+int inp_sethandler(hWindow win, void (*handler) (inpev));
+void inp_unsethandler();
+
 
 /** Key wrapper */
 enum inp_key {

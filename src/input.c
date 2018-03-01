@@ -3,22 +3,30 @@
 
 static struct {
 	const char* tag;
+	hWindow win;
+	void (*handler) (inpev); // Callback when inp_poll is called
 } G;
+
 
 int inp_init()
 {
 	G.tag = "INPUT";
+	G.handler = NULL;
+	G.win = -1;
 	return 0;
 }
+
 
 int inp_exit()
 {
 	return 0;
 }
 
-inpev inp_poll(hWindow win)
+
+inpev inp_winpoll(hWindow win)
 {
         inpev ev;
+	ev.win = win;
         int ch = wgetch(win_getnwin(win));
         if((ch >= 33 && ch <= 126) || ch == k_space) {
                 ev.type = INSERT;
@@ -37,4 +45,32 @@ inpev inp_poll(hWindow win)
                 ev.data.i = 0;
         }
         return ev;
+}
+
+
+void inp_poll()
+{
+	if(G.handler == NULL || G.win == -1) {
+		log_e(G.tag, "%s: No handler(%d)/window(%d) set!", G.handler, G.win);
+		return;
+	}
+	inpev ev = inp_winpoll(G.win);
+	G.handler(ev);
+}
+
+
+int inp_sethandler(hWindow win, void (*handler) (inpev))
+{
+	log_l(G.tag, "Setting input handler: win=%d->%d, handler=%p->%p", G.win, win, G.handler, handler);
+	G.handler = handler;
+	G.win = win;
+	return 0;
+}
+
+
+void inp_unsethandler()
+{
+	log_l(G.tag, "Unsetting input handler: win=%d, handler=%p", G.win, G.handler);
+	G.handler = NULL;
+	G.win = -1;
 }
