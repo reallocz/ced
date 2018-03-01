@@ -98,16 +98,19 @@ int menu_prompt(hMenu menu, hWindow win)
 	struct menu * mu = _get_menu(menu);
 	WINDOW* w = win_getnwin(win);
 	wclear(w);
-	int row = 0;
+
+	waddstr(w, "MENU: Please choose an option");
+	int row = 1;
 	for(int i = 0; i < mu->optcount; ++i) {
 		mvwaddch(w, row++, 0, (char)i + 48);
 		waddstr(w, " -> ");
 		waddstr(w, mu->options[i].optstring);
 	}
+	wmove(w, row, 0);
 	int res;
 	inpev ev;
 	while(1) {
-	       ev = inp_poll(win);
+	       ev = inp_winpoll(win);
 	       if(ev.type == INSERT) {
 			res = ev.data.ch;
 			break;
@@ -117,6 +120,8 @@ int menu_prompt(hMenu menu, hWindow win)
 		       break;
 	       }
 	}
+	// Clear the screen as soon as we get a valid response
+	wclear(w);
 	return res;
 }
 

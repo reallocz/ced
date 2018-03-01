@@ -18,10 +18,9 @@ hMenu menu_create(enum menu_type type);
 void menu_destroy(hMenu menu);
 
 /** Add an option to the menu */
-int menu_addopt(hMenu menu, int id, const char* optstring);
+int menu_addopt(hMenu menu, int optid, const char* optstring);
 
 /** Displays the options and returns the selected option */
 int menu_prompt(hMenu mu, hWindow win);
-
 
 void menu_pprint(hMenu menu);
