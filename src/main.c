@@ -2,6 +2,7 @@
 #include <ncurses.h>
 #include <locale.h>
 #include <assert.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include "log.h"
 #include "window.h"
@@ -9,11 +10,22 @@
 #include "line.h"
 #include "menu.h"
 
+
+static struct {
+	const char* tag;
+	int quit;	// Break out of mainloop if 1
+} G;
+
 /** Initialize submodules */
 void init()
 {
+	G.tag = "MAIN";
+	G.quit = 0;
+
+	/// submodules
 	// Logs init first
 	log_init();
+	buf_init();
 	inp_init();
 	line_init();
 	menu_init();
@@ -26,6 +38,7 @@ void onexit()
 	inp_exit();
 	line_exit();
 	menu_exit();
+	buf_exit();
 	win_exit();
 	// Logs exit last
 	log_exit();
@@ -41,12 +54,11 @@ void printmenu(hWindow win)
 }
 
 
-/** Process each keystroke */
-void process_input(hWindow win, inpev ev)
+/** input handler callback */
+void main_input_handler(inpev ev)
 {
-
 	static int x= 0, y = 0;
-	WINDOW* nwin = win_getnwin(win);
+	WINDOW* nwin = win_getnwin(ev.win);
 
 	if(ev.type == INSERT) {
 		mvwaddch(nwin, y, x++, ev.data.ch);
@@ -56,6 +68,8 @@ void process_input(hWindow win, inpev ev)
 	} else if (ev.type == MOVE) {
 		x = 0;
 		wmove(nwin, ++y, x);
+	} else if (ev.type == QUIT) {
+		G.quit = 1;
 	}
 }
 
@@ -63,11 +77,8 @@ void process_input(hWindow win, inpev ev)
 void mainloop(hWindow win)
 {
 	inpev ev;
-	while(1) {
-		ev = inp_poll(win);
-		if(ev.type == QUIT)
-			break;
-		process_input(win, ev);
+	while(!G.quit) {
+		inp_poll();
 		wrefresh(win_getnwin(win));
 	}
 }
@@ -75,9 +86,16 @@ void mainloop(hWindow win)
 
 int main()
 {
+	atexit(onexit);
+
 	init();
+	// Create window and set buffer
 	hWindow w = win_create(0, 0, 0, 0);
+	hBuffer b = buf_create(SCRATCH);
+	win_setbuffer(w, b);
+	// set input handler
+	inp_sethandler(w, main_input_handler);
+
 	printmenu(w);
 	mainloop(w);
-	onexit();
 }
