@@ -15,6 +15,8 @@
 struct window {
 	int id;
 	int flags;
+
+	// Curses
         WINDOW* nwin;
 	int x;
 	int y;
@@ -22,13 +24,16 @@ struct window {
         int cols;
         int curx;
         int cury;
+
+	// Buffers
+	hBuffer buf;
 };
 
 static struct {
 	const char* tag;
 	// Base window(stdout);
 	struct window stdscr;
-	int wincount;
+	unsigned int wincount;
 	struct window windows[WINDOW_DEFCAP];
 } G;
 
@@ -74,7 +79,10 @@ hWindow win_create(int y, int x, int rows, int cols)
 
 	w->id = G.wincount;
 	w->flags = 0;
+
         w->nwin = NULL;
+        w->nwin = newwin(w->rows, w->cols, w->y, w->x);
+        assert(w->nwin);
         w->rows = rows;
         w->cols = cols;
 	w->y = y;
@@ -82,13 +90,28 @@ hWindow win_create(int y, int x, int rows, int cols)
         w->cury = 0;
         w->curx = 0;
 
-        w->nwin = newwin(w->rows, w->cols, w->y, w->x);
-        assert(w->nwin);
-        keypad(w->nwin, TRUE);
+	w->buf = -1;
 
+        keypad(w->nwin, TRUE);
 	G.wincount++;
         return w->id;
 }
+
+void win_destory(hWindow win)
+{
+	// TODO
+}
+
+
+int win_setbuffer(hWindow win, hBuffer buf)
+{
+	SW(w, win);
+	w->buf = buf;
+	return 0;
+}
+
+
+// Accessors
 
 WINDOW* win_getnwin(hWindow win)
 {
@@ -96,6 +119,20 @@ WINDOW* win_getnwin(hWindow win)
         return w->nwin;
 }
 
+
+void win_getsize(hWindow win, int* rows, int* cols)
+{
+	SW(w, win);
+	*rows = w->rows;
+	*cols = w->cols;
+}
+
+
+hBuffer win_getbuffer(hWindow win)
+{
+	SW(w, win);
+	return w->buf;
+}
 
 void win_pprint(hWindow win)
 {

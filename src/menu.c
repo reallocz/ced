@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <ncurses.h>
+#include <stdlib.h>
 #include "window.h"
 #include "input.h"
 
@@ -27,9 +28,9 @@ struct menu {
 
 static struct {
 	const char* tag;
-	int flags;
-	int menucount;
-	int menucap;
+	unsigned int flags;
+	unsigned int menucount;
+	unsigned int menucap;
 	struct menu menus[MENU_MENUCAP];
 } G;
 
