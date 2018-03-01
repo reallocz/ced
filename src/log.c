@@ -28,13 +28,13 @@ void log_exit(void)
                 fprintf(G.logfile, "\n--END--\n");
                 fclose(G.logfile);
         }
-        printf("closing log file");
+        printf("closing log file\n");
 }
 
 
 void log_l(const char* tag, const char* msg, ...)
 {
-        fprintf(G.logfile, "[%s]", tag);
+        fprintf(G.logfile, "[%s] ", tag);
         va_list args;
         va_start(args, msg);
         vfprintf(G.logfile, msg, args);
@@ -44,7 +44,7 @@ void log_l(const char* tag, const char* msg, ...)
 
 void log_e(const char* tag, const char* msg, ...)
 {
-        fprintf(G.logfile, "**[%s]", tag);
+        fprintf(G.logfile, "**[%s] ", tag);
         va_list args;
         va_start(args, msg);
         vfprintf(G.logfile, msg, args);
