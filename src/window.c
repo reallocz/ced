@@ -26,7 +26,7 @@ struct window {
         int cury;
 
 	// Buffers
-	hBuffer buf;
+	hBuffer buf;	// -1 if no buffer set
 };
 
 static struct {
@@ -81,10 +81,9 @@ hWindow win_create(int y, int x, int rows, int cols)
 	w->flags = 0;
 
         w->nwin = NULL;
-        w->nwin = newwin(w->rows, w->cols, w->y, w->x);
+        w->nwin = newwin(rows, cols, y, x);
         assert(w->nwin);
-        w->rows = rows;
-        w->cols = cols;
+	getmaxyx(w->nwin, w->rows, w->cols);
 	w->y = y;
 	w->x = x;
         w->cury = 0;
@@ -106,6 +105,8 @@ void win_destory(hWindow win)
 int win_setbuffer(hWindow win, hBuffer buf)
 {
 	SW(w, win);
+	log_l(G.tag, "%s: hWindow=%d, buf=%d->%d", __func__,
+			win, w->buf, buf);
 	w->buf = buf;
 	return 0;
 }
@@ -127,6 +128,12 @@ void win_getsize(hWindow win, int* rows, int* cols)
 	*cols = w->cols;
 }
 
+void win_getcur(hWindow win, int* y, int* x)
+{
+	SW(w, win);
+	*y = w->y;
+	*x = w->x;
+}
 
 hBuffer win_getbuffer(hWindow win)
 {
