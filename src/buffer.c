@@ -135,6 +135,11 @@ hBuffer buf_create(enum buffer_type type, unsigned int linecount)
 }
 
 
+unsigned int buf_get_linecount(hBuffer buf)
+{
+	SB(b, buf);
+	return b->linecount;
+}
 
 void buf_pprint(hBuffer buf)
 {

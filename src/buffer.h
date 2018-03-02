@@ -31,4 +31,7 @@ hBuffer buf_createfrom_file(const char* filename);
 /** buf_destroy destorys the buffer and discards all its lines */
 void buf_destory(hBuffer buf);
 
+/** returns line count */
+unsigned int buf_get_linecount(hBuffer buf);
+
 void buf_pprint(hBuffer buf);
