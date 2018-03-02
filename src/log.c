@@ -26,6 +26,7 @@ void log_exit(void)
 {
         if(G.logfile != NULL) {
                 fprintf(G.logfile, "\n--LOG END--\n");
+		fflush(G.logfile);
                 fclose(G.logfile);
         }
         printf("closing log file\n");
@@ -73,4 +74,18 @@ void log_ec(const char* msg, ...)
         vfprintf(G.logfile, msg, args);
         va_end(args);
 	fflush(G.logfile);
+}
+
+void log_fatal(const char* tag, const char* msg, ...)
+{
+	fprintf(G.logfile, "----FATAL-----");
+        fprintf(G.logfile, "**[%s]** ", tag);
+        va_list args;
+        va_start(args, msg);
+        vfprintf(G.logfile, msg, args);
+        va_end(args);
+        fprintf(G.logfile, "\n");
+	fflush(G.logfile);
+	log_exit();
+	exit(1);
 }
