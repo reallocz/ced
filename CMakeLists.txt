@@ -8,7 +8,7 @@ set(SRCDIR "src")
 
 include_directories(SRCDIR)
 
-add_compile_options(-Wall -Wextra -Wpedantic)
+add_compile_options(-g -Wall -Wextra -Wpedantic)
 
 add_executable(debug
         ${SRCDIR}/main.c
