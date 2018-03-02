@@ -3,13 +3,18 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include "log.h"
 
 #define LN_DEFSIZE 8
 #define LN_DEFGAP 4
 #define LN_DEFCAP 64
 
+/** Bring struct line* alias of id x into scope */
+#define SL(alias, hLine) \
+	struct line* alias = _get_line(hLine)
+
 struct line {
-	unsigned int id;
+	int id; // -1 = free line
         unsigned int num;// Line number
         char* buf;// buffer
         unsigned int size;// line size
@@ -20,8 +25,8 @@ struct line {
 
 static struct {
 	int flags;
+	unsigned int ids; // Generate id's by incrementing
 	const char* tag;
-	unsigned int linecount;
 	unsigned int linecap;
 	struct line* lines;
 } G;
@@ -31,16 +36,25 @@ int line_init()
 {
 	G.tag = "LINE";
 	G.flags = 0;
-	G.linecount = 0;
 	G.linecap = LN_DEFCAP;
+	G.ids = 0;
 	G.lines = malloc(G.linecap * sizeof(struct line));
 	assert(G.lines);
+
+	for(unsigned int i = 0; i < G.linecap; ++i) {
+		G.lines[i].id = -1;
+	}
+
 	log_l(G.tag, "Init success");
 	return 0;
 }
 
+
 int line_exit()
 {
+	for(unsigned int i = 0; i < G.linecap; ++i) {
+		free(G.lines[i].buf);
+	}
 	free(G.lines);
 	return 0;
 }
@@ -49,24 +63,44 @@ int line_exit()
 /** Return the pointer to the line */
 static struct line* _get_line(hLine line)
 {
-	if(line >= G.linecap) {
-		printf("INVALID HLINE!\n");
-		return NULL;
+	for(unsigned int i = 0; i < G.linecap; ++i) {
+		if(G.lines[i].id == line) {
+			return &G.lines[i];
+		}
 	}
-	return &G.lines[line];
+	log_e(G.tag, "%s: line not found: %d", __func__,
+			line);
+	exit(1);
+}
+
+
+/** Generate a new id for line */
+static
+unsigned int _generate_id()
+{
+	return G.ids++;
+}
+
+
+static
+struct line* _get_free_line()
+{
+	for(unsigned int i = 0; i < G.linecap; ++i) {
+		if(G.lines[i].id == -1) {
+			log_l(G.tag, "%s: found free line at: %d", __func__, i);
+			return &G.lines[i];
+		}
+	}
+	log_e(G.tag, "%s: OUT OF LINES!", __func__);
+	exit(1);
 }
 
 
 hLine line_create(void)
 {
-	if(G.linecount >= G.linecap) {
-		printf("cnt %d, cap %d\n", G.linecount, G.linecap);
-		printf("ERROR: ALLOC MORE LINES!\n");
-	}
+        struct line* ln = _get_free_line();
 
-        struct line* ln = &G.lines[G.linecount];
-	ln->id = G.linecount;
-
+	ln->id = _generate_id();
         ln->num = 0;
         ln->buf = NULL;
         ln->size = LN_DEFSIZE;
@@ -77,20 +111,22 @@ hLine line_create(void)
         ln->buf = calloc(ln->size, sizeof(ln->buf[0]));
         assert(ln->buf);
 
-	G.linecount++;
         return ln->id;
 }
 
 
-void line_destroy(hLine ln)
+void line_destroy(hLine line)
 {
-	// TODO
+	SL(ln, line);
+	ln->id = -1;
+	free(ln->buf);
 }
 
 
 void line_add_gap(hLine line)
 {
-	struct line* ln = _get_line(line);
+	SL(ln, line);
+
 	unsigned int newsize = ln->size + LN_DEFGAP;
 	unsigned int newgap = ln->gap + LN_DEFGAP;
 	char* newbuf = calloc(newsize, sizeof(ln->buf[0]));
@@ -116,7 +152,7 @@ void line_add_gap(hLine line)
 
 void line_addch(hLine line, char c)
 {
-	struct line* ln = _get_line(line);
+	SL(ln, line);
         assert(ln && ln->buf);
         if(ln->gap < 1) {
 		line_add_gap(line);
@@ -130,7 +166,7 @@ void line_addch(hLine line, char c)
 
 void line_delch(hLine line)
 {
-	struct line* ln = _get_line(line);
+	SL(ln, line);
         assert(ln && ln->buf);
         if(ln->cur < 1) {
                 return;
@@ -146,7 +182,7 @@ void line_delch(hLine line)
 
 void line_move_cur_left(hLine line)
 {
-	struct line* ln = _get_line(line);
+	SL(ln, line);
         assert(ln);
         if(ln->cur == 0) {
                 return;
@@ -159,7 +195,7 @@ void line_move_cur_left(hLine line)
 
 void line_move_cur_right(hLine line)
 {
-	struct line* ln = _get_line(line);
+	SL(ln, line);
         assert(ln);
         if(ln->cur + ln->gap  == ln->size) {
 		printf("EOB!\n");
@@ -172,7 +208,7 @@ void line_move_cur_right(hLine line)
 
 int line_get_cursor(hLine line)
 {
-	struct line* ln = _get_line(line);
+	SL(ln, line);
         assert(ln);
         return ln->cur;
 }
@@ -180,7 +216,7 @@ int line_get_cursor(hLine line)
 
 void line_pprint(hLine line)
 {
-	struct line* ln = _get_line(line);
+	SL(ln, line);
         assert(ln);
         printf("Line{size=%d, cur=%d, gap=%d}\n",
 			ln->size, ln->cur, ln->gap);
@@ -189,7 +225,7 @@ void line_pprint(hLine line)
 
 void line_print(hLine line)
 {
-	struct line* ln = _get_line(line);
+	SL(ln, line);
         assert(ln);
         for(unsigned int i = 0; i < ln->size; ++i) {
                 if(i >= ln->cur && i < ln->cur + ln->gap) {

@@ -16,7 +16,7 @@ int line_exit();
 hLine line_create();
 
 /** Destroy line */
-void line_destroy(hLine ln);
+void line_destroy(hLine line);
 
 
 ////////////////////////////////////////
@@ -24,7 +24,7 @@ void line_destroy(hLine ln);
 ////////////////////////////////////////
 
 /** Increase the width of gap */
-void line_add_gap(hLine ln);
+void line_add_gap(hLine line);
 
 
 ////////////////////////////////////////
@@ -32,10 +32,10 @@ void line_add_gap(hLine ln);
 ////////////////////////////////////////
 
 /** Add char at current cursor pos */
-void line_addch(hLine ln, char c);
+void line_addch(hLine line, char c);
 
 /** Delete char at current cursor pos and move cur left */
-void line_delch(hLine ln);
+void line_delch(hLine line);
 
 
 ////////////////////////////////////////
@@ -43,10 +43,10 @@ void line_delch(hLine ln);
 ////////////////////////////////////////
 
 /** Move cursor to the left */
-void line_move_cur_left(hLine ln);
+void line_move_cur_left(hLine line);
 
 /** Move cursor to right */
-void line_move_cur_right(hLine ln);
+void line_move_cur_right(hLine line);
 
 
 ////////////////////////////////////////
@@ -54,11 +54,11 @@ void line_move_cur_right(hLine ln);
 ////////////////////////////////////////
 
 /** Get cursor position */
-int line_get_cursor(hLine ln);
+int line_get_cursor(hLine line);
 
 
 ////////////////////////////////////////
 /// Debug
 ////////////////////////////////////////
-void line_pprint(hLine ln);
-void line_print(hLine ln);
+void line_pprint(hLine line);
+void line_print(hLine line);
