@@ -18,14 +18,14 @@ void log_init(void)
 	G.logfilename = LOG_LOGFILE;
         G.logfile = fopen(G.logfilename, "w");
         assert(G.logfile);
-        fprintf(G.logfile, "--BEGIN--\n");
+        fprintf(G.logfile, "--LOG BEGIN--\n");
 }
 
 
 void log_exit(void)
 {
         if(G.logfile != NULL) {
-                fprintf(G.logfile, "\n--END--\n");
+                fprintf(G.logfile, "\n--LOG END--\n");
                 fclose(G.logfile);
         }
         printf("closing log file\n");
@@ -43,6 +43,17 @@ void log_l(const char* tag, const char* msg, ...)
 	fsync(G.logfile);
 }
 
+
+void log_lc(const char* msg, ...)
+{
+        va_list args;
+        va_start(args, msg);
+        vfprintf(G.logfile, msg, args);
+        va_end(args);
+	fsync(G.logfile);
+}
+
+
 void log_e(const char* tag, const char* msg, ...)
 {
         fprintf(G.logfile, "**[%s] ", tag);
@@ -51,5 +62,15 @@ void log_e(const char* tag, const char* msg, ...)
         vfprintf(G.logfile, msg, args);
         va_end(args);
         fprintf(G.logfile, "\n");
+	fsync(G.logfile);
+}
+
+
+void log_ec(const char* msg, ...)
+{
+        va_list args;
+        va_start(args, msg);
+        vfprintf(G.logfile, msg, args);
+        va_end(args);
 	fsync(G.logfile);
 }

@@ -8,7 +8,11 @@ void log_exit(void);
 
 /** Standard log lvl */
 void log_l(const char* tag, const char* msg, ...);
+/** arbitary message without new line */
+void log_lc(const char* msg, ...);
 
 /** Error log lvl */
 void log_e(const char* tag, const char* msg, ...);
+/** arbitary message without new line */
+void log_ec(const char* msg, ...);
 
