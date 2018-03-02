@@ -17,9 +17,6 @@
 typedef int hWindow;
 
 
-////////////////////////////////////////
-/// Constructor and Destructors
-////////////////////////////////////////
 /** initialize ncurses and the window submodule.*/
 void win_init();
 void win_exit();
@@ -29,17 +26,8 @@ hWindow win_create(int y, int x, int rows, int cols);
 void win_destory(hWindow win);
 
 
-////////////////////////////////////////
-/// Buffer management
-////////////////////////////////////////
 /** Set's window buffer. Replaces the old buffer */
 int win_setbuffer(hWindow win, hBuffer buf);
-
-
-
-////////////////////////////////////////
-/// Accessors
-////////////////////////////////////////
 
 /** Get a handle to ncurses WINDOW* */
 WINDOW* win_getnwin(hWindow win);
