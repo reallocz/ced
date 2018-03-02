@@ -29,6 +29,7 @@ struct window {
 	hBuffer buf;	// -1 if no buffer set
 };
 
+
 static struct {
 	const char* tag;
 	// Base window(stdout);
@@ -47,6 +48,7 @@ static struct window* _get_win(hWindow win)
 	}
 	return &G.windows[win];
 }
+
 
 void win_init()
 {
@@ -73,6 +75,7 @@ void win_exit()
         endwin();
 }
 
+
 hWindow win_create(int y, int x, int rows, int cols)
 {
 	SW(w, G.wincount);
@@ -95,6 +98,7 @@ hWindow win_create(int y, int x, int rows, int cols)
 	G.wincount++;
         return w->id;
 }
+
 
 void win_destory(hWindow win)
 {
@@ -128,6 +132,14 @@ void win_getsize(hWindow win, int* rows, int* cols)
 	*cols = w->cols;
 }
 
+
+void win_getmaxsize(int* rows, int* cols)
+{
+	*rows = G.stdscr.rows;
+	*cols = G.stdscr.cols;
+}
+
+
 void win_getcur(hWindow win, int* y, int* x)
 {
 	SW(w, win);
@@ -135,11 +147,13 @@ void win_getcur(hWindow win, int* y, int* x)
 	*x = w->x;
 }
 
+
 hBuffer win_getbuffer(hWindow win)
 {
 	SW(w, win);
 	return w->buf;
 }
+
 
 void win_pprint(hWindow win)
 {
