@@ -22,8 +22,6 @@ struct window {
 	int y;
         int rows;
         int cols;
-        int curx;
-        int cury;
 
 	// Buffers
 	hBuffer buf;	// -1 if no buffer set
@@ -78,8 +76,6 @@ hWindow win_create(int y, int x, int rows, int cols)
 	w->cols = height - 1;	// cols are 0 indexed
 	w->y = y;
 	w->x = x;
-        w->cury = 0;
-        w->curx = 0;
 
 	w->buf = -1;
 
@@ -122,13 +118,20 @@ void win_getsize(hWindow win, int* rows, int* cols)
 }
 
 
-void win_getcur(hWindow win, int* y, int* x)
+void win_get_cursor(hWindow win, int* y, int* x)
 {
 	SW(w, win);
-	*y = w->y;
-	*x = w->x;
+	int my, mx;
+	getyx(w->nwin, my, mx);
+	*y = my;
+	*x = mx;
 }
 
+void win_set_cursor(hWindow win, int y, int x)
+{
+	SW(w, win);
+	wmove(w->nwin, y, x);
+}
 
 hBuffer win_getbuffer(hWindow win)
 {

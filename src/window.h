@@ -34,9 +34,13 @@ WINDOW* win_getnwin(hWindow win);
 
 /** get window size: rows and columns */
 void win_getsize(hWindow win, int* rows, int* cols);
-void win_getcur(hWindow win, int* y, int* x);
+/** get window cursor position */
+void win_get_cursor(hWindow win, int* y, int* x);
+/** Move window cursor */
+void win_set_cursor(hWindow win, int y, int x);
 
 /** returns the set window buffer. -1 if no buffer is set */
 hBuffer win_getbuffer(hWindow win);
 
 void win_pprint(hWindow win);
+
