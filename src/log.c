@@ -40,6 +40,7 @@ void log_l(const char* tag, const char* msg, ...)
         vfprintf(G.logfile, msg, args);
         va_end(args);
         fprintf(G.logfile, "\n");
+	fsync(G.logfile);
 }
 
 void log_e(const char* tag, const char* msg, ...)
@@ -50,4 +51,5 @@ void log_e(const char* tag, const char* msg, ...)
         vfprintf(G.logfile, msg, args);
         va_end(args);
         fprintf(G.logfile, "\n");
+	fsync(G.logfile);
 }
