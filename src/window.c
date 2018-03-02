@@ -32,8 +32,6 @@ struct window {
 
 static struct {
 	const char* tag;
-	// Base window(stdout);
-	struct window stdscr;
 	unsigned int wincount;
 	struct window windows[WINDOW_DEFCAP];
 } G;
@@ -55,24 +53,12 @@ void win_init()
 	/// Initialize globals
 	G.tag = "WINDOW";
 	G.wincount = 0;
-
-        /// Initialize ncurses
-        setlocale(LC_ALL, ""); // Required
-        G.stdscr.nwin = initscr();
-	getmaxyx(G.stdscr.nwin, G.stdscr.rows, G.stdscr.cols);
-	log_l(G.tag, "STDSCR: rows=%d, cols=%d",
-			G.stdscr.rows, G.stdscr.cols);
-
-        /// Set char buffered instead of line buffered input
-        cbreak();
-        noecho();       // Don't echo input on terminal
-        keypad(G.stdscr.nwin, TRUE);
+	log_l(G.tag, "Init success");
 }
 
 
 void win_exit()
 {
-        endwin();
 }
 
 
@@ -130,13 +116,6 @@ void win_getsize(hWindow win, int* rows, int* cols)
 	SW(w, win);
 	*rows = w->rows;
 	*cols = w->cols;
-}
-
-
-void win_getmaxsize(int* rows, int* cols)
-{
-	*rows = G.stdscr.rows;
-	*cols = G.stdscr.cols;
 }
 
 
