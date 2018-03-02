@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include "window.h"
 #include "input.h"
+#include "log.h"
 
 // Maximum number of options
 #define MENU_OPTCAP 8

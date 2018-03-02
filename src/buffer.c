@@ -6,8 +6,6 @@
 
 // A maximum of 4 buffers allowed
 #define BUFFER_DEFCAP 4
-// Empty buffer line count
-#define BUFFER_DEFLINECOUNT 4
 
 /** Bring struct buffer* alias of id x into scope */
 #define SB(alias, hBuffer) \
@@ -17,7 +15,7 @@ struct buffer {
 	int id;		// -1 for unused buffer
 	int flags;
 	enum buffer_type type;
-	char name[64];
+	const char* name;
 	unsigned int linecount;
 	hLine* lines;
 };
@@ -25,8 +23,9 @@ struct buffer {
 
 static struct {
 	const char* tag;
-	unsigned int bufcount;
-	unsigned int bufcap;
+
+	unsigned int ids; // Generate id's by incrementing
+	unsigned int bufcap; // Total buffer capacity
 	struct buffer buffers[BUFFER_DEFCAP];
 } G;
 
@@ -34,8 +33,12 @@ static struct {
 int buf_init()
 {
 	G.tag = "BUFFER";
-	G.bufcount = 0;
 	G.bufcap = BUFFER_DEFCAP;
+	G.ids = 0;
+	for(unsigned int i = 0; i < G.bufcap; ++i) {
+		G.buffers[i].id = -1;
+	}
+	log_l(G.tag, "Init success");
 	return 0;
 }
 
@@ -46,42 +49,91 @@ int buf_exit()
 	return 1;
 }
 
-static struct buffer* _get_buffer(hBuffer buf)
+
+static
+struct buffer* _get_buffer(hBuffer buf)
 {
-	if(buf >= G.bufcap) {
-		log_e(G.tag, "%s: invalid buffer: %d. (bufcap=%d)", __func__, buf, G.bufcap);
-		exit(1);
+	for(unsigned int i = 0; i < G.bufcap; ++i) {
+		if(G.buffers[i].id == buf) {
+			return &G.buffers[i];
+		}
 	}
-	return &G.buffers[buf];
+
+	// Buffer not found
+	log_e(G.tag, "%s: buffer not found: %d.", __func__,
+			buf, G.bufcap);
+	log_ec("Available buffers: ");
+	for(unsigned int i = 0; i < G.bufcap; ++i) {
+		if(G.buffers[i].id != -1) {
+			log_ec("%d, ", G.buffers[i].id);
+		}
+	}
+	log_ec("\n");
+	exit(1);
 }
 
 
-hBuffer buf_create(enum buffer_type type)
+/** Generate a new id for buffer */
+static
+unsigned int _generate_id()
 {
-	SB(b, G.bufcount);
-	b->id = G.bufcount;
+	return G.ids++;
+}
+
+
+/** Returns index of a free buffer */
+static
+struct buffer*  _get_free_buffer()
+{
+	for(unsigned int i = 0; i < G.bufcap; ++i) {
+		if(G.buffers[i].id == -1) {
+			log_l(G.tag, "%s: found free buffer at: %d", __func__, i);
+			return &G.buffers[i];
+		}
+	}
+	log_e(G.tag, "%s: OUT OF BUFFERS!", __func__);
+	exit(1);
+}
+
+
+
+void buf_destroy(hBuffer buf)
+{
+	SB(b, buf);
+	unsigned int id = b->id;
+	b->id = -1;
+	for(unsigned int i = 0; i < b->linecount; ++i) {
+		line_destroy(b->lines[i]);
+	}
+	free(b->lines);
+	log_l(G.tag, "Buffer %d destroyed", id);
+}
+
+
+
+hBuffer buf_create(enum buffer_type type, unsigned int linecount)
+{
+	assert(linecount);
+
+	struct buffer* b = _get_free_buffer();
+	assert(b->id == -1);
+
+	b->id = _generate_id();
 	b->flags = 0;
-	b->type = type;
-	b->linecount = BUFFER_DEFLINECOUNT;
+	b->type = type; // TODO type specific setup
+	b->linecount = linecount;
 
 	b->lines = malloc(sizeof(hLine) * b->linecount);
 	for(unsigned int i = 0; i < b->linecount; ++i) {
 		b->lines[i] = line_create();
 	}
+
 	log_l(G.tag, "buffer created");
 	buf_pprint(b->id);
 
-	G.bufcount++;
 	return b->id;
 }
 
-void buf_destroy(hBuffer buf)
-{
-	SB(b, buf);
-	b->id = -1;
-	// TODO free lines
-	return 0;
-}
 
 
 void buf_pprint(hBuffer buf)
