@@ -61,7 +61,7 @@ void inp_poll()
 }
 
 
-int inp_sethandler(hWindow win, void (*handler) (inpev))
+int inp_set_handler(hWindow win, void (*handler) (inpev))
 {
 	log_l(G.tag, "Setting input handler: win=%d->%d, handler=%p->%p", G.win, win, G.handler, handler);
 	G.handler = handler;

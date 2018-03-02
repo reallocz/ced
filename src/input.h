@@ -38,7 +38,7 @@ void inp_poll();
 inpev inp_winpoll(hWindow win);
 
 /** Set an input handler function */
-int inp_sethandler(hWindow win, void (*handler) (inpev));
+int inp_set_handler(hWindow win, void (*handler) (inpev));
 void inp_unsethandler();
 
 
