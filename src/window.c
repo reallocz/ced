@@ -72,7 +72,10 @@ hWindow win_create(int y, int x, int rows, int cols)
         w->nwin = NULL;
         w->nwin = newwin(rows, cols, y, x);
         assert(w->nwin);
-	getmaxyx(w->nwin, w->rows, w->cols);
+	int width, height;
+	getmaxyx(w->nwin, width, height);
+	w->rows = width - 1;	// rows are 0 indexed
+	w->cols = height - 1;	// cols are 0 indexed
 	w->y = y;
 	w->x = x;
         w->cury = 0;
