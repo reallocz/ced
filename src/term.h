@@ -7,7 +7,7 @@
 /** Initialize terminal and its properties */
 int term_init();
 
-int term_quit();
+void term_exit();
 
 /** query terminal props */
 int term_rows();
