@@ -87,7 +87,7 @@ struct line* _get_free_line()
 {
 	for(unsigned int i = 0; i < G.linecap; ++i) {
 		if(G.lines[i].id == -1) {
-			log_l(G.tag, "%s: found free line at: %d", __func__, i);
+			/*log_l(G.tag, "%s: found free line at: %d", __func__, i);*/
 			return &G.lines[i];
 		}
 	}

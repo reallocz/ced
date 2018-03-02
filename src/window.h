@@ -27,7 +27,10 @@ void win_destory(hWindow win);
 
 
 /** Set's window buffer. Replaces the old buffer */
-int win_setbuffer(hWindow win, hBuffer buf);
+int win_set_buffer(hWindow win, hBuffer buf);
+
+/** returns the set window buffer. -1 if no buffer is set */
+hBuffer win_get_buffer(hWindow win);
 
 /** Get a handle to ncurses WINDOW* */
 WINDOW* win_getnwin(hWindow win);
@@ -38,9 +41,6 @@ void win_getsize(hWindow win, int* rows, int* cols);
 void win_get_cursor(hWindow win, int* y, int* x);
 /** Move window cursor */
 void win_set_cursor(hWindow win, int y, int x);
-
-/** returns the set window buffer. -1 if no buffer is set */
-hBuffer win_getbuffer(hWindow win);
 
 void win_pprint(hWindow win);
 

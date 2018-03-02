@@ -91,7 +91,7 @@ void win_destory(hWindow win)
 }
 
 
-int win_setbuffer(hWindow win, hBuffer buf)
+int win_set_buffer(hWindow win, hBuffer buf)
 {
 	SW(w, win);
 	log_l(G.tag, "%s: hWindow=%d, buf=%d->%d", __func__,
@@ -99,6 +99,13 @@ int win_setbuffer(hWindow win, hBuffer buf)
 	w->buf = buf;
 	return 0;
 }
+
+hBuffer win_get_buffer(hWindow win)
+{
+	SW(w, win);
+	return w->buf;
+}
+
 
 
 // Accessors
@@ -132,13 +139,6 @@ void win_set_cursor(hWindow win, int y, int x)
 	SW(w, win);
 	wmove(w->nwin, y, x);
 }
-
-hBuffer win_getbuffer(hWindow win)
-{
-	SW(w, win);
-	return w->buf;
-}
-
 
 void win_pprint(hWindow win)
 {
