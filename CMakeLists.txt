@@ -19,6 +19,7 @@ add_executable(debug
         ${SRCDIR}/line.c
         ${SRCDIR}/buffer.c
         ${SRCDIR}/menu.c
+	${SRCDIR}/term.c
 )
 
 target_link_libraries(debug ncurses)
