@@ -13,6 +13,7 @@ int inp_init()
 	G.tag = "INPUT";
 	G.handler = NULL;
 	G.win = -1;
+	log_l(G.tag, "Init success");
 	return 0;
 }
 

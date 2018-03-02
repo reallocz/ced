@@ -50,6 +50,7 @@ int menu_init()
 	G.flags = 0;
 	G.menucount = 0;
 	G.menucap = MENU_MENUCAP;
+	log_l(G.tag, "Init success");
 	return 0;
 }
 

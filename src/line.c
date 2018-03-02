@@ -35,6 +35,7 @@ int line_init()
 	G.linecap = LN_DEFCAP;
 	G.lines = malloc(G.linecap * sizeof(struct line));
 	assert(G.lines);
+	log_l(G.tag, "Init success");
 	return 0;
 }
 
