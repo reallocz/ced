@@ -15,6 +15,8 @@ static struct {
 	const char* tag;
 	enum ced_mode mode;
 	int quit; // Return to main if 1
+
+	hWindow focussed_window;
 } G;
 
 // Draw bottom status line
@@ -22,18 +24,17 @@ void drawstatus(hWindow win)
 {
 	WINDOW* w = win_getnwin(win);
 	int x, y, rows, cols;
-	win_getcur(win, &y, &x);
+	win_get_cursor(win, &y, &x);
 	win_getsize(win, &rows, &cols);
-	wmove(w, rows - 2, 0);
+	win_set_cursor(win, rows - 1, 0);
 	whline(w, ACS_HLINE, cols);
 	if(G.mode == MODE_NORMAL) {
-		mvwaddstr(w, rows -1 , 0, "MODE: NORMAL");
+		mvwaddstr(w, rows, 0, "MODE: NORMAL");
 	} else {
-		mvwaddstr(w, rows -1 , 0, "MODE: INSERT");
+		mvwaddstr(w, rows, 0, "MODE: INSERT");
 	}
-	wrefresh(w);
 	// Go back to original positions
-	wmove(w, y, x);
+	win_set_cursor(win, y, x);
 	return;
 }
 
@@ -43,19 +44,22 @@ void ced_run()
 	// Initialize globals
 	G.tag = "CED";
 	G.quit = 0;
+	G.focussed_window = -1;
 
 	// Create window and set buffer
 	hWindow window = win_create(0, 0, 0, 0);
-	hBuffer buffer = buf_create(SCRATCH, 4);
+	hBuffer buffer = buf_create(SCRATCH, term_rows());
+	buf_pprint(buffer);
 	win_setbuffer(window, buffer);
+	ced_set_window_focus(window);
 
 	// Start in normal mode
 	ced_set_mode(window, MODE_NORMAL);
 
 	// Main loop
 	while(!G.quit) {
-		inp_poll();
 		drawstatus(window);
+		inp_poll();
 		wrefresh(win_getnwin(window));
 	}
 }
@@ -88,6 +92,14 @@ void ced_set_mode(hWindow win, enum ced_mode mode)
 }
 
 
+void ced_set_window_focus(hWindow win)
+{
+	log_l(G.tag, "Window focus set %d -> %d",
+			G.focussed_window, win);
+	G.focussed_window = win;
+}
+
+
 void ced_insert_input_handler(inpev ev)
 {
 	static int x= 0, y = 0;
@@ -96,11 +108,11 @@ void ced_insert_input_handler(inpev ev)
 	if(ev.type == INSERT) {
 		mvwaddch(nwin, y, x++, ev.data.ch);
 	} else if (ev.type == DELETE) {
-		wmove(nwin, 0, --x);
+		win_set_cursor(ev.win, 0, --x);
 		wdelch(nwin);
 	} else if (ev.type == MOVE) {
 		x = 0;
-		wmove(nwin, ++y, x);
+		win_set_cursor(ev.win, ++y, x);
 	} else if (ev.key == k_esc) {
 		ced_set_mode(ev.win, MODE_NORMAL);
 	}

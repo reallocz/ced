@@ -23,6 +23,8 @@ void ced_run();
 
 /** Set the editor mode */
 void ced_set_mode(hWindow win, enum ced_mode mode);
+/** Set window focus */
+void ced_set_window_focus(hWindow win);
 
 // Input handlers
 /** Input handler for MODE_INSERT */
