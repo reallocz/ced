@@ -39,6 +39,22 @@ void drawstatus(hWindow win)
 }
 
 
+void drawnumbers(hWindow win)
+{
+	WINDOW* w = win_getnwin(win);
+	hBuffer buf = win_get_buffer(win);
+	unsigned int lcount = buf_get_linecount(buf);
+	int curx, cury;
+	win_get_cursor(win, &cury, &curx);
+	char lnstr[3];
+	for(unsigned int i = 0; i < lcount; ++i) {
+		win_set_cursor(win, i, 0);
+		sprintf(lnstr, "%d", i);
+		waddstr(w, lnstr);
+	}
+	win_set_cursor(win, cury, curx);
+}
+
 void ced_run()
 {
 	// Initialize globals
@@ -50,7 +66,7 @@ void ced_run()
 	hWindow window = win_create(0, 0, 0, 0);
 	hBuffer buffer = buf_create(SCRATCH, term_rows());
 	buf_pprint(buffer);
-	win_setbuffer(window, buffer);
+	win_set_buffer(window, buffer);
 	ced_set_window_focus(window);
 
 	// Start in normal mode
@@ -59,6 +75,7 @@ void ced_run()
 	// Main loop
 	while(!G.quit) {
 		drawstatus(window);
+		drawnumbers(window);
 		inp_poll();
 		wrefresh(win_getnwin(window));
 	}
