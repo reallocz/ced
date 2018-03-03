@@ -10,7 +10,8 @@
  */
 
 
-typedef int hBuffer;
+/** Buffer handle: 0 for an invalid buffer */
+typedef unsigned int hBuffer;
 
 enum buffer_type {
 	DEFAULT,	// Empty buffer
