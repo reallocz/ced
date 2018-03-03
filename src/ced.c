@@ -70,7 +70,7 @@ void ced_run()
 	ced_set_window_focus(window);
 
 	// Start in normal mode
-	ced_set_mode(window, MODE_NORMAL);
+	ced_set_mode(MODE_NORMAL);
 
 	// Main loop
 	while(!G.quit) {
@@ -82,22 +82,22 @@ void ced_run()
 }
 
 
-void ced_set_mode(hWindow win, enum ced_mode mode)
+void ced_set_mode(enum ced_mode mode)
 {
 	G.mode = mode;
 	const char* modename;
 
 	switch(G.mode) {
 	case MODE_NORMAL:
-		inp_set_handler(win, ced_normal_input_handler);
+		inp_set_handler(G.focussed_window, ced_normal_input_handler);
 		modename = "MODE_NORMAL";
 		break;
 	case MODE_INSERT:
-		inp_set_handler(win, ced_insert_input_handler);
+		inp_set_handler(G.focussed_window, ced_insert_input_handler);
 		modename = "MODE_INSERT";
 		break;
 	case MODE_META:
-		inp_set_handler(win, ced_meta_input_handler);
+		inp_set_handler(G.focussed_window, ced_meta_input_handler);
 		modename = "MODE_META";
 		break;
 	default:
@@ -131,7 +131,7 @@ void ced_insert_input_handler(inpev ev)
 		x = 0;
 		win_set_cursor(ev.win, ++y, x);
 	} else if (ev.key == k_esc) {
-		ced_set_mode(ev.win, MODE_NORMAL);
+		ced_set_mode(MODE_NORMAL);
 	}
 }
 
@@ -140,7 +140,7 @@ void ced_normal_input_handler(inpev ev)
 {
 	if(ev.key == 'i') {
 		// Switch to insert mode
-		ced_set_mode(ev.win, MODE_INSERT);
+		ced_set_mode(MODE_INSERT);
 		return;
 	} else if (ev.key == k_f1) {
 		G.quit = 1;

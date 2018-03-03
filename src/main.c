@@ -12,30 +12,6 @@
 #include "term.h"
 #include "ced.h"
 
-static struct {
-	const char* tag;
-} G;
-
-
-/** Initialize submodules */
-void init_submodules()
-{
-	G.tag = "MAIN";
-
-	// Logs init first
-	log_init();
-	log_l(G.tag, "\n--------INIT BEGIN-------");
-	/// submodules
-	term_init();
-	buf_init();
-	inp_init();
-	line_init();
-	menu_init();
-	win_init();
-	log_l(G.tag, "\n---------INIT END--------\n");
-}
-
-
 /** Cleanup submodules */
 void onexit()
 {
@@ -53,16 +29,20 @@ void onexit()
 int main()
 {
 	atexit(onexit);
-	init_submodules();
+
+	// init submodules
+	// Logs init first
+	log_init();
+	log_l("MAIN", "\n--------INIT BEGIN-------");
+	term_init();
+	buf_init();
+	inp_init();
+	line_init();
+	menu_init();
+	win_init();
+	log_l("MAIN", "\n---------INIT END--------\n");
+
+	// Run program
 	ced_run();
 }
 
-
-void printmenu(hWindow win)
-{
-	menu_init();
-	hMenu mu = menu_create(QUICK);
-	menu_addopt(mu, 1, "Hello");
-	menu_addopt(mu, 2, "World!");
-	int res = menu_prompt(mu, win);
-}

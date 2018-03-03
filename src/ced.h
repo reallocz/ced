@@ -21,8 +21,8 @@ enum ced_mode {
  */
 void ced_run();
 
-/** Set the editor mode */
-void ced_set_mode(hWindow win, enum ced_mode mode);
+/** Set the editor mode for the focussed window */
+void ced_set_mode(enum ced_mode mode);
 /** Set window focus */
 void ced_set_window_focus(hWindow win);
 
