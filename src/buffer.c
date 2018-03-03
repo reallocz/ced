@@ -3,11 +3,10 @@
 #include <stdlib.h>
 #include <assert.h>
 #include "log.h"
+#include "defaults.h"
 
 // A maximum of 4 buffers allowed
 #define BUFFER_DEFCAP 4
-// Default/invalid buffer id
-#define BUFFER_DEFID 0
 
 /** Bring struct buffer* alias of id x into scope */
 #define SB(alias, hBuffer) \

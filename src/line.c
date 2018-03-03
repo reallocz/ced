@@ -4,6 +4,7 @@
 #include <string.h>
 #include <assert.h>
 #include "log.h"
+#include "defaults.h"
 
 #define LN_DEFSIZE 8
 #define LN_DEFGAP 4
@@ -14,12 +15,12 @@
 	struct line* alias = _get_line(hLine)
 
 struct line {
-	int id; // -1 = free line
-        unsigned int num;// Line number
-        char* buf;// buffer
-        unsigned int size;// line size
-        unsigned int cur;// Cursor
-        unsigned int gap;// Gap buf len
+	unsigned int id;
+        unsigned int num;	// Line number
+        char* buf;		// buffer
+        unsigned int size;	// line size
+        unsigned int cur;	// Cursor
+        unsigned int gap;	// Gap size
 };
 
 
@@ -42,7 +43,7 @@ int line_init()
 	assert(G.lines);
 
 	for(unsigned int i = 0; i < G.linecap; ++i) {
-		G.lines[i].id = -1;
+		G.lines[i].id = LINE_DEFID;
 	}
 
 	log_l(G.tag, "Init success");
@@ -78,7 +79,7 @@ static struct line* _get_line(hLine line)
 static
 unsigned int _generate_id()
 {
-	return G.ids++;
+	return ++G.ids;
 }
 
 
@@ -86,7 +87,7 @@ static
 struct line* _get_free_line()
 {
 	for(unsigned int i = 0; i < G.linecap; ++i) {
-		if(G.lines[i].id == -1) {
+		if(G.lines[i].id == LINE_DEFID) {
 			/*log_l(G.tag, "%s: found free line at: %d", __func__, i);*/
 			return &G.lines[i];
 		}
@@ -118,7 +119,7 @@ hLine line_create(void)
 void line_destroy(hLine line)
 {
 	SL(ln, line);
-	ln->id = -1;
+	ln->id = LINE_DEFID;
 	free(ln->buf);
 }
 

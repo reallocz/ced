@@ -5,11 +5,10 @@
 #include <assert.h>
 #include "log.h"
 #include <stdlib.h>
+#include "defaults.h"
 
 // A maximum of 4 windows allowed
 #define WINDOW_DEFCAP 4
-// Default/invalid window id
-#define WINDOW_DEFID 0
 
 /** Bring struct window* alias of id x into scope */
 #define SW(alias, hWindow) \
