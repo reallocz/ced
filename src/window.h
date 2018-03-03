@@ -14,7 +14,8 @@
  */
 
 
-typedef int hWindow;
+/** Window handle: 0 for an invalid window */
+typedef unsigned int hWindow;
 
 
 /** initialize ncurses and the window submodule.*/
