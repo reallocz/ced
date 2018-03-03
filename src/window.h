@@ -24,7 +24,7 @@ void win_exit();
 
 /** Create a window at (x, y) of size (cols, rows) */
 hWindow win_create(int y, int x, int rows, int cols);
-void win_destory(hWindow win);
+void win_destroy(hWindow win);
 
 
 /** Set's window buffer. Replaces the old buffer */

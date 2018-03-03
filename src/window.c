@@ -118,9 +118,12 @@ hWindow win_create(int y, int x, int rows, int cols)
 }
 
 
-void win_destory(hWindow win)
+void win_destroy(hWindow win)
 {
-	// TODO
+	SW(w, win);
+	w->id = WINDOW_DEFID;
+	delwin(w->nwin);
+	log_l(G.tag, "Window destroyed: %d", win);
 }
 
 
