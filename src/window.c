@@ -9,6 +9,7 @@
 
 // A maximum of 4 windows allowed
 #define WINDOW_DEFCAP 4
+#define WINDOW_STATUSHEIGHT 2
 
 /** Bring struct window* alias of id x into scope */
 #define SW(alias, hWindow) \
@@ -20,13 +21,11 @@ struct window {
 
 	// Curses
         WINDOW* nwin;
-	// top left corner coords
-	int y, x;
-        int rows;
-        int cols;
 
-	// Buffers
+	// Buffer
 	hBuffer buffer;	// 0 if no buffer set
+
+	struct win_props props;
 };
 
 
@@ -64,6 +63,7 @@ unsigned int _generate_id()
 	return ++G.ids;
 }
 
+
 static
 struct window* _get_window(hWindow win)
 {
@@ -98,20 +98,16 @@ struct window* _get_free_window()
 hWindow win_create(int y, int x, int rows, int cols)
 {
 	struct window* w = _get_free_window();
+
 	w->id = _generate_id();
 	w->flags = 0;
-
         w->nwin = NULL;
         w->nwin = newwin(rows, cols, y, x);
         assert(w->nwin);
-	int width, height;
-	getmaxyx(w->nwin, width, height);
-	w->rows = width - 1;	// rows are 0 indexed
-	w->cols = height - 1;	// cols are 0 indexed
-	w->y = y;
-	w->x = x;
 
-	w->buffer = 0;
+	win_update(w->id);
+
+	w->buffer = BUFFER_DEFID;
 
         keypad(w->nwin, TRUE);
         return w->id;
@@ -127,14 +123,78 @@ void win_destroy(hWindow win)
 }
 
 
+
+void win_update(hWindow win)
+{
+	SW(w, win);
+
+	struct win_props props;
+
+	// Dimensions
+	{
+		getyx(w->nwin, props.wy, props.wx);
+
+		int width, height;
+		getmaxyx(w->nwin, width, height);
+		// 0 indexed
+		props.wrows = width;
+		props.wcols = height;
+	}
+
+	// statusline
+	{
+		props.sy = props.wrows - 1 - WINDOW_STATUSHEIGHT;
+		props.sx = 0;
+		props.swidth = props.wcols;
+		props.sheight = WINDOW_STATUSHEIGHT;
+	}
+
+	// margin
+	{
+		props.my = 0;
+		props.mx = 0;
+
+		unsigned int lcount = 100;
+		if(w->buffer != BUFFER_DEFID) {
+			lcount = buf_get_linecount(w->buffer);
+		}
+		props.mwidth = lcount > 999 ? 4 : 3;
+		props.mheight = props.wrows - 1 - WINDOW_STATUSHEIGHT;
+	}
+
+	// textarea
+	{
+		props.ty = 0;
+		props.tx = props.mwidth;
+		props.twidth = props.wcols - props.mwidth;
+		props.theight = props.mheight;
+	}
+
+	w->props = props;
+
+	// TODO Set window title based on the buffer
+
+}
+
+
+
+WINDOW* win_nwin(hWindow win)
+{
+	SW(w, win);
+        return w->nwin;
+}
+
+
 int win_set_buffer(hWindow win, hBuffer buf)
 {
 	SW(w, win);
 	log_l(G.tag, "(win:%d) buffer set: %d -> %d", win,
 			w->buffer, buf);
 	w->buffer = buf;
+	win_update(win);
 	return 0;
 }
+
 
 hBuffer win_get_buffer(hWindow win)
 {
@@ -143,21 +203,17 @@ hBuffer win_get_buffer(hWindow win)
 }
 
 
-
-// Accessors
-
-WINDOW* win_getnwin(hWindow win)
+struct win_props win_get_props(hWindow win)
 {
 	SW(w, win);
-        return w->nwin;
+	return w->props;
 }
 
 
-void win_getsize(hWindow win, int* rows, int* cols)
+void win_set_cursor(hWindow win, int y, int x)
 {
 	SW(w, win);
-	*rows = w->rows;
-	*cols = w->cols;
+	wmove(w->nwin, y, x);
 }
 
 
@@ -170,14 +226,17 @@ void win_get_cursor(hWindow win, int* y, int* x)
 	*x = mx;
 }
 
-void win_set_cursor(hWindow win, int y, int x)
-{
-	SW(w, win);
-	wmove(w->nwin, y, x);
-}
 
 void win_pprint(hWindow win)
 {
 	SW(w, win);
-	log_l(G.tag, "Window {id=%d, y=%d, x=%d, rows=%d, cols=%d}", w->id, w->y, w->x, w->rows, w->cols);
+	log_l(G.tag, "Window {");
+	log_lc("id: %d, wy: %d, wx: %d, wrows: %d, wcols: %d\n",
+			w->id, w->props.wy, w->props.wx, w->props.wrows, w->props.wcols);
+	log_lc("sy: %d, sx: %d, swidth: %d, sheight: %d\n",
+			w->props.sy, w->props.sx, w->props.swidth, w->props.sheight);
+	log_lc("my: %d, mx: %d, mwidth: %d, mheight: %d\n",
+			w->props.my, w->props.mx, w->props.mwidth, w->props.mheight);
+	log_lc("ty: %d, tx: %d, twidth: %d, theight: %d\n}\n",
+			w->props.ty, w->props.tx, w->props.twidth, w->props.theight);
 }

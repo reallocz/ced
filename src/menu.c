@@ -98,7 +98,7 @@ int menu_addopt(hMenu menu, int id, const char* optstring)
 int menu_prompt(hMenu menu, hWindow win)
 {
 	struct menu * mu = _get_menu(menu);
-	WINDOW* w = win_getnwin(win);
+	WINDOW* w = win_nwin(win);
 	wclear(w);
 
 	waddstr(w, "MENU: Please choose an option");

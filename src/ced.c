@@ -9,6 +9,7 @@
 #include "line.h"
 #include "term.h"
 #include "input_keys.h"
+#include "defaults.h"
 
 
 static struct {
@@ -19,48 +20,14 @@ static struct {
 	hWindow focussed_window;
 } G;
 
-// Draw bottom status line
-void drawstatus(hWindow win)
-{
-	WINDOW* w = win_getnwin(win);
-	int x, y, rows, cols;
-	win_get_cursor(win, &y, &x);
-	win_getsize(win, &rows, &cols);
-	win_set_cursor(win, rows - 1, 0);
-	whline(w, ACS_HLINE, cols);
-	if(G.mode == MODE_NORMAL) {
-		mvwaddstr(w, rows, 0, "MODE: NORMAL");
-	} else {
-		mvwaddstr(w, rows, 0, "MODE: INSERT");
-	}
-	// Go back to original positions
-	win_set_cursor(win, y, x);
-	return;
-}
 
-
-void drawnumbers(hWindow win)
-{
-	WINDOW* w = win_getnwin(win);
-	hBuffer buf = win_get_buffer(win);
-	unsigned int lcount = buf_get_linecount(buf);
-	int curx, cury;
-	win_get_cursor(win, &cury, &curx);
-	char lnstr[3];
-	for(unsigned int i = 0; i < lcount; ++i) {
-		win_set_cursor(win, i, 0);
-		sprintf(lnstr, "%d", i);
-		waddstr(w, lnstr);
-	}
-	win_set_cursor(win, cury, curx);
-}
 
 void ced_run()
 {
 	// Initialize globals
 	G.tag = "CED";
 	G.quit = 0;
-	G.focussed_window = -1;
+	G.focussed_window = WINDOW_DEFID;
 
 	// Create window and set buffer
 	hWindow window = win_create(0, 0, 0, 0);
@@ -69,15 +36,18 @@ void ced_run()
 	win_set_buffer(window, buffer);
 	ced_set_window_focus(window);
 
+	struct win_props props = win_get_props(window);
 	// Start in normal mode
 	ced_set_mode(MODE_NORMAL);
+	// Set cursor to text area
+	win_set_cursor(window, 0, props.mwidth);
 
 	// Main loop
 	while(!G.quit) {
-		drawstatus(window);
-		drawnumbers(window);
+		ced_draw_statusline(G.focussed_window, G.mode);
+		ced_draw_numberline(G.focussed_window, G.mode);
 		inp_poll();
-		wrefresh(win_getnwin(window));
+		wrefresh(win_nwin(window));
 	}
 }
 
@@ -119,13 +89,13 @@ void ced_set_window_focus(hWindow win)
 
 void ced_insert_input_handler(inpev ev)
 {
-	static int x= 0, y = 0;
-	WINDOW* nwin = win_getnwin(ev.win);
-
+	static int x = 0, y = 0;
+	WINDOW* nwin = win_nwin(ev.win);
+	struct win_props props = win_get_props(ev.win);
 	if(ev.type == INSERT) {
-		mvwaddch(nwin, y, x++, ev.data.ch);
+		mvwaddch(nwin, y, props.mwidth + x++, ev.data.ch);
 	} else if (ev.type == DELETE) {
-		win_set_cursor(ev.win, 0, --x);
+		win_set_cursor(ev.win, 0, props.mwidth + --x);
 		wdelch(nwin);
 	} else if (ev.type == MOVE) {
 		x = 0;
@@ -150,4 +120,52 @@ void ced_normal_input_handler(inpev ev)
 
 void ced_meta_input_handler(inpev ev)
 {
+}
+
+
+void ced_draw_statusline(hWindow win, enum ced_mode mode)
+{
+	WINDOW* w = win_nwin(win);
+	// Save cursor position
+	int curx, cury;
+	win_get_cursor(win, &cury, &curx);
+
+	struct win_props props = win_get_props(win);
+	win_set_cursor(win, props.sy, props.sx);
+	whline(w, ACS_HLINE, props.swidth);
+	if(G.mode == MODE_NORMAL) {
+		mvwaddstr(w, props.sy + 1, 0, "MODE: NORMAL");
+	} else {
+		mvwaddstr(w, props.sy + 1, 0, "MODE: INSERT");
+	}
+	// Go back to original positions
+	win_set_cursor(win, cury, curx);
+	return;
+}
+
+
+void ced_draw_numberline(hWindow win, enum ced_mode mode)
+{
+	WINDOW* w = win_nwin(win);
+
+	struct win_props props = win_get_props(win);
+
+	int curx, cury;
+	win_get_cursor(win, &cury, &curx);
+
+	wattron(w, A_BOLD);
+	char lnstr[props.mwidth]; // line number to string
+	for(unsigned int i = 0; i < props.mheight; ++i) {
+		win_set_cursor(win, i, 0);
+		if(i < 10) {
+			sprintf(lnstr, " %d", i);
+		} else if(i < 100) {
+			sprintf(lnstr, "%d", i);
+		} else {
+			sprintf(lnstr, "%d", i);
+		}
+		waddstr(w, lnstr);
+	}
+	wattroff(w, A_BOLD);
+	win_set_cursor(win, cury, curx);
 }

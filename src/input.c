@@ -29,7 +29,7 @@ inpev inp_winpoll(hWindow win)
 {
         inpev ev;
 	ev.win = win;
-        int ch = wgetch(win_getnwin(win));
+        int ch = wgetch(win_nwin(win));
 	ev.key = ch;
         if((ch >= 33 && ch <= 126) || ch == k_space) {
                 ev.type = INSERT;
