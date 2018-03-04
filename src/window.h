@@ -70,28 +70,29 @@ void win_exit();
 
 /** Create a window at (x, y) of size (cols, rows) */
 hWindow win_create(int y, int x, int rows, int cols);
+/** destroys the window without touching
+ * the attached buffer */
 void win_destroy(hWindow win);
 
-/** Updates window properties based on the current state */
+/** updates window properties */
 void win_update(hWindow win);
 
-
-/** win_nwin return's the handle to ncurses WINDOW* */
+/** return's the handle to ncurses WINDOW* */
 WINDOW* win_nwin(hWindow win);
 
-/** Set's window buffer. Replaces the old buffer */
+/** sets/replaces the window buffer */
 int win_set_buffer(hWindow win, hBuffer buf);
-/** win_get_buffer returns the hBuffer set on the window or
- * BUFFER_DEFID if a buffer isn't set
- */
+/** returns the buffer set on the window
+ * or BUFFER_DEFID if a buffer isn't set */
 hBuffer win_get_buffer(hWindow win);
 
-/** win_set_cursor moves window cursor to (x,y)*/
+/** moves window cursor to (x,y)*/
 void win_set_cursor(hWindow win, int y, int x);
-/** win_get_cursor query cursor positions */
+/** query cursor positions */
 void win_get_cursor(hWindow win, int* y, int* x);
-
+/** returns the window properties struct*/
 struct win_props win_get_props(hWindow win);
+
 
 void win_pprint(hWindow win);
 
