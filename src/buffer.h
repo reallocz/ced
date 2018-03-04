@@ -1,6 +1,7 @@
 #pragma once
 #include "line.h"
 
+#define INVALID_BUFFER -1
 
 /** buffer.h
  * A buffer consists of a type describing the buffer
@@ -10,8 +11,11 @@
  */
 
 
-/** Buffer handle: 0 for an invalid buffer */
-typedef unsigned int hBuffer;
+/**
+ * Buffer handle
+ * Implemented in similar fashion as hWindow (window.h)
+ */
+typedef int hBuffer;
 
 enum buffer_type {
 	DEFAULT,	// Empty buffer

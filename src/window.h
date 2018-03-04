@@ -2,6 +2,7 @@
 #include <ncurses.h>
 #include "buffer.h"
 
+#define INVALID_WINDOW -1
 
 /** window.h
  * A window is a rectangular division of the terminal.
@@ -49,8 +50,17 @@
  */
 
 
-/** Window handle: 0 for an invalid window */
-typedef unsigned int hWindow;
+/**
+ * Window handle
+ * This handle is used for accessing all the window related
+ * functions. A handle < 0 represents an invalid window.
+ * Internally, the window submodule maintains a pool of
+ * window structs that can be reused. This pool is
+ * implemented as an array. The handle is a valid index
+ * to a window struct in that array. An invalid handle
+ * is represented by INVAID_WINDOW
+ */
+typedef int hWindow;
 
 struct win_props {
 	// Dimensions
@@ -70,8 +80,7 @@ void win_exit();
 
 /** Create a window at (x, y) of size (cols, rows) */
 hWindow win_create(int y, int x, int rows, int cols);
-/** destroys the window without touching
- * the attached buffer */
+/** destroys the window. doesn't alter attached buffer*/
 void win_destroy(hWindow win);
 
 /** updates window properties */

@@ -1,6 +1,5 @@
 #include "input.h"
 #include "log.h"
-#include "defaults.h"
 
 static struct {
 	const char* tag;
@@ -13,7 +12,7 @@ int inp_init()
 {
 	G.tag = "INPUT";
 	G.handler = NULL;
-	G.win = WINDOW_DEFID;
+	G.win = INVALID_WINDOW;
 	log_l(G.tag, "Init success");
 	return 0;
 }
@@ -53,7 +52,7 @@ inpev inp_winpoll(hWindow win)
 
 void inp_poll()
 {
-	if(G.handler == NULL || G.win == WINDOW_DEFID) {
+	if(G.handler == NULL || G.win == INVALID_WINDOW) {
 		log_e(G.tag, "%s: No handler(%d)/window(%d) set!", G.handler, G.win);
 		return;
 	}
@@ -75,5 +74,5 @@ void inp_unsethandler()
 {
 	log_l(G.tag, "Unsetting input handler: win=%d, handler=%p", G.win, G.handler);
 	G.handler = NULL;
-	G.win = WINDOW_DEFID;
+	G.win = INVALID_WINDOW;
 }

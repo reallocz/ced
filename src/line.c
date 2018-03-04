@@ -4,7 +4,6 @@
 #include <string.h>
 #include <assert.h>
 #include "log.h"
-#include "defaults.h"
 
 #define LN_DEFSIZE 8
 #define LN_DEFGAP 4
@@ -15,7 +14,11 @@
 	struct line* alias = _get_line(hLine)
 
 struct line {
+	/*unique identifier of each line for debugging*/
 	unsigned int id;
+	/* 1 if line is in use (not destroyed)*/
+	int in_use;
+
         unsigned int num;	// Line number
         char* buf;		// buffer
         unsigned int size;	// line size
@@ -25,8 +28,6 @@ struct line {
 
 
 static struct {
-	int flags;
-	unsigned int ids; // Generate id's by incrementing
 	const char* tag;
 	unsigned int linecap;
 	struct line* lines;
@@ -36,14 +37,13 @@ static struct {
 int line_init()
 {
 	G.tag = "LINE";
-	G.flags = 0;
 	G.linecap = LN_DEFCAP;
-	G.ids = 0;
+
 	G.lines = malloc(G.linecap * sizeof(struct line));
 	assert(G.lines);
 
 	for(unsigned int i = 0; i < G.linecap; ++i) {
-		G.lines[i].id = LINE_DEFID;
+		G.lines[i].in_use = 0;
 	}
 
 	log_l(G.tag, "Init success");
@@ -60,48 +60,50 @@ int line_exit()
 	return 0;
 }
 
-
-/** Return the pointer to the line */
-static struct line* _get_line(hLine line)
-{
-	for(unsigned int i = 0; i < G.linecap; ++i) {
-		if(G.lines[i].id == line) {
-			return &G.lines[i];
-		}
-	}
-	log_e(G.tag, "%s: line not found: %d", __func__,
-			line);
-	exit(1);
-}
-
-
-/** Generate a new id for line */
+/** return a new id for a line */
 static
 unsigned int _generate_id()
 {
-	return ++G.ids;
+	static unsigned int ids = 0;
+	return ids++;
 }
 
 
+/** Return the pointer to the line in use*/
 static
-struct line* _get_free_line()
+struct line* _get_line(hLine line)
+{
+	if(line < 0 || line >= G.linecap) {
+		log_fatal(G.tag, "Invalid handle: %d", line);
+	}
+	struct line* ln = &G.lines[line];
+	if(!ln->in_use) {
+		log_fatal(G.tag, "Bad handle: %d", line);
+	}
+	return ln;
+}
+
+
+
+/** return a handle to a free line (in_use == 0)*/
+static
+hLine _get_free_handle()
 {
 	for(unsigned int i = 0; i < G.linecap; ++i) {
-		if(G.lines[i].id == LINE_DEFID) {
-			/*log_l(G.tag, "%s: found free line at: %d", __func__, i);*/
-			return &G.lines[i];
+		if(! G.lines[i].in_use) {
+			return i;
 		}
 	}
-	log_e(G.tag, "%s: OUT OF LINES!", __func__);
-	exit(1);
+	log_fatal(G.tag, "%s: OUT OF LINES!", __func__);
 }
 
 
 hLine line_create(void)
 {
-        struct line* ln = _get_free_line();
-
+	hLine line = _get_free_handle();
+        struct line* ln = &G.lines[line];
 	ln->id = _generate_id();
+	ln->in_use = 1;
         ln->num = 0;
         ln->buf = NULL;
         ln->size = LN_DEFSIZE;
@@ -112,14 +114,14 @@ hLine line_create(void)
         ln->buf = calloc(ln->size, sizeof(ln->buf[0]));
         assert(ln->buf);
 
-        return ln->id;
+        return line;
 }
 
 
 void line_destroy(hLine line)
 {
 	SL(ln, line);
-	ln->id = LINE_DEFID;
+	ln->in_use = 0;
 	free(ln->buf);
 }
 

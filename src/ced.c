@@ -9,7 +9,6 @@
 #include "line.h"
 #include "term.h"
 #include "input_keys.h"
-#include "defaults.h"
 
 
 static struct {
@@ -27,7 +26,7 @@ void ced_run()
 	// Initialize globals
 	G.tag = "CED";
 	G.quit = 0;
-	G.focussed_window = WINDOW_DEFID;
+	G.focussed_window = INVALID_WINDOW;
 
 	// Create window and set buffer
 	hWindow window = win_create(0, 0, 0, 0);

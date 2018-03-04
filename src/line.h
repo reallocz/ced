@@ -1,8 +1,11 @@
 #pragma once
 
 
-/** Handle to line */
-typedef unsigned int hLine;
+/**
+ * Line handle
+ * Implemented in similar fashion as hWindow (window.h)
+ */
+typedef int hLine;
 
 int line_init();
 int line_exit();
