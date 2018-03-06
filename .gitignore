@@ -5,3 +5,7 @@ build/
 .ycm_*
 Doxyfile
 tmp/
+GPATH
+GRTAGS
+GTAGS
+**/#*
