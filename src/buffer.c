@@ -126,7 +126,7 @@ void buf_add_gap(hBuffer buf)
     unsigned int newgap = b->gap + BUFFER_DEFGAP;
     char* newbuf = calloc(newsize, sizeof(b->data[0]));
     assert(newbuf);
-    log_l(G.tag, "Gap added: %d -> %d", b->size, newsize);
+    /*log_l(G.tag, "Gap added: %d -> %d", b->size, newsize);*/
 
     /* Copy memory to new buffer */
     // from start to cursor
@@ -204,6 +204,44 @@ unsigned int buf_get_cursor(hBuffer buf)
 }
 
 
+unsigned int buf_get_linecount(hBuffer buf)
+{
+    SB(b, buf);
+    assert(b);
+    unsigned int count = 0;
+    for(unsigned int i = 0; i < b->size; ++i) {
+        if(i >= b->cur && i < b->gap) {
+            continue;
+        }
+        if(b->data[i] == '\n')
+            count++;
+    }
+    return count;
+}
+
+
+unsigned int buf_get_size(hBuffer buf)
+{
+    SB(b, buf);
+    return b->size;
+}
+
+
+char buf_get_char(hBuffer buf, unsigned int pos)
+{
+    SB(b, buf);
+    assert(pos < b->size);
+    return b->data[pos];
+}
+
+
+unsigned int buf_in_gap(hBuffer buf, unsigned int pos)
+{
+    SB(b, buf);
+    return (b >= b->cur) && (b < b->cur + b->gap);
+}
+
+
 void buf_pprint(hBuffer buf)
 {
     SB(b, buf);
@@ -211,19 +249,32 @@ void buf_pprint(hBuffer buf)
             b->id, b->cur, b->gap, b->size);
 }
 
+
+struct buf_props buf_get_props(hBuffer buf)
+{
+    SB(b, buf);
+    struct buf_props props = {
+        .size = b->size,
+        .gap = b->gap,
+        .cur = b->cur,
+    };
+    return props;
+}
+
+
 void buf_printbuf(const hBuffer buf)
 {
     SB(b, buf);
     for(unsigned int i = 0; i < b->size; ++i) {
         if(i >= b->cur && i < b->cur + b->gap) {
-            printf("-");
+            log_lc("-");
             continue;
         }
         if(b->data[i] == 0) {
-            printf("_");
+            log_lc("_");
         } else {
-            printf("%c", b->data[i]);
+            log_lc("%c", b->data[i]);
         }
     }
-    printf("\n");
+    log_lc("\n");
 }
