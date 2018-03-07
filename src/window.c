@@ -157,7 +157,8 @@ void win_update(hWindow win)
 
 		unsigned int lcount = 100;
 		if(w->buffer != INVALID_BUFFER) {
-			lcount = buf_get_linecount(w->buffer);
+			/*lcount = buf_get_linecount(w->buffer);*/
+			lcount = 8; // TODO Fix this
 		}
 		props.mwidth = lcount > 999 ? 4 : 3;
 		props.mheight = props.wrows - 1 - WINDOW_STATUSHEIGHT;

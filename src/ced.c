@@ -6,7 +6,6 @@
 #include "window.h"
 #include "input.h"
 #include "buffer.h"
-#include "line.h"
 #include "term.h"
 #include "input_keys.h"
 
@@ -20,7 +19,6 @@ static struct {
 } G;
 
 
-
 void ced_run()
 {
 	// Initialize globals
@@ -30,7 +28,7 @@ void ced_run()
 
 	// Create window and set buffer
 	hWindow window = win_create(0, 0, 0, 0);
-	hBuffer buffer = buf_create(SCRATCH, term_rows());
+	hBuffer buffer = buf_create(SCRATCH);
 	buf_pprint(buffer);
 	win_set_buffer(window, buffer);
 	ced_set_window_focus(window);

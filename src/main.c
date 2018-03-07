@@ -7,7 +7,6 @@
 #include "log.h"
 #include "window.h"
 #include "input.h"
-#include "line.h"
 #include "menu.h"
 #include "term.h"
 #include "ced.h"
@@ -16,7 +15,6 @@
 void onexit()
 {
 	inp_exit();
-	line_exit();
 	menu_exit();
 	buf_exit();
 	win_exit();
@@ -37,7 +35,6 @@ int main()
 	term_init();
 	buf_init();
 	inp_init();
-	line_init();
 	menu_init();
 	win_init();
 	log_l("MAIN", "\n---------INIT END--------\n");

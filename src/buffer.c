@@ -2,134 +2,228 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <string.h>
 #include "log.h"
 
 // A maximum of 4 buffers allowed
 #define BUFFER_DEFCAP 4
+#define BUFFER_DEFSIZE 8
+#define BUFFER_DEFGAP 4
+
 
 /** Bring struct buffer* alias of id x into scope */
-#define SB(alias, hBuffer) \
-	struct buffer* alias = _get_buffer(hBuffer)
+#define SB(alias, hBuffer)			\
+    struct buffer* alias = _get_buffer(hBuffer)
 
 struct buffer {
-	/*unique identifier of each buffer for debugging*/
-	unsigned int id;
-	/* 1 if buffer is in use (not destroyed)*/
-	int in_use;
+    /*unique identifier of each buffer for debugging*/
+    unsigned int id;
+    /* 1 if buffer is in use (not destroyed)*/
+    int in_use;
 
-	enum buffer_type type;
-	const char* name;
-	unsigned int linecount;
-	hLine* lines;
+    enum buffer_type type;
+    const char* name;		/* Name of buffer(file) */
+    char* data;			/* File in memory */
+    unsigned int size;		/* Size of buffer */
+    unsigned int cur;		/* Cursor position */
+    unsigned int gap;		/* Size of the gap */
 };
 
 
 static struct {
-	const char* tag;
-	unsigned int bufcap; // Total buffer capacity
-	struct buffer buffers[BUFFER_DEFCAP];
+    const char* tag;
+    unsigned int bufcap; // Total buffer capacity
+    struct buffer buffers[BUFFER_DEFCAP];
 } G;
 
 
 int buf_init()
 {
-	G.tag = "BUFFER";
-	G.bufcap = BUFFER_DEFCAP;
+    G.tag = "BUFFER";
+    G.bufcap = BUFFER_DEFCAP;
 
-	for(unsigned int i = 0; i < G.bufcap; ++i) {
-		G.buffers[i].in_use = 0;
-	}
-	log_l(G.tag, "Init success");
-	return 0;
+    for(unsigned int i = 0; i < G.bufcap; ++i) {
+        G.buffers[i].in_use = 0;
+    }
+    log_l(G.tag, "Init success");
+    return 0;
 }
 
 
 int buf_exit()
 {
-	// TODO
-	return 1;
+    // TODO free memory
+    return 1;
 }
 
 
 /** return a new id for a buffer */
-static
+    static
 unsigned int _generate_id()
 {
-	static unsigned int ids = 0;
-	return ids++;
+    static unsigned int ids = 0;
+    return ids++;
 }
 
 /** return a pointer to the buffer in use of the handle */
-static
+    static
 struct buffer* _get_buffer(hBuffer buf)
 {
-	if(buf < 0 || buf >= G.bufcap) {
-		log_fatal(G.tag, "Invalid handle: %d", buf);
-	}
-	struct buffer* b = &G.buffers[buf];
-	if(! b->in_use) {
-		log_fatal(G.tag, "Bad handle: %d", buf);
-	}
-	return b;
+    if(buf < 0 || buf >= G.bufcap) {
+        log_fatal(G.tag, "Invalid handle: %d", buf);
+    }
+    struct buffer* b = &G.buffers[buf];
+    if(! b->in_use) {
+        log_fatal(G.tag, "Bad handle: %d", buf);
+    }
+    return b;
 }
 
 
 /** return a handle to a free buffer (in_use == 0)*/
-static
+    static
 hBuffer _get_free_handle()
 {
-	for(unsigned int i = 0; i < G.bufcap; ++i) {
-		if(! G.buffers[i].in_use) {
-			return i;
-		}
-	}
-	log_fatal(G.tag, "%s: OUT OF BUFFERS!", __func__);
+    for(unsigned int i = 0; i < G.bufcap; ++i) {
+        if(! G.buffers[i].in_use) {
+            return i;
+        }
+    }
+    log_fatal(G.tag, "%s: OUT OF BUFFERS!", __func__);
 }
 
 
 void buf_destroy(hBuffer buf)
 {
-	SB(b, buf);
-	unsigned int id = b->id;
-	b->in_use = 0;
-	for(unsigned int i = 0; i < b->linecount; ++i) {
-		line_destroy(b->lines[i]);
-	}
-	free(b->lines);
-	log_l(G.tag, "Buffer %d destroyed", id);
+    SB(b, buf);
+    unsigned int id = b->id;
+    b->in_use = 0;
+    free(b->data);
 }
 
 
-
-hBuffer buf_create(enum buffer_type type, unsigned int linecount)
+hBuffer buf_create(enum buffer_type type)
 {
-	assert(linecount);
+    hBuffer buf = _get_free_handle();
+    struct buffer* b = &G.buffers[buf];
 
-	hBuffer buf = _get_free_handle();
-	struct buffer* b = &G.buffers[buf];
-
-	b->id = _generate_id();
-	b->in_use = 1;
-	b->type = type; // TODO type specific setup
-	b->linecount = linecount;
-
-	b->lines = malloc(sizeof(hLine) * b->linecount);
-	for(unsigned int i = 0; i < b->linecount; ++i) {
-		b->lines[i] = line_create();
-	}
-	return buf;
+    b->id = _generate_id();
+    b->in_use = 1;
+    b->type = type; // TODO type specific setup
+    b->name = "[NEWBUF]";
+    b->size = BUFFER_DEFSIZE;
+    b->data = calloc(b->size, sizeof(char));
+    b->gap = BUFFER_DEFGAP;
+    b->cur = 0;
+    return buf;
 }
 
 
-unsigned int buf_get_linecount(hBuffer buf)
+void buf_add_gap(hBuffer buf)
 {
-	SB(b, buf);
-	return b->linecount;
+    SB(b, buf);
+    unsigned int newsize = b->size + BUFFER_DEFGAP;
+    unsigned int newgap = b->gap + BUFFER_DEFGAP;
+    char* newbuf = calloc(newsize, sizeof(b->data[0]));
+    assert(newbuf);
+    log_l(G.tag, "Gap added: %d -> %d", b->size, newsize);
+
+    /* Copy memory to new buffer */
+    // from start to cursor
+    memcpy(newbuf, b->data, b->cur * sizeof(char));
+    // from end of gap to end of buffer
+    memcpy(&newbuf[b->cur + newgap],
+           &b->data[b->cur + b->gap],
+           b->size - (b->cur + b->gap));
+    // free old buffer
+    free(b->data);
+    b->data = newbuf;
+    b->size = newsize;
+    b->gap = newgap;
 }
+
+
+void buf_addch(hBuffer buf, char ch)
+{
+    SB(b, buf);
+    assert(b->data);
+    if(b->gap < 1) {
+        buf_add_gap(buf);
+    }
+    b->data[b->cur] = ch;
+    b->cur++;
+    b->gap--;
+    return;
+}
+
+
+void buf_delch(hBuffer buf)
+{
+    SB(b, buf);
+    assert(b && b->data);
+    if(b->cur < 1) {
+        return;
+    }
+    b->cur--;
+    b->gap++;
+    if(b->cur + b->gap > b->size) {
+        log_fatal(G.tag, "ERROR: FIX THIS!");
+    }
+}
+
+
+void buf_move_cur_forward(hBuffer buf, unsigned int n)
+{
+    SB(b, buf);
+    assert(b);
+    if(b->cur + b->gap == b->size) {
+        log_l(G.tag, "EOB!");
+        return;
+    }
+    b->data[b->cur] = b->data[b->cur + b->gap];
+    b->cur++;
+}
+
+void buf_move_cur_back(hBuffer buf, unsigned int n)
+{
+    SB(b, buf);
+    assert(b);
+    if(b->cur == 0) {
+        return;
+    }
+    b->data[(b->cur + b->gap) - 1] = b->data[b->cur - 1];
+    b->cur--;
+}
+
+
+unsigned int buf_get_cursor(hBuffer buf)
+{
+    SB(b, buf);
+    assert(b);
+    return b->cur;
+}
+
 
 void buf_pprint(hBuffer buf)
 {
-	SB(b, buf);
-	log_l(G.tag, "Buffer{id=%d, name=%s, lncount=%d",
-			b->id, b->name, b->linecount);
+    SB(b, buf);
+    log_l(G.tag, "Buffer{id=%d, cur=%d, gap=%d, size=%d}",
+            b->id, b->cur, b->gap, b->size);
+}
+
+void buf_printbuf(const hBuffer buf)
+{
+    SB(b, buf);
+    for(unsigned int i = 0; i < b->size; ++i) {
+        if(i >= b->cur && i < b->cur + b->gap) {
+            printf("-");
+            continue;
+        }
+        if(b->data[i] == 0) {
+            printf("_");
+        } else {
+            printf("%c", b->data[i]);
+        }
+    }
+    printf("\n");
 }
