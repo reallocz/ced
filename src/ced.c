@@ -54,25 +54,31 @@ void ced_set_mode(enum ced_mode mode)
 {
     G.mode = mode;
     const char* modename;
+    struct inp_handler handler;
+    handler.window = G.focussed_window;
 
     switch(G.mode) {
         case MODE_NORMAL:
-            inp_set_handler(G.focussed_window, ced_normal_input_handler);
             modename = "MODE_NORMAL";
+            handler.name = modename;
+            handler.callback = ced_normal_input_cb;
             break;
         case MODE_INSERT:
-            inp_set_handler(G.focussed_window, ced_insert_input_handler);
             modename = "MODE_INSERT";
+            handler.name = modename;
+            handler.callback = ced_insert_input_cb;
             break;
         case MODE_META:
-            inp_set_handler(G.focussed_window, ced_meta_input_handler);
             modename = "MODE_META";
+            handler.name = modename;
+            handler.callback = ced_meta_input_cb;
             break;
         default:
             log_fatal(G.tag, "%s: Unknown mode %d",
                     __func__, mode);
     }
 
+    inp_set_handler(handler);
     log_l(G.tag, "Mode set: %s", modename);
 }
 
@@ -85,29 +91,36 @@ void ced_set_window_focus(hWindow win)
 }
 
 
-void ced_insert_input_handler(inpev ev)
+void ced_insert_input_cb(inpev ev)
 {
-    static int x = 0, y = 0;
-    WINDOW* nwin = win_nwin(ev.win);
-    struct win_props props = win_get_props(ev.win);
-    hBuffer buf = win_get_buffer(ev.win);
-    if(ev.type == INSERT) {
-        buf_addch(buf, ev.data.ch);
-        /*mvwaddch(nwin, y, props.mwidth + x++, ev.data.ch);*/
-    } else if (ev.type == DELETE) {
-        buf_delch(buf);
-        /*win_set_cursor(ev.win, 0, props.mwidth + --x);*/
-        /*wdelch(nwin);*/
-    } else if (ev.type == MOVE) {
-        /*x = 0;*/
-        /*win_set_cursor(ev.win, ++y, x);*/
-    } else if (ev.key == k_esc) {
-        ced_set_mode(MODE_NORMAL);
+    hBuffer buf = win_get_buffer(G.focussed_window);
+
+    if(ev.type == INP_ALPHA || ev.type == INP_NUM
+            || ev.type == INP_SYMBOL || ev.key == k_space)
+    {
+        buf_addch(buf, ev.key);
+    }
+
+    if(ev.type == INP_SPECIAL)
+    {
+        switch(ev.key) {
+        case k_enter:
+            // TODO
+            break;
+        case k_backspace:
+            buf_delch(buf);
+            break;
+        case k_esc:
+            ced_set_mode(MODE_NORMAL);
+            break;
+        default:
+            break;
+        }
     }
 }
 
 
-void ced_normal_input_handler(inpev ev)
+void ced_normal_input_cb(inpev ev)
 {
     if(ev.key == 'i') {
         // Switch to insert mode
@@ -119,7 +132,7 @@ void ced_normal_input_handler(inpev ev)
 }
 
 
-void ced_meta_input_handler(inpev ev)
+void ced_meta_input_cb(inpev ev)
 {
 }
 
@@ -134,7 +147,7 @@ void ced_draw_statusline(hWindow win, enum ced_mode mode)
     struct win_props props = win_get_props(win);
     win_set_cursor(win, props.sy, props.sx);
     whline(w, ACS_HLINE, props.swidth);
-    if(G.mode == MODE_NORMAL) {
+    if(mode == MODE_NORMAL) {
         mvwaddstr(w, props.sy + 1, 0, "MODE: NORMAL");
     } else {
         mvwaddstr(w, props.sy + 1, 0, "MODE: INSERT");
