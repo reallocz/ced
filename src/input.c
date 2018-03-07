@@ -1,78 +1,122 @@
 #include "input.h"
 #include "log.h"
+#include <assert.h>
 
 static struct {
-	const char* tag;
-	hWindow win;
-	void (*handler) (inpev); // Callback when inp_poll is called
+    const char* tag;
+    struct inp_handler handler;
 } G;
 
 
+/** Return an empty handler */
+static
+struct inp_handler _empty_handler()
+{
+    struct inp_handler handler = {
+        .name = "DEFAULT",
+        .window = INVALID_WINDOW,
+        .callback = NULL,
+    };
+    return handler;
+}
+
+/** Return 1 if set handler is valid. else return 0 */
+static
+int _handler_valid()
+{
+    return G.handler.window != INVALID_WINDOW
+        && G.handler.callback != NULL;
+}
+
 int inp_init()
 {
-	G.tag = "INPUT";
-	G.handler = NULL;
-	G.win = INVALID_WINDOW;
-	log_l(G.tag, "Init success");
-	return 0;
+    G.tag = "INPUT";
+    G.handler = _empty_handler();
+    log_l(G.tag, "Init success");
+    return 0;
 }
 
 
 int inp_exit()
 {
-	return 0;
+    return 0;
 }
 
 
-inpev inp_winpoll(hWindow win)
+int inp_set_handler(struct inp_handler handler)
 {
-        inpev ev;
-	ev.win = win;
-        int ch = wgetch(win_nwin(win));
-	ev.key = ch;
-        if((ch >= 33 && ch <= 126) || ch == k_space) {
-                ev.type = INSERT;
-                ev.data.ch = (char)ch;
-        } else if (ch == k_esc || ch == k_f1) {
-                ev.type = QUIT;
-                ev.data.i = 0;
-        } else if (ch == k_backspace) {
-                ev.type = DELETE;
-                ev.data.i = -1;
-        } else if ( ch == k_enter ) {
-                ev.type = MOVE;
-                ev.data.i = 1;
-        } else {
-                ev.type = NOP;
-                ev.data.i = 0;
-        }
-        return ev;
-}
+    assert(handler.callback && handler.window != INVALID_WINDOW);
 
-
-void inp_poll()
-{
-	if(G.handler == NULL || G.win == INVALID_WINDOW) {
-		log_e(G.tag, "%s: No handler(%d)/window(%d) set!", G.handler, G.win);
-		return;
-	}
-	inpev ev = inp_winpoll(G.win);
-	G.handler(ev);
-}
-
-
-int inp_set_handler(hWindow win, void (*handler) (inpev))
-{
-	log_l(G.tag, "Setting input handler: win=%d->%d, handler=%p->%p", G.win, win, G.handler, handler);
-	G.handler = handler;
-	G.win = win;
-	return 0;
+    log_l(G.tag, "Setting handler: %s->%s, handler: %p->%p\
+            window: %d->%d",
+            G.handler.name, handler.name,
+            G.handler.callback, handler.callback,
+            G.handler.window, handler.window);
+    G.handler = handler;
+    return 0;
 }
 
 
 void inp_unsethandler()
 {
-	log_l(G.tag, "Unsetting input handler: win=%d, handler=%p", G.win, G.handler);
-	G.handler = NULL;
-	G.win = INVALID_WINDOW;
+    log_l(G.tag, "Unsetting handler: %s, handler: %p, window: %d",
+            G.handler.name, G.handler.callback, G.handler.window);
+    G.handler = _empty_handler();
+}
+
+
+void inp_poll()
+{
+    if(! _handler_valid())
+    {
+        log_e(G.tag, "%s: No input handler set!");
+        return;
+    }
+
+    inpev ev;
+    int ch = wgetch(win_nwin(G.handler.window));
+    ev.type = inp_classify(ch);
+    ev.key = ch;
+
+    G.handler.callback(ev);
+}
+
+
+enum inp_type inp_classify(int ch)
+{
+    if((ch >= 65 && ch <= 90)   // Uppercase
+            || (ch >= 97 && ch <= 122)) // Lowercase
+    {
+        return INP_ALPHA;
+    }
+
+    if(ch >= 48 && ch <= 57)
+    {
+        return INP_NUM;
+    }
+
+    if((ch >= 33 && ch <= 47) || (ch >= 58 && ch <= 64)
+            ||(ch >= 91 && ch <= 96) || (ch >= 123 && ch <= 126))
+    {
+        return INP_SYMBOL;
+    }
+
+    if(ch == k_esc || ch == k_enter || ch == k_tab || ch == k_space
+            || ch == k_delete || ch == k_insert || ch == k_backspace)
+    {
+        return INP_SPECIAL;
+    }
+
+    if(ch == k_up || ch == k_down || ch == k_left || ch == k_right)
+    {
+        return INP_ARROW;
+    }
+
+    if(ch >= k_f1 && ch <= k_f12)
+    {
+        return INP_FUNCTION;
+    }
+
+    log_l(G.tag, "Unknown key: %d", ch);
+    return INP_UNKNOWN;
 }

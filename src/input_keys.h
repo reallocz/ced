@@ -35,7 +35,7 @@ enum inp_key {
         k_enter = 10,
         k_esc = 27,
         k_space = 32,
-        k_del = 330,
+        k_delete = 330,
         k_insert = 331,
         k_backspace = KEY_BACKSPACE, //263?
 
