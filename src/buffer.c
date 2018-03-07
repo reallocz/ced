@@ -17,7 +17,7 @@
 
 /** Evals to 1 if pos is inside buffer gap */
 #define INGAP(buffer, pos)\
-    (pos >= buffer->cur) && (pos < buffer->cur + buffer->gap)
+    ((pos >= buffer->cur && pos < buffer->cur + buffer->gap))
 
 struct buffer {
     /*unique identifier of each buffer for debugging*/
@@ -70,7 +70,7 @@ unsigned int _generate_id()
 }
 
 /** return a pointer to the buffer in use of the handle */
-    static
+static
 struct buffer* _get_buffer(hBuffer buf)
 {
     if(buf < 0 || buf >= G.bufcap) {
@@ -214,10 +214,7 @@ unsigned int buf_get_linecount(hBuffer buf)
     assert(b);
     unsigned int count = 0;
     for(unsigned int i = 0; i < b->size; ++i) {
-        if(i >= b->cur && i < b->gap) {
-            continue;
-        }
-        if(b->data[i] == '\n')
+        if((!INGAP(b, i)) && b->data[i] == '\n')
             count++;
     }
     return count;
@@ -281,7 +278,7 @@ void buf_printbuf(const hBuffer buf)
 {
     SB(b, buf);
     for(unsigned int i = 0; i < b->size; ++i) {
-        if(i >= b->cur && i < b->cur + b->gap) {
+        if(INGAP(b, i)) {
             log_lc("-");
             continue;
         }
