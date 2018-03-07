@@ -92,7 +92,7 @@ WINDOW* win_nwin(hWindow win);
 /** sets/replaces the window buffer */
 int win_set_buffer(hWindow win, hBuffer buf);
 /** returns the buffer set on the window
- * or BUFFER_DEFID if a buffer isn't set */
+ * or INVALID_BUFFER if a buffer isn't set */
 hBuffer win_get_buffer(hWindow win);
 
 /** moves window cursor to (x,y)*/
@@ -102,6 +102,11 @@ void win_get_cursor(hWindow win, int* y, int* x);
 /** returns the window properties struct*/
 struct win_props win_get_props(hWindow win);
 
+/** Drawing / rendering */
+/** Refresh's window */
+void win_draw_refresh(hWindow win);
+/** Draws buffer on to the textarea */
+void win_draw_buffer(hWindow win);
 
 void win_pprint(hWindow win);
 

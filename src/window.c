@@ -53,6 +53,7 @@ void win_init()
 	G.windowcap = WINDOW_DEFCAP;
 	for(unsigned int i = 0; i < G.windowcap; ++i) {
 		G.windows[i].in_use = 0;
+                G.windows[i].buffer = INVALID_BUFFER;
 	}
 	log_l(G.tag, "Init success");
 }
@@ -226,6 +227,42 @@ void win_get_cursor(hWindow win, int* y, int* x)
 	getyx(w->nwin, my, mx);
 	*y = my;
 	*x = mx;
+}
+
+
+
+void win_draw_refresh(hWindow win)
+{
+    SW(w, win);
+    wrefresh(w->nwin);
+}
+
+
+void win_draw_buffer(hWindow win)
+{
+    SW(w, win);
+    hBuffer buf = w->buffer;
+    assert(buf != INVALID_BUFFER);
+
+    int y = w->props.ty;
+    int x = w->props.tx;
+    struct buf_props bprops = buf_get_props(buf);
+
+    // Clear current line
+    wmove(w->nwin, y, x);
+    wclrtoeol(w->nwin);
+
+    // Draw line
+    for(unsigned int i = 0; i < bprops.size; ++i) {
+        if(i >= bprops.cur && i < bprops.cur + bprops.gap) {
+            // In gap
+            continue;
+        } else {
+            char c = buf_get_char(buf, i);
+            if(c != 0)
+                mvwaddch(w->nwin, y, x++, buf_get_char(buf, i));
+        }
+    }
 }
 
 
