@@ -12,7 +12,6 @@
 enum ced_mode {
 	MODE_NORMAL,
 	MODE_INSERT,
-	MODE_META
 };
 
 /** Initialize logic and run.
@@ -31,8 +30,6 @@ void ced_set_window_focus(hWindow win);
 void ced_insert_input_cb(inpev ev);
 /** Input callback for MODE_NORMAL */
 void ced_normal_input_cb(inpev ev);
-/** Input callback for MODE_META */
-void ced_meta_input_cb(inpev ev);
 
 // Drawing
 void ced_draw_statusline(hWindow win, enum ced_mode mode);

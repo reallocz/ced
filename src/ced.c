@@ -68,11 +68,6 @@ void ced_set_mode(enum ced_mode mode)
             handler.name = modename;
             handler.callback = ced_insert_input_cb;
             break;
-        case MODE_META:
-            modename = "MODE_META";
-            handler.name = modename;
-            handler.callback = ced_meta_input_cb;
-            break;
         default:
             log_fatal(G.tag, "%s: Unknown mode %d",
                     __func__, mode);
@@ -129,11 +124,6 @@ void ced_normal_input_cb(inpev ev)
     } else if (ev.key == k_f1) {
         G.quit = 1;
     }
-}
-
-
-void ced_meta_input_cb(inpev ev)
-{
 }
 
 
