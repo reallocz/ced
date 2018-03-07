@@ -53,10 +53,10 @@ unsigned int buf_get_linecount(hBuffer buf);
 unsigned int buf_get_size(hBuffer buf);
 /** Return char at pos. check buf_in_gap().*/
 char buf_get_char(hBuffer buf, unsigned int pos);
-/** returns 1 if pos is inside the gap */
-unsigned int buf_in_gap(hBuffer buf, unsigned int pos);
 /** Return buffer properties */
 struct buf_props buf_get_props(hBuffer buf);
+/** Save buffer to disk at path*/
+int buf_save_to_disk(hBuffer buf, const char* path);
 
 
 void buf_pprint(hBuffer buf);

@@ -124,6 +124,11 @@ void ced_normal_input_cb(inpev ev)
     } else if (ev.key == k_f1) {
         G.quit = 1;
     }
+
+    if(ev.key == k_f2) {
+        hBuffer buf = win_get_buffer(G.focussed_window);
+        buf_save_to_disk(buf, "doc.txt"); // TODO prompt for name
+    }
 }
 
 

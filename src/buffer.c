@@ -12,8 +12,12 @@
 
 
 /** Bring struct buffer* alias of id x into scope */
-#define SB(alias, hBuffer)			\
+#define SB(alias, hBuffer)\
     struct buffer* alias = _get_buffer(hBuffer)
+
+/** Evals to 1 if pos is inside buffer gap */
+#define INGAP(buffer, pos)\
+    (pos >= buffer->cur) && (pos < buffer->cur + buffer->gap)
 
 struct buffer {
     /*unique identifier of each buffer for debugging*/
@@ -80,8 +84,8 @@ struct buffer* _get_buffer(hBuffer buf)
 }
 
 
-/** return a handle to a free buffer (in_use == 0)*/
-    static
+/** return a handle to a free buffer (in_use == 0) */
+static
 hBuffer _get_free_handle()
 {
     for(unsigned int i = 0; i < G.bufcap; ++i) {
@@ -235,21 +239,6 @@ char buf_get_char(hBuffer buf, unsigned int pos)
 }
 
 
-unsigned int buf_in_gap(hBuffer buf, unsigned int pos)
-{
-    SB(b, buf);
-    return (b >= b->cur) && (b < b->cur + b->gap);
-}
-
-
-void buf_pprint(hBuffer buf)
-{
-    SB(b, buf);
-    log_l(G.tag, "Buffer{id=%d, cur=%d, gap=%d, size=%d}",
-            b->id, b->cur, b->gap, b->size);
-}
-
-
 struct buf_props buf_get_props(hBuffer buf)
 {
     SB(b, buf);
@@ -259,6 +248,32 @@ struct buf_props buf_get_props(hBuffer buf)
         .cur = b->cur,
     };
     return props;
+}
+
+
+int buf_save_to_disk(hBuffer buf, const char* path)
+{
+    SB(b, buf);
+    FILE* f = fopen(path, "w");
+    assert(f);
+    unsigned int wbytes = 0;
+    for(unsigned int i = 0; i < b->size; ++i) {
+        if(! INGAP(b, i)) {
+            fputc(b->data[i], f);
+            wbytes++;
+        }
+    }
+    log_l(G.tag, "Buffer saved (%d bytes): %s", wbytes, path);
+    fclose(f);
+    return 0;
+}
+
+
+void buf_pprint(hBuffer buf)
+{
+    SB(b, buf);
+    log_l(G.tag, "Buffer{id=%d, cur=%d, gap=%d, size=%d}",
+            b->id, b->cur, b->gap, b->size);
 }
 
 
