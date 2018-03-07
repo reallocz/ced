@@ -74,7 +74,7 @@ void ced_set_mode(enum ced_mode mode)
     }
 
     inp_set_handler(handler);
-    log_l(G.tag, "Mode set: %s", modename);
+    /*log_l(G.tag, "Mode set: %s", modename);*/
 }
 
 
@@ -117,17 +117,26 @@ void ced_insert_input_cb(inpev ev)
 
 void ced_normal_input_cb(inpev ev)
 {
+    hBuffer buf = win_get_buffer(G.focussed_window);
+
     if(ev.key == 'i') {
         // Switch to insert mode
         ced_set_mode(MODE_INSERT);
         return;
-    } else if (ev.key == k_f1) {
-        G.quit = 1;
     }
-
+    if (ev.key == k_f1) {
+        G.quit = 1;
+        return;
+    }
     if(ev.key == k_f2) {
-        hBuffer buf = win_get_buffer(G.focussed_window);
         buf_save_to_disk(buf, "doc.txt"); // TODO prompt for name
+        return;
+    }
+    if(ev.key == 'h') {
+        buf_move_cur_back(buf, 1);
+    }
+    if(ev.key == 'l') {
+        buf_move_cur_forward(buf, 1);
     }
 }
 
