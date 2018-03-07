@@ -263,6 +263,9 @@ void win_draw_buffer(hWindow win)
                 mvwaddch(w->nwin, y, x++, buf_get_char(buf, i));
         }
     }
+
+    // Sync window cursor and buffer cursor
+    wmove(w->nwin, y, w->props.tx + bprops.cur);
 }
 
 
