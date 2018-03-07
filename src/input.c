@@ -47,11 +47,11 @@ int inp_set_handler(struct inp_handler handler)
 {
     assert(handler.callback && handler.window != INVALID_WINDOW);
 
-    log_l(G.tag, "Setting handler: %s->%s, handler: %p->%p\
-            window: %d->%d",
-            G.handler.name, handler.name,
-            G.handler.callback, handler.callback,
-            G.handler.window, handler.window);
+    /*log_l(G.tag, "Setting handler: %s->%s, handler: %p->%p\*/
+            /*window: %d->%d",*/
+            /*G.handler.name, handler.name,*/
+            /*G.handler.callback, handler.callback,*/
+            /*G.handler.window, handler.window);*/
     G.handler = handler;
     return 0;
 }
