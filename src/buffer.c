@@ -7,8 +7,8 @@
 
 // A maximum of 4 buffers allowed
 #define BUFFER_DEFCAP 4
-#define BUFFER_DEFSIZE 8
-#define BUFFER_DEFGAP 4
+// Gap size
+#define BUFFER_GAPSIZE 4
 
 
 /** Bring struct buffer* alias of id x into scope */
@@ -115,9 +115,9 @@ hBuffer buf_create(enum buffer_type type)
     b->in_use = 1;
     b->type = type; // TODO type specific setup
     b->name = "[NEWBUF]";
-    b->size = BUFFER_DEFSIZE;
+    b->size = BUFFER_GAPSIZE;
+    b->gap = BUFFER_GAPSIZE;
     b->data = calloc(b->size, sizeof(char));
-    b->gap = BUFFER_DEFGAP;
     b->cur = 0;
     return buf;
 }
@@ -126,11 +126,11 @@ hBuffer buf_create(enum buffer_type type)
 void buf_add_gap(hBuffer buf)
 {
     SB(b, buf);
-    unsigned int newsize = b->size + BUFFER_DEFGAP;
-    unsigned int newgap = b->gap + BUFFER_DEFGAP;
+    unsigned int newsize = b->size + BUFFER_GAPSIZE;
+    unsigned int newgap = b->gap + BUFFER_GAPSIZE;
     char* newbuf = calloc(newsize, sizeof(b->data[0]));
     assert(newbuf);
-    /*log_l(G.tag, "Gap added: %d -> %d", b->size, newsize);*/
+    log_l(G.tag, "Gap added: %d -> %d", b->size, newsize);
 
     /* Copy memory to new buffer */
     // from start to cursor
