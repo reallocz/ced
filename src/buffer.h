@@ -24,6 +24,7 @@ struct buf_props {
     unsigned int size;
     unsigned int cur;
     unsigned int gap;
+    unsigned int linecount;
 };
 
 /** Initialize buffer submodule */
@@ -57,6 +58,8 @@ char buf_get_char(hBuffer buf, unsigned int pos);
 struct buf_props buf_get_props(hBuffer buf);
 /** Save buffer to disk at path*/
 int buf_save_to_disk(hBuffer buf, const char* path);
+/** Update buffer. Update cache etc. */
+int buf_update(hBuffer buf);
 
 
 void buf_pprint(hBuffer buf);

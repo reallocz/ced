@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <string.h>
 #include "log.h"
+#include "input_keys.h"
 
 // A maximum of 4 buffers allowed
 #define BUFFER_DEFCAP 4
@@ -19,6 +20,11 @@
 #define INGAP(buffer, pos)\
     ((pos >= buffer->cur && pos < buffer->cur + buffer->gap))
 
+/** Store expensive to calculate stuff like linecount */
+struct buf_cache {
+    unsigned int linecount;
+};
+
 struct buffer {
     /*unique identifier of each buffer for debugging*/
     unsigned int id;
@@ -31,6 +37,8 @@ struct buffer {
     unsigned int size;		/* Size of buffer */
     unsigned int cur;		/* Cursor position */
     unsigned int gap;		/* Size of the gap */
+
+    struct buf_cache cache;
 };
 
 
@@ -97,6 +105,20 @@ hBuffer _get_free_handle()
 }
 
 
+/** Calculate number of char 'c' in the buffer */
+static
+unsigned int _calc_charcount(hBuffer buf, char ch)
+{
+    SB(b, buf);
+    assert(b);
+    unsigned int count = 0;
+    for(unsigned int i = 0; i < b->size; ++i) {
+        if((!INGAP(b, i)) && b->data[i] == ch)
+            count++;
+    }
+    return count;
+}
+
 void buf_destroy(hBuffer buf)
 {
     SB(b, buf);
@@ -119,6 +141,8 @@ hBuffer buf_create(enum buffer_type type)
     b->gap = BUFFER_GAPSIZE;
     b->data = calloc(b->size, sizeof(char));
     b->cur = 0;
+
+    b->cache.linecount = 0;
     return buf;
 }
 
@@ -154,9 +178,16 @@ void buf_addch(hBuffer buf, char ch)
     if(b->gap < 1) {
         buf_add_gap(buf);
     }
+
+    if(ch == '\n') {
+        // Update cache and linecount
+        buf_update(buf);
+    }
+
     b->data[b->cur] = ch;
     b->cur++;
     b->gap--;
+
     return;
 }
 
@@ -168,8 +199,16 @@ void buf_delch(hBuffer buf)
     if(b->cur < 1) {
         return;
     }
+
     b->cur--;
     b->gap++;
+    char delchar = b->data[b->cur];
+
+    if(delchar == '\n') {
+        // Update cache
+        buf_update(buf);
+    }
+
     if(b->cur + b->gap > b->size) {
         log_fatal(G.tag, "ERROR: FIX THIS!");
     }
@@ -212,12 +251,7 @@ unsigned int buf_get_linecount(hBuffer buf)
 {
     SB(b, buf);
     assert(b);
-    unsigned int count = 0;
-    for(unsigned int i = 0; i < b->size; ++i) {
-        if((!INGAP(b, i)) && b->data[i] == '\n')
-            count++;
-    }
-    return count;
+    return b->cache.linecount;
 }
 
 
@@ -243,6 +277,7 @@ struct buf_props buf_get_props(hBuffer buf)
         .size = b->size,
         .gap = b->gap,
         .cur = b->cur,
+        .linecount = b->cache.linecount,
     };
     return props;
 }
@@ -262,6 +297,15 @@ int buf_save_to_disk(hBuffer buf, const char* path)
     }
     log_l(G.tag, "Buffer saved (%d bytes): %s", wbytes, path);
     fclose(f);
+    return 0;
+}
+
+
+int buf_update(hBuffer buf)
+{
+    SB(b, buf);
+    // Update cache
+    b->cache.linecount = _calc_charcount(buf, '\n') + 1;
     return 0;
 }
 
