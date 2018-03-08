@@ -1,4 +1,5 @@
 #pragma once
+#include <ncurses.h>    // For KEY_* defs
 
 /** Key wrapper */
 enum inp_key {
