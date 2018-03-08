@@ -1,4 +1,5 @@
 #include "buffer.h"
+#include "buffer_internal.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
