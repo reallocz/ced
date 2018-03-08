@@ -254,7 +254,9 @@ void win_draw_buffer(hWindow win)
 
     // Draw line
     for(unsigned int i = 0; i < bprops.size; ++i) {
-        if(i >= bprops.cur && i < bprops.cur + bprops.gap) {
+        if(i >= bprops.gap.pos
+                && i < bprops.gap.pos + bprops.gap.len)
+        {
             // In gap
             continue;
         } else {

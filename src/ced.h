@@ -33,5 +33,5 @@ void ced_normal_input_cb(inpev ev);
 
 // Drawing
 void ced_draw_statusline(hWindow win, enum ced_mode mode);
-void ced_draw_numberline(hWindow win, enum ced_mode mode);
+void ced_draw_margin(hWindow win, enum ced_mode mode);
 void ced_draw_textarea(hWindow win);

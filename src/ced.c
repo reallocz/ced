@@ -42,7 +42,7 @@ void ced_run()
     // Main loop
     while(!G.quit) {
         ced_draw_statusline(G.focussed_window, G.mode);
-        ced_draw_numberline(G.focussed_window, G.mode);
+        ced_draw_margin(G.focussed_window, G.mode);
         win_draw_buffer(window);
         win_draw_refresh(window);
         inp_poll();
@@ -91,7 +91,8 @@ void ced_insert_input_cb(inpev ev)
     hBuffer buf = win_get_buffer(G.focussed_window);
 
     if(ev.type == INP_ALPHA || ev.type == INP_NUM
-            || ev.type == INP_SYMBOL || ev.key == k_space)
+            || ev.type == INP_SYMBOL || ev.key == k_space
+            || ev.key == k_enter)
     {
         buf_addch(buf, ev.key);
     }
@@ -99,9 +100,6 @@ void ced_insert_input_cb(inpev ev)
     if(ev.type == INP_SPECIAL)
     {
         switch(ev.key) {
-        case k_enter:
-            // TODO
-            break;
         case k_backspace:
             buf_delch(buf);
             break;
@@ -133,10 +131,10 @@ void ced_normal_input_cb(inpev ev)
         return;
     }
     if(ev.key == 'h') {
-        buf_move_cur_back(buf, 1);
+        buf_cur_mvb(buf, 1);
     }
     if(ev.key == 'l') {
-        buf_move_cur_forward(buf, 1);
+        buf_cur_mvf(buf, 1);
     }
 }
 
@@ -162,7 +160,7 @@ void ced_draw_statusline(hWindow win, enum ced_mode mode)
 }
 
 
-void ced_draw_numberline(hWindow win, enum ced_mode mode)
+void ced_draw_margin(hWindow win, enum ced_mode mode)
 {
     WINDOW* w = win_nwin(win);
 
@@ -170,19 +168,24 @@ void ced_draw_numberline(hWindow win, enum ced_mode mode)
 
     int curx, cury;
     win_get_cursor(win, &cury, &curx);
+    unsigned int linecount = buf_get_linecount(win_get_buffer(win));
 
     wattron(w, A_BOLD);
     char lnstr[props.mwidth]; // line number to string
     for(unsigned int i = 0; i < props.mheight; ++i) {
         win_set_cursor(win, i, 0);
-        if(i < 10) {
-            sprintf(lnstr, " %d", i);
-        } else if(i < 100) {
-            sprintf(lnstr, "%d", i);
+        if(i <= linecount) {
+            if(i < 10) {
+                sprintf(lnstr, " %d", i + 1);
+            } else if(i < 100) {
+                sprintf(lnstr, "%d", i + 1);
+            } else {
+                sprintf(lnstr, "%d", i + 1);
+            }
+            waddstr(w, lnstr);
         } else {
-            sprintf(lnstr, "%d", i);
+            waddstr(w, " ~");
         }
-        waddstr(w, lnstr);
     }
     wattroff(w, A_BOLD);
     win_set_cursor(win, cury, curx);
