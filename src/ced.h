@@ -10,8 +10,8 @@
 
 /** Editor modes */
 enum ced_mode {
-	MODE_NORMAL,
-	MODE_INSERT,
+    MODE_NORMAL,
+    MODE_INSERT,
 };
 
 /** Initialize logic and run.

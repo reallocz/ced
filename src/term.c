@@ -8,51 +8,51 @@
 
 
 static struct {
-	const char* tag;
-	int rows, cols;	// Global width and height
+    const char* tag;
+    int rows, cols;	// Global width and height
 
-	WINDOW* stdscr;
+    WINDOW* stdscr;
 } G;
 
 
 int term_init()
 {
-	G.tag = "TERM";
+    G.tag = "TERM";
 
-	// Initialize ncurses
-	setlocale(LC_ALL, "");
-	G.stdscr = initscr();
-	getmaxyx(G.stdscr, G.rows, G.cols);
-	cbreak();
-	noecho();
-	keypad(G.stdscr, TRUE);
-	log_l(G.tag, "Init success");
-	log_lc("stdscr { rows: %d, cols %d }\n",
-			G.rows, G.cols);
-	return 0;
+    // Initialize ncurses
+    setlocale(LC_ALL, "");
+    G.stdscr = initscr();
+    getmaxyx(G.stdscr, G.rows, G.cols);
+    cbreak();
+    noecho();
+    keypad(G.stdscr, TRUE);
+    log_l(G.tag, "Init success");
+    log_lc("stdscr { rows: %d, cols %d }\n",
+            G.rows, G.cols);
+    return 0;
 }
 
 
 void term_exit()
 {
-        endwin();
-	log_l(G.tag, "Term exit");
+    endwin();
+    log_l(G.tag, "Term exit");
 }
 
 
 int term_rows()
 {
-	return G.rows;
+    return G.rows;
 }
 
 int term_cols()
 {
-	return G.cols;
+    return G.cols;
 }
 
 void term_size(int *rows, int *cols)
 {
-	*rows = G.rows;
-	*cols = G.cols;
+    *rows = G.rows;
+    *cols = G.cols;
 }
 

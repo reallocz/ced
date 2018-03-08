@@ -15,9 +15,9 @@
 typedef int hBuffer;
 
 enum buffer_type {
-	DEFAULT,	// Empty buffer
-	DOCUMENT,	// Saved on disk
-	SCRATCH		// Temporary buffer
+    DEFAULT,	// Empty buffer
+    DOCUMENT,	// Saved on disk
+    SCRATCH		// Temporary buffer
 };
 
 struct buf_props {

@@ -113,15 +113,15 @@ int menu_prompt(hMenu menu, hWindow win)
     inpev ev;
     // TODO Fix this!
     /*while(1) {*/
-        /*ev = inp_winpoll(win);*/
-        /*if(ev.type == INSERT) {*/
-            /*res = ev.data.ch;*/
-            /*break;*/
-        /*}*/
-        /*if(ev.type == QUIT) {*/
-            /*res = 0;*/
-            /*break;*/
-        /*}*/
+    /*ev = inp_winpoll(win);*/
+    /*if(ev.type == INSERT) {*/
+    /*res = ev.data.ch;*/
+    /*break;*/
+    /*}*/
+    /*if(ev.type == QUIT) {*/
+    /*res = 0;*/
+    /*break;*/
+    /*}*/
     /*}*/
     // Clear the screen as soon as we get a valid response
     wclear(w);

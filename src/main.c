@@ -14,32 +14,32 @@
 /** Cleanup submodules */
 void onexit()
 {
-	inp_exit();
-	menu_exit();
-	buf_exit();
-	win_exit();
-	// Logs exit last
-	term_exit();
-	log_exit();
+    inp_exit();
+    menu_exit();
+    buf_exit();
+    win_exit();
+    // Logs exit last
+    term_exit();
+    log_exit();
 }
 
 
 int main()
 {
-	atexit(onexit);
+    atexit(onexit);
 
-	// init submodules
-	// Logs init first
-	log_init();
-	log_l("MAIN", "\n--------INIT BEGIN-------");
-	term_init();
-	buf_init();
-	inp_init();
-	menu_init();
-	win_init();
-	log_l("MAIN", "\n---------INIT END--------\n");
+    // init submodules
+    // Logs init first
+    log_init();
+    log_l("MAIN", "\n--------INIT BEGIN-------");
+    term_init();
+    buf_init();
+    inp_init();
+    menu_init();
+    win_init();
+    log_l("MAIN", "\n---------INIT END--------\n");
 
-	// Run program
-	ced_run();
+    // Run program
+    ced_run();
 }
 

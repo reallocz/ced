@@ -63,14 +63,14 @@
 typedef int hWindow;
 
 struct win_props {
-	// Dimensions
-	unsigned int wy, wx, wrows, wcols;
-	// statusline
-	unsigned int sy, sx, swidth, sheight;
-	// margin
-	unsigned int my, mx, mwidth, mheight;
-	// textarea
-	unsigned int ty, tx, twidth, theight;
+    // Dimensions
+    unsigned int wy, wx, wrows, wcols;
+    // statusline
+    unsigned int sy, sx, swidth, sheight;
+    // margin
+    unsigned int my, mx, mwidth, mheight;
+    // textarea
+    unsigned int ty, tx, twidth, theight;
 };
 
 
