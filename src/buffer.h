@@ -1,6 +1,5 @@
 #pragma once
 
-#define INVALID_BUFFER -1
 
 /** buffer.h
  * A buffer is just contents of a file and some metadata.

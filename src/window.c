@@ -5,6 +5,7 @@
 #include <assert.h>
 #include "log.h"
 #include <stdlib.h>
+#include "defs.h"
 
 
 // A maximum of 4 windows allowed
@@ -30,7 +31,7 @@ struct window {
      * Each window can have upto one attached buffer
      * which is manipulated using the win_buf_*
      * functions.
-     * INVALID_BUFFER if no buffer set
+     * INVALID_ID if no buffer set
      */
     hBuffer buffer;
 
@@ -53,7 +54,7 @@ void win_init()
     G.windowcap = WINDOW_DEFCAP;
     for(unsigned int i = 0; i < G.windowcap; ++i) {
         G.windows[i].in_use = 0;
-        G.windows[i].buffer = INVALID_BUFFER;
+        G.windows[i].buffer = INVALID_ID;
     }
     log_l(G.tag, "Init success");
 }
@@ -106,7 +107,7 @@ hWindow win_create(int y, int x, int rows, int cols)
     struct window* w = &G.windows[win];
     w->id = _generate_id();
     w->in_use = 1;
-    w->buffer = INVALID_BUFFER;
+    w->buffer = INVALID_ID;
     w->nwin = newwin(rows, cols, y, x);
     assert(w->nwin);
     win_update(win);
@@ -157,7 +158,7 @@ void win_update(hWindow win)
         props.mx = 0;
 
         unsigned int lcount = 100;
-        if(w->buffer != INVALID_BUFFER) {
+        if(w->buffer != INVALID_ID) {
             /*lcount = buf_get_linecount(w->buffer);*/
             lcount = 8; // TODO Fix this
         }
@@ -242,7 +243,7 @@ void win_draw_buffer(hWindow win)
 {
     SW(w, win);
     hBuffer buf = w->buffer;
-    assert(buf != INVALID_BUFFER);
+    assert(buf != INVALID_ID);
 
     int y = w->props.ty;
     int x = w->props.tx;

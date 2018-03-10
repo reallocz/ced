@@ -2,7 +2,6 @@
 #include <ncurses.h>
 #include "buffer.h"
 
-#define INVALID_WINDOW -1
 
 /** window.h
  * A window is a rectangular division of the terminal.
@@ -92,7 +91,7 @@ WINDOW* win_nwin(hWindow win);
 /** sets/replaces the window buffer */
 int win_set_buffer(hWindow win, hBuffer buf);
 /** returns the buffer set on the window
- * or INVALID_BUFFER if a buffer isn't set */
+ * or INVALID_ID if a buffer isn't set */
 hBuffer win_get_buffer(hWindow win);
 
 /** moves window cursor to (x,y)*/

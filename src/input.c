@@ -1,6 +1,7 @@
 #include "input.h"
 #include "log.h"
 #include <assert.h>
+#include "defs.h"
 
 static struct {
     const char* tag;
@@ -14,7 +15,7 @@ struct inp_handler _empty_handler()
 {
     struct inp_handler handler = {
         .name = "DEFAULT",
-        .window = INVALID_WINDOW,
+        .window = INVALID_ID,
         .callback = NULL,
     };
     return handler;
@@ -24,7 +25,7 @@ struct inp_handler _empty_handler()
 static
 int _handler_valid()
 {
-    return G.handler.window != INVALID_WINDOW
+    return G.handler.window != INVALID_ID
         && G.handler.callback != NULL;
 }
 
@@ -45,7 +46,7 @@ int inp_exit()
 
 int inp_set_handler(struct inp_handler handler)
 {
-    assert(handler.callback && handler.window != INVALID_WINDOW);
+    assert(handler.callback && handler.window != INVALID_ID);
 
     /*log_l(G.tag, "Setting handler: %s->%s, handler: %p->%p\*/
             /*window: %d->%d",*/
