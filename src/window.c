@@ -6,6 +6,7 @@
 #include "log.h"
 #include <stdlib.h>
 #include "defs.h"
+#include "defs.h"
 
 
 // A maximum of 4 windows allowed
@@ -13,8 +14,8 @@
 #define WINDOW_STATUSHEIGHT 2
 
 /** Bring struct window* alias of id x into scope */
-#define SW(alias, hWindow) \
-    struct window* alias = _get_window(hWindow)
+#define SCOPE(alias, hWindow) \
+    struct window* alias = _get_window(hWindow);
 
 struct window {
     /*unique identifier of each window for debugging*/
@@ -118,7 +119,7 @@ hWindow win_create(int y, int x, int rows, int cols)
 
 void win_destroy(hWindow win)
 {
-    SW(w, win);
+    SCOPE(w, win)
     // Mark window as not in use
     w->in_use = 0;
     delwin(w->nwin);
@@ -129,7 +130,7 @@ void win_destroy(hWindow win)
 
 void win_update(hWindow win)
 {
-    SW(w, win);
+    SCOPE(w, win)
 
     struct win_props props;
 
@@ -184,14 +185,14 @@ void win_update(hWindow win)
 
 WINDOW* win_nwin(hWindow win)
 {
-    SW(w, win);
+    SCOPE(w, win)
     return w->nwin;
 }
 
 
-int win_set_buffer(hWindow win, hBuffer buf)
+int win_buffer_set(hWindow win, hBuffer buf)
 {
-    SW(w, win);
+    SCOPE(w, win)
     log_l(G.tag, "(win:%d) buffer set: %d -> %d", win,
             w->buffer, buf);
     w->buffer = buf;
@@ -200,30 +201,35 @@ int win_set_buffer(hWindow win, hBuffer buf)
 }
 
 
-hBuffer win_get_buffer(hWindow win)
+hBuffer win_buffer_get(hWindow win)
 {
-    SW(w, win);
+    SCOPE(w, win)
     return w->buffer;
 }
 
 
-struct win_props win_get_props(hWindow win)
+struct win_props win_props_get(hWindow win)
 {
-    SW(w, win);
+    SCOPE(w, win)
     return w->props;
 }
 
 
-void win_set_cursor(hWindow win, int y, int x)
+int win_props_set(hWindow win, struct win_props props)
 {
-    SW(w, win);
+}
+
+
+void win_cursor_set(hWindow win, int y, int x)
+{
+    SCOPE(w, win)
     wmove(w->nwin, y, x);
 }
 
 
-void win_get_cursor(hWindow win, int* y, int* x)
+void win_cursor_get(hWindow win, int* y, int* x)
 {
-    SW(w, win);
+    SCOPE(w, win)
     int my, mx;
     getyx(w->nwin, my, mx);
     *y = my;
@@ -234,14 +240,14 @@ void win_get_cursor(hWindow win, int* y, int* x)
 
 void win_draw_refresh(hWindow win)
 {
-    SW(w, win);
+    SCOPE(w, win)
     wrefresh(w->nwin);
 }
 
 
 void win_draw_buffer(hWindow win)
 {
-    SW(w, win);
+    SCOPE(w, win)
     hBuffer buf = w->buffer;
     assert(buf != INVALID_ID);
 
@@ -275,7 +281,7 @@ void win_draw_buffer(hWindow win)
 
 void win_pprint(hWindow win)
 {
-    SW(w, win);
+    SCOPE(w, win)
     log_l(G.tag, "Window {");
     log_lc("id: %d, wy: %d, wx: %d, wrows: %d, wcols: %d\n",
             w->id, w->props.wy, w->props.wx, w->props.wrows, w->props.wcols);

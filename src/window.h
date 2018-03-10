@@ -57,7 +57,7 @@
  * window structs that can be reused. This pool is
  * implemented as an array. The handle is a valid index
  * to a window struct in that array. An invalid handle
- * is represented by INVAID_WINDOW
+ * is represented by INVALID_ID
  */
 typedef int hWindow;
 
@@ -89,17 +89,19 @@ void win_update(hWindow win);
 WINDOW* win_nwin(hWindow win);
 
 /** sets/replaces the window buffer */
-int win_set_buffer(hWindow win, hBuffer buf);
+int win_buffer_set(hWindow win, hBuffer buf);
 /** returns the buffer set on the window
  * or INVALID_ID if a buffer isn't set */
-hBuffer win_get_buffer(hWindow win);
+hBuffer win_buffer_get(hWindow win);
 
 /** moves window cursor to (x,y)*/
-void win_set_cursor(hWindow win, int y, int x);
+void win_cursor_set(hWindow win, int y, int x);
 /** query cursor positions */
-void win_get_cursor(hWindow win, int* y, int* x);
+void win_cursor_get(hWindow win, int* y, int* x);
+
 /** returns the window properties struct*/
-struct win_props win_get_props(hWindow win);
+struct win_props win_props_get(hWindow win);
+int win_props_set(hWindow win, struct win_props props);
 
 /** Drawing / rendering */
 /** Refresh's window */
