@@ -22,16 +22,9 @@ void ced_run();
 
 /** Set the editor mode for the focussed window */
 void ced_set_mode(enum ced_mode mode);
-/** Set window focus */
-void ced_set_window_focus(hWindow win);
 
 // Input callbacks
 /** Input callback for MODE_INSERT */
 void ced_insert_input_cb(inpev ev);
 /** Input callback for MODE_NORMAL */
 void ced_normal_input_cb(inpev ev);
-
-// Drawing
-void ced_draw_statusline(hWindow win, enum ced_mode mode);
-void ced_draw_margin(hWindow win, enum ced_mode mode);
-void ced_draw_textarea(hWindow win);

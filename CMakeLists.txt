@@ -17,7 +17,6 @@ add_executable(debug
         ${SRCDIR}/window.c
         ${SRCDIR}/input.c
         ${SRCDIR}/buffer.c
-        ${SRCDIR}/menu.c
 	${SRCDIR}/term.c
         ${SRCDIR}/ced.c
 )

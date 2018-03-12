@@ -1,85 +1,19 @@
 #include "input.h"
 #include "log.h"
 #include <assert.h>
-#include "defs.h"
 
-static struct {
-    const char* tag;
-    struct inp_handler handler;
-} G;
+#define TAG "INPUT"
 
-
-/** Return an empty handler */
-static
-struct inp_handler _empty_handler()
+void inp_poll(const char* name, struct window* win,
+        void (*callback) (inpev))
 {
-    struct inp_handler handler = {
-        .name = "DEFAULT",
-        .window = INVALID_ID,
-        .callback = NULL,
-    };
-    return handler;
-}
-
-/** Return 1 if set handler is valid. else return 0 */
-static
-int _handler_valid()
-{
-    return G.handler.window != INVALID_ID
-        && G.handler.callback != NULL;
-}
-
-int inp_init()
-{
-    G.tag = "INPUT";
-    G.handler = _empty_handler();
-    log_l(G.tag, "Init success");
-    return 0;
-}
-
-
-int inp_exit()
-{
-    return 0;
-}
-
-
-int inp_set_handler(struct inp_handler handler)
-{
-    assert(handler.callback && handler.window != INVALID_ID);
-
-    /*log_l(G.tag, "Setting handler: %s->%s, handler: %p->%p\*/
-            /*window: %d->%d",*/
-            /*G.handler.name, handler.name,*/
-            /*G.handler.callback, handler.callback,*/
-            /*G.handler.window, handler.window);*/
-    G.handler = handler;
-    return 0;
-}
-
-
-void inp_unsethandler()
-{
-    log_l(G.tag, "Unsetting handler: %s, handler: %p, window: %d",
-            G.handler.name, G.handler.callback, G.handler.window);
-    G.handler = _empty_handler();
-}
-
-
-void inp_poll()
-{
-    if(! _handler_valid())
-    {
-        log_e(G.tag, "%s: No input handler set!");
-        return;
-    }
 
     inpev ev;
-    int ch = wgetch(win_nwin(G.handler.window));
+    int ch = wgetch(win->nwin);
     ev.type = inp_classify(ch);
     ev.key = ch;
 
-    G.handler.callback(ev);
+    callback(ev);
 }
 
 
@@ -118,6 +52,6 @@ enum inp_type inp_classify(int ch)
         return INP_FUNCTION;
     }
 
-    log_l(G.tag, "Unknown key: %d", ch);
+    log_l(TAG, "Unknown key: %d", ch);
     return INP_UNKNOWN;
 }

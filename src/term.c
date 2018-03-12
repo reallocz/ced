@@ -9,7 +9,7 @@
 
 static struct {
     const char* tag;
-    int rows, cols;	// Global width and height
+    unsigned int rows, cols;	// Global width and height
 
     WINDOW* stdscr;
 } G;
@@ -40,6 +40,11 @@ void term_exit()
 }
 
 
+void term_update()
+{
+    getmaxyx(G.stdscr, G.rows, G.cols);
+}
+
 int term_rows()
 {
     return G.rows;
@@ -50,7 +55,7 @@ int term_cols()
     return G.cols;
 }
 
-void term_size(int *rows, int *cols)
+void term_size(unsigned int *rows, unsigned int *cols)
 {
     *rows = G.rows;
     *cols = G.cols;

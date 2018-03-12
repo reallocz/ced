@@ -5,290 +5,193 @@
 #include <assert.h>
 #include "log.h"
 #include <stdlib.h>
-#include "defs.h"
-#include "defs.h"
 
-
-// A maximum of 4 windows allowed
-#define WINDOW_DEFCAP 4
-#define WINDOW_STATUSHEIGHT 2
-
-/** Bring struct window* alias of id x into scope */
-#define SCOPE(alias, hWindow) \
-    struct window* alias = _get_window(hWindow);
-
-struct window {
-    /*unique identifier of each window for debugging*/
-    unsigned int id;
-
-    /*1 if the window is in use (not destroyed)*/
-    int in_use;
-
-    /** Handle to ncurses WINDOW* */
-    WINDOW* nwin;
-
-    /**
-     * Handle to a buffer.
-     * Each window can have upto one attached buffer
-     * which is manipulated using the win_buf_*
-     * functions.
-     * INVALID_ID if no buffer set
-     */
-    hBuffer buffer;
-
-    /** contains window properties */
-    struct win_props props;
-};
-
-
-static struct {
-    const char* tag;
-    unsigned int windowcap;
-    struct window windows[WINDOW_DEFCAP];
-} G;
-
-
-void win_init()
-{
-    /// Initialize globals
-    G.tag = "WINDOW";
-    G.windowcap = WINDOW_DEFCAP;
-    for(unsigned int i = 0; i < G.windowcap; ++i) {
-        G.windows[i].in_use = 0;
-        G.windows[i].buffer = INVALID_ID;
-    }
-    log_l(G.tag, "Init success");
-}
-
-
-void win_exit()
-{
-}
-
+#define TAG "WINDOW"
 
 /** return a new id for a window */
-    static
-unsigned int _generate_id()
+static unsigned int generate_id()
 {
     static unsigned int ids = 0;
     return ids++;
 }
 
-
-/** return a pointer to the window of the handle */
-    static
-struct window* _get_window(hWindow win)
+struct window* win_create(struct buffer* buffer)
 {
-    if(win < 0 || win >= G.windowcap) {
-        log_fatal(G.tag, "Invalid handle: %d", win);
-    }
-    struct window* w = &G.windows[win];
-    if(!w->in_use) {
-        log_fatal(G.tag, "Bad handle: %d", win);
-    }
+    assert(buffer);
+
+    struct window* w = malloc(sizeof(struct window));
+    assert(w);
+
+    w->id = generate_id();
+    w->buffer = buffer;
+
+    // ncurses
+    w->nwin = newwin(0, 0, 0, 0);
+    assert(w->nwin);
+    keypad(w->nwin, TRUE);
+
+    // Statusline
+    w->stl.bufname = "TODO-BUFNAME";
+    w->stl.mode = "TODO-MODE";
+    w->stl.row = 0;
+    w->stl.col = 0;
+
+    // Margin
+    w->mgn.width = 3;
+
+    // Cursor
+    w->curx = w->cury = 0;
+    log_l(TAG, "Window created: id: %d", w->id);
     return w;
 }
 
-/** return a handle to a free window (in_use == 0)*/
-    static
-hWindow _get_free_handle()
+
+void win_destroy(struct window* win)
 {
-    for(unsigned int i = 0; i < G.windowcap; ++i) {
-        if(! G.windows[i].in_use) {
-            return i;
-        }
+    delwin(win->nwin);
+    log_l(TAG, "Window destroyed: %d", win->id);
+}
+
+
+void win_draw(struct window* win, const char* mode,
+        unsigned int y, unsigned int x,
+        unsigned int height, unsigned int width)
+{
+    // Statusline
+    {
+        // Save cursor position
+        int curx = win->curx;
+        int cury = win->cury;
+
+        // Draw bottom horizontal line
+        wmove(win->nwin, height - 2, 0);
+        whline(win->nwin, ACS_HLINE, width);
+
+        mvwaddstr(win->nwin, height - 1, 0, mode);
+
+        // Go back to original positions
+        wmove(win->nwin, cury, curx);
     }
-    log_fatal(G.tag, "%s: OUT OF WINDOWS!", __func__);
+
+
+    // Margin
+    {
+        // Save cursor position
+        int curx = win->curx;
+        int cury = win->cury;
+        unsigned int linecount = buf_get_linecount(win->buffer);
+
+        wattron(win->nwin, A_BOLD);
+        char lnstr[win->mgn.width]; // line number to string
+        for(unsigned int i = 0; i < height - 2; ++i) {
+            wmove(win->nwin, i, 0);
+            if(i <= linecount) {
+                sprintf(lnstr, "%d", i + 1);
+                waddstr(win->nwin, lnstr);
+            } else {
+                waddstr(win->nwin, " ~");
+            }
+        }
+        wattroff(win->nwin, A_BOLD);
+        wmove(win->nwin, cury, curx);
+    }
+
+    // Text area
+    {
+        int y = 0;
+        int x = win->mgn.width;
+        struct buffer* buf = win->buffer;
+
+        // Clear current line
+        wmove(win->nwin, y, x);
+        wclrtoeol(win->nwin);
+
+        // Draw line
+        for(unsigned int i = 0; i < buf->size; ++i) {
+            if(!buf_ingap(buf, i))
+            {
+                char c = buf_get_char(buf, i);
+                if(c != 0)
+                    mvwaddch(win->nwin, y, x++, buf_get_char(buf, i));
+                else
+                    log_e(TAG, "%s: ERROR: THIS SHOULDN'T HAPPEN",
+                            __func__);
+            }
+        }
+
+        // Sync window cursor and buffer cursor
+        wmove(win->nwin, y, win->mgn.width + buf->cur);
+        /*buf_printbuf(buf);  //Debugging gapbuffer*/
+    }
 }
 
 
-hWindow win_create(int y, int x, int rows, int cols)
+void win_update(struct window* win)
 {
-    hWindow win = _get_free_handle();
-    struct window* w = &G.windows[win];
-    w->id = _generate_id();
-    w->in_use = 1;
-    w->buffer = INVALID_ID;
-    w->nwin = newwin(rows, cols, y, x);
-    assert(w->nwin);
-    win_update(win);
-    keypad(w->nwin, TRUE);
-    return win;
-}
-
-
-void win_destroy(hWindow win)
-{
-    SCOPE(w, win)
-    // Mark window as not in use
-    w->in_use = 0;
-    delwin(w->nwin);
-    log_l(G.tag, "Window destroyed: %d", win);
-}
-
-
-
-void win_update(hWindow win)
-{
-    SCOPE(w, win)
-
-    struct win_props props;
 
     // Dimensions
-    {
-        getyx(w->nwin, props.wy, props.wx);
+    /*getyx(w->nwin, props->y, props->x);*/
+    /*getmaxyx(w->nwin, props->cols, props->rows);*/
 
-        int width, height;
-        getmaxyx(w->nwin, width, height);
-        // 0 indexed
-        props.wrows = width;
-        props.wcols = height;
-    }
+    /*// statusline*/
+    /*[>props->sy = props->wrows - 1 - WINDOW_STATUSHEIGHT;<]*/
+    /*[>props->sx = 0;<]*/
+    /*[>props->swidth = props.wcols;<]*/
+    /*[>props->sheight = WINDOW_STATUSHEIGHT;<]*/
 
-    // statusline
-    {
-        props.sy = props.wrows - 1 - WINDOW_STATUSHEIGHT;
-        props.sx = 0;
-        props.swidth = props.wcols;
-        props.sheight = WINDOW_STATUSHEIGHT;
-    }
+    /*// margin*/
+    /*props->marx = 0;*/
+    /*props->mary = 0;*/
 
-    // margin
-    {
-        props.my = 0;
-        props.mx = 0;
+    /*props->marw = 4;    // TODO calculate from buffer linecount*/
+    /*props->marh = props->rows - 1 - WINDOW_STATUSHEIGHT;*/
 
-        unsigned int lcount = 100;
-        if(w->buffer != INVALID_ID) {
-            /*lcount = buf_get_linecount(w->buffer);*/
-            lcount = 8; // TODO Fix this
-        }
-        props.mwidth = lcount > 999 ? 4 : 3;
-        props.mheight = props.wrows - 1 - WINDOW_STATUSHEIGHT;
-    }
-
-    // textarea
-    {
-        props.ty = 0;
-        props.tx = props.mwidth;
-        props.twidth = props.wcols - props.mwidth;
-        props.theight = props.mheight;
-    }
-
-    w->props = props;
+    /*// textarea*/
+    /*props->texy = 0;*/
+    /*props->texx = props->marw;*/
+    /*props->texw = props.wcols - props.mwidth;*/
+    /*props->texh = props->marh;*/
 
     // TODO Set window title based on the buffer
-
 }
 
 
 
-WINDOW* win_nwin(hWindow win)
+void win_draw_buffer(struct window* win)
 {
-    SCOPE(w, win)
-    return w->nwin;
+        /*hBuffer buf = w->buffer;*/
+    /*assert(buf != INVALID_ID);*/
+
+    /*int y = w->props.texy;*/
+    /*int x = w->props.texx;*/
+    /*struct buf_props bprops = buf_get_props(buf);*/
+
+    /*// Clear current line*/
+    /*wmove(w->nwin, y, x);*/
+    /*wclrtoeol(w->nwin);*/
+
+    /*// Draw line*/
+    /*for(unsigned int i = 0; i < bprops.size; ++i) {*/
+        /*if(i >= bprops.gap.pos*/
+                /*&& i < bprops.gap.pos + bprops.gap.len)*/
+        /*{*/
+            /*// In gap*/
+            /*continue;*/
+        /*} else {*/
+            /*char c = buf_get_char(buf, i);*/
+            /*if(c != 0)*/
+                /*mvwaddch(w->nwin, y, x++, buf_get_char(buf, i));*/
+        /*}*/
+    /*}*/
+
+    /*// Sync window cursor and buffer cursor*/
+    /*wmove(w->nwin, y, w->props.tx + bprops.cur);*/
+    /*[>buf_printbuf(buf);<] // Debugging gapbuffer*/
 }
 
 
-int win_buffer_set(hWindow win, hBuffer buf)
+void win_pprint(struct window* win)
 {
-    SCOPE(w, win)
-    log_l(G.tag, "(win:%d) buffer set: %d -> %d", win,
-            w->buffer, buf);
-    w->buffer = buf;
-    win_update(win);
-    return 0;
-}
-
-
-hBuffer win_buffer_get(hWindow win)
-{
-    SCOPE(w, win)
-    return w->buffer;
-}
-
-
-struct win_props win_props_get(hWindow win)
-{
-    SCOPE(w, win)
-    return w->props;
-}
-
-
-int win_props_set(hWindow win, struct win_props props)
-{
-}
-
-
-void win_cursor_set(hWindow win, int y, int x)
-{
-    SCOPE(w, win)
-    wmove(w->nwin, y, x);
-}
-
-
-void win_cursor_get(hWindow win, int* y, int* x)
-{
-    SCOPE(w, win)
-    int my, mx;
-    getyx(w->nwin, my, mx);
-    *y = my;
-    *x = mx;
-}
-
-
-
-void win_draw_refresh(hWindow win)
-{
-    SCOPE(w, win)
-    wrefresh(w->nwin);
-}
-
-
-void win_draw_buffer(hWindow win)
-{
-    SCOPE(w, win)
-    hBuffer buf = w->buffer;
-    assert(buf != INVALID_ID);
-
-    int y = w->props.ty;
-    int x = w->props.tx;
-    struct buf_props bprops = buf_get_props(buf);
-
-    // Clear current line
-    wmove(w->nwin, y, x);
-    wclrtoeol(w->nwin);
-
-    // Draw line
-    for(unsigned int i = 0; i < bprops.size; ++i) {
-        if(i >= bprops.gap.pos
-                && i < bprops.gap.pos + bprops.gap.len)
-        {
-            // In gap
-            continue;
-        } else {
-            char c = buf_get_char(buf, i);
-            if(c != 0)
-                mvwaddch(w->nwin, y, x++, buf_get_char(buf, i));
-        }
-    }
-
-    // Sync window cursor and buffer cursor
-    wmove(w->nwin, y, w->props.tx + bprops.cur);
-    /*buf_printbuf(buf);*/ // Debugging gapbuffer
-}
-
-
-void win_pprint(hWindow win)
-{
-    SCOPE(w, win)
-    log_l(G.tag, "Window {");
-    log_lc("id: %d, wy: %d, wx: %d, wrows: %d, wcols: %d\n",
-            w->id, w->props.wy, w->props.wx, w->props.wrows, w->props.wcols);
-    log_lc("sy: %d, sx: %d, swidth: %d, sheight: %d\n",
-            w->props.sy, w->props.sx, w->props.swidth, w->props.sheight);
-    log_lc("my: %d, mx: %d, mwidth: %d, mheight: %d\n",
-            w->props.my, w->props.mx, w->props.mwidth, w->props.mheight);
-    log_lc("ty: %d, tx: %d, twidth: %d, theight: %d\n}\n",
-            w->props.ty, w->props.tx, w->props.twidth, w->props.theight);
+    log_lc(TAG, "Window {id:%d, curx:%d, cury: %d", win->id,
+            win->curx, win->cury);
 }

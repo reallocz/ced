@@ -21,28 +21,11 @@ typedef struct {
 } inpev;
 
 
-struct inp_handler {
-    const char* name;           /** Name for identification */
-    hWindow window;                /** handle used for polling */
-    void (*callback) (inpev);   /** Callback function */
-};
-
-
-/** Initialize input submodule */
-int inp_init();
-int inp_exit();
-
-/** Set an input handler */
-int inp_set_handler(struct inp_handler handler);
-/** Return's the set handler */
-struct inp_handler inp_get_handler();
-/** Remove input handler function */
-void inp_remove_handler();
-
 /** Poll ncurses for input events.
  * The input event is passed on to the handler.
  */
-void inp_poll();
+void inp_poll(const char* name, struct window* win,
+        void (*callback) (inpev));
 
 /** Return the type of given int */
 enum inp_type inp_classify(int c);
