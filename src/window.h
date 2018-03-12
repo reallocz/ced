@@ -64,7 +64,7 @@ enum window_pane {
 };
 
 /** Draw the window */
-void win_draw(struct window* win, const char* mode,
+void win_draw(const struct window* win, const char* mode,
         unsigned int y, unsigned int x,
         unsigned int height, unsigned int width);
 

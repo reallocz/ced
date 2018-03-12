@@ -54,26 +54,25 @@ void win_destroy(struct window* win)
 }
 
 
-void win_draw(struct window* win, const char* mode,
+void win_draw(const struct window* win, const char* mode,
         unsigned int y, unsigned int x,
         unsigned int height, unsigned int width)
 {
     int txtpadding = 1;
+    unsigned int linecount = buf_get_linecount(win->buffer);
+    // Saved window cursor positions
+    unsigned int curx = win->curx;
+    unsigned int cury = win->cury;
 
     // Statusline
     {
         // statusline string
         char stsstring[width];
-        unsigned int row, col;
-        row = 0;
-        col = win->buffer->cur;
+        unsigned int row = 0;
+        unsigned int col = win->buffer->cur;
         const char* bufname = win->buffer->name;
         sprintf(stsstring, "%s | %s | row:%d - col: %d | line: %d",
                 mode, bufname, row, col, row + 1);
-
-        // Save cursor position
-        int curx = win->curx;
-        int cury = win->cury;
 
         init_pair(1, COLOR_BLACK, COLOR_WHITE);
         wattron(win->nwin, COLOR_PAIR(1));
@@ -81,6 +80,7 @@ void win_draw(struct window* win, const char* mode,
         wclrtoeol(win->nwin);
         waddstr(win->nwin, stsstring);
         wattroff(win->nwin, COLOR_PAIR(1));
+
         // Go back to original positions
         wmove(win->nwin, cury, curx);
     }
@@ -88,11 +88,6 @@ void win_draw(struct window* win, const char* mode,
 
     // Margin
     {
-        // Save cursor position
-        int curx = win->curx;
-        int cury = win->cury;
-        unsigned int linecount = buf_get_linecount(win->buffer);
-
         wattron(win->nwin, A_BOLD);
 
         // line number to string
@@ -113,28 +108,39 @@ void win_draw(struct window* win, const char* mode,
 
     // Text area
     {
-        int y = 0;
-        int x = win->mgn.width + txtpadding;
+        int leftedge = win->mgn.width + txtpadding;
         struct buffer* buf = win->buffer;
 
-        // Clear current line
-        wmove(win->nwin, y, x);
+        unsigned int col = 0;
+        unsigned int row = 0;
+
+        // Clear first row
+        wmove(win->nwin, 0, leftedge);
         wclrtoeol(win->nwin);
 
-        // Draw line
+        // Draw lines
         for(unsigned int i = 0; i < buf->size; ++i) {
             if(!buf_ingap(buf, i)) {
-                char c = buf_get_char(buf, i);
-                if(c != 0)
-                    mvwaddch(win->nwin, y, x++, buf_get_char(buf, i));
-                else
-                    log_e(TAG, "%s: ERROR: THIS SHOULDN'T HAPPEN",
-                            __func__);
+                char c = buf->data[i];
+
+                if(c == '\n') {
+                    // Clear next row
+                    row++;
+                    col = 0; // Reset col
+                    wmove(win->nwin, row, leftedge + col);
+                    wclrtoeol(win->nwin);
+                } else if (c != 0) {
+                    waddch(win->nwin, c);
+                    /*mvwaddch(win->nwin, row, leftedge + col++, c);*/
+                } else {
+                    log_fatal(TAG, "%s: ERROR: THIS SHOULDN'T HAPPEN", __func__);
+                }
             }
         }
 
         // Sync window cursor and buffer cursor
-        wmove(win->nwin, y, win->mgn.width + txtpadding + buf->cur);
+        unsigned int curline = buf_cur_line(win->buffer);
+        wmove(win->nwin, curline, win->mgn.width + txtpadding + buf_cur_lineoffset(buf));
         /*buf_printbuf(buf);  //Debugging gapbuffer*/
     }
 }
