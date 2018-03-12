@@ -8,10 +8,6 @@
 static
 unsigned int generate_id();
 
-/** Calculate number of char 'c' in the buffer */
-static
-unsigned int charcount(struct buffer* b, char ch);
-
 /** Increase buffer gap */
 static
 void gap_add(struct buffer* b);

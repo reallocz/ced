@@ -13,7 +13,6 @@
 #define INGAP(buffer, i)\
     ((i >= buffer->gappos && i < buffer->gappos + buffer->gaplen))
 
-
 #define TAG "BUFFER"
 
 
@@ -107,15 +106,26 @@ void buf_cur_mvb(struct buffer* b, unsigned int n)
 }
 
 
-unsigned int buf_get_linecount(struct buffer* b)
+unsigned int buf_cur_mveol(struct buffer* buf)
 {
-    return b->cache.linecount;
+    for(unsigned int i = buf->cur; i < buf->size; ++i) {
+        if(!INGAP(buf, i) && buf->data[i] == '\n') {
+            unsigned int offset = i - buf->cur;
+            buf->cur = i;
+            return offset;
+        }
+    }
+    // EOB
+    unsigned int eob = buf->size - 1;
+    unsigned int offset = eob - buf->cur;
+    buf->cur = eob;
+    return offset;
 }
 
 
-unsigned int buf_get_size(struct buffer* b)
+unsigned int buf_get_linecount(struct buffer* b)
 {
-    return b->size;
+    return b->cache.linecount;
 }
 
 
@@ -142,10 +152,23 @@ int buf_save_to_disk(struct buffer* b, const char* path)
     return 0;
 }
 
+
+unsigned int buf_charcount(struct buffer* b, char ch)
+{
+    unsigned int count = 0;
+    for(unsigned int i = 0; i < b->size; ++i) {
+        if((!INGAP(b, i)) && b->data[i] == ch)
+            count++;
+    }
+    return count;
+}
+
+
 int buf_ingap(struct buffer* buf, unsigned int pos)
 {
     return INGAP(buf, pos);
 }
+
 
 void buf_pprint(struct buffer* b)
 {
@@ -182,21 +205,11 @@ unsigned int generate_id()
 
 
 static
-unsigned int charcount(struct buffer* b, char ch)
-{
-    unsigned int count = 0;
-    for(unsigned int i = 0; i < b->size; ++i) {
-        if((!INGAP(b, i)) && b->data[i] == ch)
-            count++;
-    }
-    return count;
-}
-
-
-static
 int update_cache(struct buffer* b)
 {
-    b->cache.linecount = charcount(b, '\n') + 1;
+    // Linecount
+    unsigned int nlcount = buf_charcount(b, '\n');
+    b->cache.linecount = nlcount + 1;
     return 0;
 }
 
@@ -225,14 +238,15 @@ void gap_add(struct buffer* b)
     b->gaplen = newgap;
 }
 
+
 static
 int gap_sync(struct buffer* b)
 {
     int diff = b->cur - b->gappos;
     unsigned int offset = 0;
 
-    // Cursor is ahead of the gap
     if(diff > 0) {
+        // Cursor is ahead of the gap
         offset = diff;
         for(unsigned int i = 0; i < offset; ++i) {
             b->data[b->gappos] = b->data[b->gappos + b->gaplen];
@@ -240,9 +254,8 @@ int gap_sync(struct buffer* b)
         }
         log_l(TAG, "%s: diff=%d, offset=%d", __func__, diff, offset);
     }
-
-    // Cursor is behind the gap
     else if(diff < 0) {
+        // Cursor is behind the gap
         offset = -1 * diff;
         for(unsigned int i = 0; i < offset; ++i) {
             b->data[b->gappos + b->gaplen - 1]
@@ -254,5 +267,6 @@ int gap_sync(struct buffer* b)
     else {
         // Cursor already in sync
     }
+
     return offset;
 }

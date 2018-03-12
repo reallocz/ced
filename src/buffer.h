@@ -44,7 +44,7 @@ void buf_delch(struct buffer* buf);
 void buf_cur_mvf(struct buffer* buf, unsigned int n);
 /** Move cursor backward (beginning of buffer) by 'n' chars */
 void buf_cur_mvb(struct buffer* buf, unsigned int n);
-/** Move cursor to EOL/EOB */
+/** Move cursor to EOL/EOB. Return offset */
 unsigned int buf_cur_mveol(struct buffer* buf);
 
 /** Return the number of newlines '\n' in the buffer */
@@ -54,8 +54,10 @@ char buf_get_char(struct buffer* buf, unsigned int pos);
 /** Save buffer to disk at path*/
 int buf_save_to_disk(struct buffer* buf, const char* path);
 
+unsigned int buf_charcount(struct buffer* buf, char ch);
 
 /** HELPERS */
+/** Return 1 if the position is inside the gap */
 int buf_ingap(struct buffer* buf, unsigned int pos);
 
 void buf_pprint(struct buffer* buf);
