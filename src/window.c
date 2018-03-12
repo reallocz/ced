@@ -68,11 +68,12 @@ void win_draw(const struct window* win, const char* mode,
     {
         // statusline string
         char stsstring[width];
-        unsigned int row = 0;
-        unsigned int col = win->buffer->cur;
+        unsigned int row = buf_cur_line(win->buffer);
+        unsigned int col = buf_cur_col(win->buffer);
+        unsigned int cur = win->buffer->cur;
         const char* bufname = win->buffer->name;
-        sprintf(stsstring, "%s | %s | row:%d - col: %d | line: %d",
-                mode, bufname, row, col, row + 1);
+        sprintf(stsstring, "%s | %s | row:%d, col: %d | cur: %d",
+                mode, bufname, row, col, cur);
 
         init_pair(1, COLOR_BLACK, COLOR_WHITE);
         wattron(win->nwin, COLOR_PAIR(1));
@@ -83,7 +84,7 @@ void win_draw(const struct window* win, const char* mode,
 
         // Go back to original positions
         wmove(win->nwin, cury, curx);
-    }
+    } // end statusline
 
 
     // Margin
@@ -104,7 +105,7 @@ void win_draw(const struct window* win, const char* mode,
         }
         wattroff(win->nwin, A_BOLD);
         wmove(win->nwin, cury, curx);
-    }
+    } // end margin
 
     // Text area
     {
@@ -139,10 +140,12 @@ void win_draw(const struct window* win, const char* mode,
         }
 
         // Sync window cursor and buffer cursor
-        unsigned int curline = buf_cur_line(win->buffer);
-        wmove(win->nwin, curline, win->mgn.width + txtpadding + buf_cur_lineoffset(buf));
+        wmove(win->nwin, buf_cur_line(buf),
+                win->mgn.width + txtpadding + buf_cur_col(buf));
+
         /*buf_printbuf(buf);  //Debugging gapbuffer*/
-    }
+
+    } // End textarea
 }
 
 

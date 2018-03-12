@@ -50,10 +50,13 @@ void buf_cur_mvb(struct buffer* buf, unsigned int n);
 unsigned int buf_cur_mveol(struct buffer* buf);
 /** Move cursor to the beginning of buffer. Return offset */
 unsigned int buf_cur_mvbeg(struct buffer* buf);
-/** Return the line on which the cursor is on */
+
+/** Return the line on which the cursor is resides */
 unsigned int buf_cur_line(const struct buffer* buf);
-/** Returns the offset of cursor from the last newline */
-unsigned int buf_cur_lineoffset(const struct buffer* buf);
+/** Return the "column" - offset from the last newline.
+ * NOTE: a cache update may be required, hence the absense
+ * of 'const' qualifier */
+unsigned int buf_cur_col(struct buffer* buf);
 
 /** Return the number of newlines '\n' in the buffer */
 unsigned int buf_get_linecount(const struct buffer* buf);

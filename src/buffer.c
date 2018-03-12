@@ -148,8 +148,12 @@ unsigned int buf_cur_line(const struct buffer* buf)
 }
 
 
-unsigned int buf_cur_lineoffset(const struct buffer* buf)
+unsigned int buf_cur_col(struct buffer* buf)
 {
+    if(buf->cur < buf->cache.curlineindex) {
+        /* Update the cache (cursor has moved to another line) */
+        update_cache(buf);
+    }
     return buf->cur - buf->cache.curlineindex;
 }
 
