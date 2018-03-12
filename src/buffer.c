@@ -93,7 +93,7 @@ void buf_delch(struct buffer* b)
 
 void buf_cur_mvf(struct buffer* b, unsigned int n)
 {
-    if(b->cur < b->size - 2) {
+    if(b->cur < b->size - b->gaplen) {
         b->cur++;
     }
 }
