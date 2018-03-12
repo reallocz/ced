@@ -33,7 +33,7 @@ struct buffer* buf_create(enum buffer_type type)
     b->data = calloc(b->size, sizeof(char));
     assert(b->data);
 
-    b->cache.linecount = 0;
+    update_cache(b);
     return b;
 }
 
@@ -92,16 +92,20 @@ void buf_delch(struct buffer* b)
 
 void buf_cur_mvf(struct buffer* b, unsigned int n)
 {
-    if(b->cur < b->size - b->gaplen) {
-        b->cur++;
-    }
+    unsigned int upperbound = b->size - b->gaplen;
+    unsigned int newcur = b->cur + n;
+    // min(newcur, upperbound)
+    b->cur = newcur < upperbound ? newcur : upperbound;
 }
 
 
 void buf_cur_mvb(struct buffer* b, unsigned int n)
 {
-    if(b->cur > 0) {
-        b->cur--;
+    // avoid unsigned int underflow
+    if(n >= b->cur) {
+        b->cur = 0;
+    } else {
+        b->cur -= n;
     }
 }
 

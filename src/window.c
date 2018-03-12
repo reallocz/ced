@@ -7,6 +7,7 @@
 #include <stdlib.h>
 
 #define TAG "WINDOW"
+#define STATUSLINE_HEIGHT 2
 
 /** return a new id for a window */
 static unsigned int generate_id()
@@ -67,18 +68,16 @@ void win_draw(struct window* win, const char* mode,
         row = 0;
         col = win->buffer->cur;
         const char* bufname = win->buffer->name;
-        sprintf(stsstring, "%s | %s | row:%d - col: %d",
-                mode, bufname, row, col);
+        sprintf(stsstring, "%s | %s | row:%d - col: %d | line: %d",
+                mode, bufname, row, col, row + 1);
 
         // Save cursor position
         int curx = win->curx;
         int cury = win->cury;
-        int stsheight = 2;
-
 
         init_pair(1, COLOR_BLACK, COLOR_WHITE);
         wattron(win->nwin, COLOR_PAIR(1));
-        wmove(win->nwin, height - stsheight, 0);
+        wmove(win->nwin, height - STATUSLINE_HEIGHT, 0);
         wclrtoeol(win->nwin);
         waddstr(win->nwin, stsstring);
         wattroff(win->nwin, COLOR_PAIR(1));
@@ -98,10 +97,10 @@ void win_draw(struct window* win, const char* mode,
 
         // line number to string
         char lnstr[win->mgn.width + txtpadding];
-        for(unsigned int i = 0; i < height - 2; ++i) {
+        for(unsigned int i = 0; i < height - STATUSLINE_HEIGHT; ++i) {
             wmove(win->nwin, i, 0);
-            if(i <= linecount) {
-                sprintf(lnstr, "%3d", i + 1);
+            if(i < linecount) {
+                sprintf(lnstr, "%3d", i + 1);  // 1 - indexed
                 waddstr(win->nwin, lnstr);
             } else {
                 sprintf(lnstr, "%3c", '~');
