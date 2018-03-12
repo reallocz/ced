@@ -24,7 +24,9 @@ struct buffer {
     unsigned int gaplen;
 
     struct {
-        unsigned int linecount;
+        unsigned int linecount;     /* number of '\n' + 1 */
+        unsigned int curline;       /* line the cursor is on */
+        unsigned int curlineindex;  /* beginning of curline*/
     } cache;
 };
 
@@ -46,20 +48,26 @@ void buf_cur_mvf(struct buffer* buf, unsigned int n);
 void buf_cur_mvb(struct buffer* buf, unsigned int n);
 /** Move cursor to EOL/EOB. Return offset */
 unsigned int buf_cur_mveol(struct buffer* buf);
+/** Move cursor to the beginning of buffer. Return offset */
+unsigned int buf_cur_mvbeg(struct buffer* buf);
+/** Return the line on which the cursor is on */
+unsigned int buf_cur_line(const struct buffer* buf);
+/** Returns the offset of cursor from the last newline */
+unsigned int buf_cur_lineoffset(const struct buffer* buf);
 
 /** Return the number of newlines '\n' in the buffer */
-unsigned int buf_get_linecount(struct buffer* buf);
+unsigned int buf_get_linecount(const struct buffer* buf);
 /** Return char at pos. check buf_in_gap().*/
-char buf_get_char(struct buffer* buf, unsigned int pos);
+char buf_get_char(const struct buffer* buf, unsigned int pos);
 /** Save buffer to disk at path*/
-int buf_save_to_disk(struct buffer* buf, const char* path);
+int buf_save_to_disk(const struct buffer* buf, const char* path);
 
-unsigned int buf_charcount(struct buffer* buf, char ch);
+unsigned int buf_charcount(const struct buffer* buf, char ch);
 
 /** HELPERS */
 /** Return 1 if the position is inside the gap */
-int buf_ingap(struct buffer* buf, unsigned int pos);
+int buf_ingap(const struct buffer* buf, unsigned int pos);
 
-void buf_pprint(struct buffer* buf);
+void buf_pprint(const struct buffer* buf);
 /** Print contents of buffer */
 void buf_printbuf(const struct buffer* buf);

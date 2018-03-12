@@ -112,10 +112,14 @@ void buf_cur_mvb(struct buffer* b, unsigned int n)
 
 unsigned int buf_cur_mveol(struct buffer* buf)
 {
+    unsigned int start = buf->cur;
+
     for(unsigned int i = buf->cur; i < buf->size; ++i) {
         if(!INGAP(buf, i) && buf->data[i] == '\n') {
             unsigned int offset = i - buf->cur;
             buf->cur = i;
+            log_l(__func__, "start: %d, end: %d, offset: %d",
+                    start, buf->cur, offset);
             return offset;
         }
     }
@@ -123,24 +127,47 @@ unsigned int buf_cur_mveol(struct buffer* buf)
     unsigned int eob = buf->size - 1;
     unsigned int offset = eob - buf->cur;
     buf->cur = eob;
+    log_l(__func__, "EOB start: %d, end: %d, offset: %d",
+            start, buf->cur, offset);
     return offset;
 }
 
 
-unsigned int buf_get_linecount(struct buffer* b)
+unsigned int buf_cur_mvbeg(struct buffer* buf)
+{
+    unsigned int offset = buf->cur;
+    buf->cur = 0;
+    return offset;
+}
+
+
+unsigned int buf_cur_line(const struct buffer* buf)
+{
+    return buf->cache.curline;
+
+}
+
+
+unsigned int buf_cur_lineoffset(const struct buffer* buf)
+{
+    return buf->cur - buf->cache.curlineindex;
+}
+
+
+unsigned int buf_get_linecount(const struct buffer* b)
 {
     return b->cache.linecount;
 }
 
 
-char buf_get_char(struct buffer* b, unsigned int pos)
+char buf_get_char(const struct buffer* b, unsigned int pos)
 {
     assert(pos < b->size);
     return b->data[pos];
 }
 
 
-int buf_save_to_disk(struct buffer* b, const char* path)
+int buf_save_to_disk(const struct buffer* b, const char* path)
 {
     FILE* f = fopen(path, "w");
     assert(f);
@@ -157,7 +184,7 @@ int buf_save_to_disk(struct buffer* b, const char* path)
 }
 
 
-unsigned int buf_charcount(struct buffer* b, char ch)
+unsigned int buf_charcount(const struct buffer* b, char ch)
 {
     unsigned int count = 0;
     for(unsigned int i = 0; i < b->size; ++i) {
@@ -168,13 +195,13 @@ unsigned int buf_charcount(struct buffer* b, char ch)
 }
 
 
-int buf_ingap(struct buffer* buf, unsigned int pos)
+int buf_ingap(const struct buffer* buf, unsigned int pos)
 {
     return INGAP(buf, pos);
 }
 
 
-void buf_pprint(struct buffer* b)
+void buf_pprint(const struct buffer* b)
 {
     log_l(TAG, "Buffer{id=%d, cur=%d, gappos=%d, gaplen = %d, size=%d}",
             b->id, b->cur, b->gappos, b->gaplen, b->size);
@@ -200,7 +227,7 @@ void buf_printbuf(const struct buffer* b)
 
 /** buffer_internal.h **/
 
-static
+    static
 unsigned int generate_id()
 {
     static unsigned int ids = 0;
@@ -208,17 +235,53 @@ unsigned int generate_id()
 }
 
 
-static
-int update_cache(struct buffer* b)
+    static
+int update_cache(struct buffer* buf)
 {
     // Linecount
-    unsigned int nlcount = buf_charcount(b, '\n');
-    b->cache.linecount = nlcount + 1;
+    {
+        unsigned int nlcount = buf_charcount(buf, '\n');
+        buf->cache.linecount = nlcount + 1;
+    }
+
+    // Curline
+    {
+        unsigned int line = 0;
+        for(unsigned int i = 0; i < buf->cur; ++i) {
+            if(!INGAP(buf, i) && buf->data[i] == '\n') {
+                line++;
+            }
+        }
+        buf->cache.curline = line;
+    }
+
+    // Curlineindex
+    {
+        // One line
+        if(buf->cache.curline == 0) {
+            buf->cache.curlineindex = 0;
+        }
+
+        unsigned int linecount = 0;
+        for(unsigned int i = 0; i < buf->size; ++i) {
+            if(!INGAP(buf, i) && buf->data[i] == '\n') {
+                linecount++;
+                if(linecount == buf->cache.curline) {
+                    //Curlineindex == the next char
+                    buf->cache.curlineindex = i + 1;
+                }
+            }
+        }
+    }
+
+    log_l(TAG, "Buffer.cache {linecount: %d, curline: %d, curlineindex: %d}",
+            buf->cache.linecount, buf->cache.curline,
+            buf->cache.curlineindex);
     return 0;
 }
 
 
-static
+    static
 void gap_add(struct buffer* b)
 {
     unsigned int newsize = b->size + BUFFER_GAPSIZE;
@@ -226,15 +289,15 @@ void gap_add(struct buffer* b)
 
     char* newbuf = calloc(newsize, sizeof(b->data[0]));
     assert(newbuf);
-    log_l(TAG, "Gap added: %d -> %d", b->size, newsize);
+    /*log_l(TAG, "Gap added: %d -> %d", b->size, newsize);*/
 
     /* Copy memory to new buffer */
     // from start to cursor
     memcpy(newbuf, b->data, b->gappos * sizeof(char));
     // from end of gap to end of buffer
     memcpy(&newbuf[b->gappos + newgap],
-           &b->data[b->gappos + b->gaplen],
-           b->size - (b->gappos + b->gaplen));
+            &b->data[b->gappos + b->gaplen],
+            b->size - (b->gappos + b->gaplen));
     // free old buffer
     free(b->data);
     b->data = newbuf;
@@ -243,7 +306,7 @@ void gap_add(struct buffer* b)
 }
 
 
-static
+    static
 int gap_sync(struct buffer* b)
 {
     int diff = b->cur - b->gappos;
