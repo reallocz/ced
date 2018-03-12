@@ -57,18 +57,31 @@ void win_draw(struct window* win, const char* mode,
         unsigned int y, unsigned int x,
         unsigned int height, unsigned int width)
 {
+    int txtpadding = 1;
+
     // Statusline
     {
+        // statusline string
+        char stsstring[width];
+        unsigned int row, col;
+        row = 0;
+        col = win->buffer->cur;
+        const char* bufname = win->buffer->name;
+        sprintf(stsstring, "%s | %s | row:%d - col: %d",
+                mode, bufname, row, col);
+
         // Save cursor position
         int curx = win->curx;
         int cury = win->cury;
+        int stsheight = 2;
 
-        // Draw bottom horizontal line
-        wmove(win->nwin, height - 2, 0);
-        whline(win->nwin, ACS_HLINE, width);
 
-        mvwaddstr(win->nwin, height - 1, 0, mode);
-
+        init_pair(1, COLOR_BLACK, COLOR_WHITE);
+        wattron(win->nwin, COLOR_PAIR(1));
+        wmove(win->nwin, height - stsheight, 0);
+        wclrtoeol(win->nwin);
+        waddstr(win->nwin, stsstring);
+        wattroff(win->nwin, COLOR_PAIR(1));
         // Go back to original positions
         wmove(win->nwin, cury, curx);
     }
@@ -82,14 +95,17 @@ void win_draw(struct window* win, const char* mode,
         unsigned int linecount = buf_get_linecount(win->buffer);
 
         wattron(win->nwin, A_BOLD);
-        char lnstr[win->mgn.width]; // line number to string
+
+        // line number to string
+        char lnstr[win->mgn.width + txtpadding];
         for(unsigned int i = 0; i < height - 2; ++i) {
             wmove(win->nwin, i, 0);
             if(i <= linecount) {
-                sprintf(lnstr, "%d", i + 1);
+                sprintf(lnstr, "%3d", i + 1);
                 waddstr(win->nwin, lnstr);
             } else {
-                waddstr(win->nwin, " ~");
+                sprintf(lnstr, "%3c", '~');
+                waddstr(win->nwin, lnstr);
             }
         }
         wattroff(win->nwin, A_BOLD);
@@ -99,7 +115,7 @@ void win_draw(struct window* win, const char* mode,
     // Text area
     {
         int y = 0;
-        int x = win->mgn.width;
+        int x = win->mgn.width + txtpadding;
         struct buffer* buf = win->buffer;
 
         // Clear current line
@@ -108,8 +124,7 @@ void win_draw(struct window* win, const char* mode,
 
         // Draw line
         for(unsigned int i = 0; i < buf->size; ++i) {
-            if(!buf_ingap(buf, i))
-            {
+            if(!buf_ingap(buf, i)) {
                 char c = buf_get_char(buf, i);
                 if(c != 0)
                     mvwaddch(win->nwin, y, x++, buf_get_char(buf, i));
@@ -120,73 +135,9 @@ void win_draw(struct window* win, const char* mode,
         }
 
         // Sync window cursor and buffer cursor
-        wmove(win->nwin, y, win->mgn.width + buf->cur);
+        wmove(win->nwin, y, win->mgn.width + txtpadding + buf->cur);
         /*buf_printbuf(buf);  //Debugging gapbuffer*/
     }
-}
-
-
-void win_update(struct window* win)
-{
-
-    // Dimensions
-    /*getyx(w->nwin, props->y, props->x);*/
-    /*getmaxyx(w->nwin, props->cols, props->rows);*/
-
-    /*// statusline*/
-    /*[>props->sy = props->wrows - 1 - WINDOW_STATUSHEIGHT;<]*/
-    /*[>props->sx = 0;<]*/
-    /*[>props->swidth = props.wcols;<]*/
-    /*[>props->sheight = WINDOW_STATUSHEIGHT;<]*/
-
-    /*// margin*/
-    /*props->marx = 0;*/
-    /*props->mary = 0;*/
-
-    /*props->marw = 4;    // TODO calculate from buffer linecount*/
-    /*props->marh = props->rows - 1 - WINDOW_STATUSHEIGHT;*/
-
-    /*// textarea*/
-    /*props->texy = 0;*/
-    /*props->texx = props->marw;*/
-    /*props->texw = props.wcols - props.mwidth;*/
-    /*props->texh = props->marh;*/
-
-    // TODO Set window title based on the buffer
-}
-
-
-
-void win_draw_buffer(struct window* win)
-{
-        /*hBuffer buf = w->buffer;*/
-    /*assert(buf != INVALID_ID);*/
-
-    /*int y = w->props.texy;*/
-    /*int x = w->props.texx;*/
-    /*struct buf_props bprops = buf_get_props(buf);*/
-
-    /*// Clear current line*/
-    /*wmove(w->nwin, y, x);*/
-    /*wclrtoeol(w->nwin);*/
-
-    /*// Draw line*/
-    /*for(unsigned int i = 0; i < bprops.size; ++i) {*/
-        /*if(i >= bprops.gap.pos*/
-                /*&& i < bprops.gap.pos + bprops.gap.len)*/
-        /*{*/
-            /*// In gap*/
-            /*continue;*/
-        /*} else {*/
-            /*char c = buf_get_char(buf, i);*/
-            /*if(c != 0)*/
-                /*mvwaddch(w->nwin, y, x++, buf_get_char(buf, i));*/
-        /*}*/
-    /*}*/
-
-    /*// Sync window cursor and buffer cursor*/
-    /*wmove(w->nwin, y, w->props.tx + bprops.cur);*/
-    /*[>buf_printbuf(buf);<] // Debugging gapbuffer*/
 }
 
 

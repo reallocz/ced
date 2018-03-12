@@ -22,6 +22,7 @@ int term_init()
     // Initialize ncurses
     setlocale(LC_ALL, "");
     G.stdscr = initscr();
+    start_color();
     getmaxyx(G.stdscr, G.rows, G.cols);
     cbreak();
     noecho();
