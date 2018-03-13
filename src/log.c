@@ -78,7 +78,7 @@ void log_ec(const char* msg, ...)
 
 void log_fatal(const char* tag, const char* msg, ...)
 {
-    fprintf(G.logfile, "----FATAL-----");
+    fprintf(G.logfile, "----FATAL-----\n");
     fprintf(G.logfile, "**[%s]** ", tag);
     va_list args;
     va_start(args, msg);
