@@ -1,5 +1,6 @@
 #include "buffer.h"
 #include "buffer_internal.h"
+#include "fileutils.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -10,22 +11,70 @@
 #define BUFFER_GAPSIZE 4
 
 /** Evals to 1 if i is inside buffer gap */
-#define INGAP(buffer, i)\
-    ((i >= buffer->gappos && i < buffer->gappos + buffer->gaplen))
+#define INGAP(buf, i)\
+    ((i >= buf->gap.col && i < buf->gap.col + buf->gap.size))
+
+#define CURVALID(buf, cur)\
+    (cur.line < buf->linecount)
 
 #define TAG "BUFFER"
 
+/** Eval to 1 if 'f' is set in 'flags' */
+#define FLAGSET(flags, f)\
+    (flags & f) == f ? 1 : 0
 
-struct buffer* buf_create(enum buffer_type type)
+struct buffer* buf_create_empty(enum buffer_type type)
 {
+    struct buffer* buf = malloc(sizeof(struct buffer));
+    assert(buf);
+
+    buf->id = generate_id();
+    buf->type = type; // TODO type specific setup
+    buf->name = "[NEWBUF]";
+
+    /** gap */
+    buf->gap.line = 0;
+    buf->gap.col = 0;
+    buf->gap.size = BUFFER_GAPSIZE;
+
+    /** lines */
+    buf->linecount = 1;    // Empty buffer has at least one line
+    buf->lines = calloc(buf->linecount, sizeof(struct line));
+    assert(buf->lines);
+
+    // Set gap on the first line
+    struct line* fln = buf_line(buf, 0);
+    fln->len = BUFFER_GAPSIZE;
+    fln->data = calloc(fln->len, sizeof(char));
+    return buf;
+}
+
+#if 0
+struct buffer* buf_create_file(enum buffer_type type,
+        const char* filename)
+{
+    struct file_stats fstats = fu_stats(filename);
+    /*log_l(TAG, "%s: loading file: %s", __func__, filename);*/
+    if(!(fstats.exists == 1 && F_FILE == fstats.type)) {
+        if(fstats.type == F_DIR) {
+            log_fatal(TAG, "%s: cannot open:%s. (Its a directory)",
+                    __func__, filename);
+        } else {
+            log_l(TAG, "%s: couldn't open:%s. Creating empty buffer",
+                    __func__, filename);
+            // Return a new empty buffer;
+            struct buffer* buf = buf_create_empty(type);
+            buf->name = filename;
+            return buf;
+        }
+    }
     struct buffer* b = malloc(sizeof(struct buffer));
     assert(b);
-
     b->id = generate_id();
-    b->type = type; // TODO type specific setup
-    b->name = "[NEWBUF]";
+    b->type = type;
+    b->name = filename;
 
-    b->size = BUFFER_GAPSIZE;
+    b->size = fstats.size + BUFFER_GAPSIZE;
     b->cur = 0;
     b->gappos = 0;
     b->gaplen = BUFFER_GAPSIZE;
@@ -33,295 +82,264 @@ struct buffer* buf_create(enum buffer_type type)
     b->data = calloc(b->size, sizeof(char));
     assert(b->data);
 
-    update_cache(b);
+    fu_read_to_buffer(fstats.path, &b->data[b->gappos + b->gaplen]);
+
+    buf_update(b);
     return b;
 }
+#endif
 
-
-void buf_destroy(struct buffer* b)
+void buf_destroy(struct buffer* buf)
 {
-    unsigned int id = b->id;
-    free(b->data);
-    free(b);
+    unsigned int id = buf->id;
+    for(unsigned int i = 0; i < buf->linecount; ++i) {
+        struct line* ln = &buf->lines[i];
+        free(ln->data);
+    }
+    free(buf->lines);
+    free(buf);
     log_l(TAG, "Buffer destroyed (id=%d)", id);
-    b = NULL;
+    buf = NULL;
 }
 
-
-void buf_addch(struct buffer* b, char ch)
+static int gap_resize_if_required(struct buffer* buf)
 {
-    gap_sync(b);
-    if(b->gaplen < 1) {
-        gap_add(b);
+    if(buf->gap.size < 1) {
+        unsigned int oldgap = buf->gap.size;
+        gap_add(buf);
+        log_l(TAG, "Gap resized %d -> %d", oldgap, buf->gap.size);
+        return 1;
     }
-
-    b->data[b->gappos] = ch;
-    b->gaplen--;
-    b->gappos++;
-    b->cur = b->gappos;
-
-    if(ch == '\n') {
-        update_cache(b);
-    }
-    return;
+    return 0;
 }
 
-
-void buf_delch(struct buffer* b)
+/** Adding a character to the buffer requires a gap synchronization.
+ * It may also require a gap resize(increase). The order of the two
+ * operations is not fixed right now but I don't think it really
+ * makes a difference */
+void buf_addch(struct buffer* buf, char ch, struct cursor cur)
 {
-    gap_sync(b);
-    if(b->gappos < 1) {
+    gap_move(buf, cur);
+    gap_resize_if_required(buf);
+
+    /*if(b->gap.size < 1) {*/
+        /*gap_add(b);*/
+    /*}*/
+
+    /*b->data[b->gappos] = ch;*/
+    /*b->gaplen--;*/
+    /*b->gappos++;*/
+    /*b->cur = b->gappos;*/
+
+    /*if(ch == '\n') {*/
+        /*buf_update(b);*/
+    /*}*/
+    /*return;*/
+}
+
+/** Deleting a character in the buffer has the same constraints as
+ * the add operation - apart from the buffer resizing */
+void buf_delch(struct buffer* buf, struct cursor cur)
+{
+    if(cur.col < 1) {
         return;
     }
 
-    b->gappos--;
-    b->gaplen++;
-    b->cur = b->gappos;
+    gap_move(buf, cur);
+    gap_resize_if_required(buf);
 
-    char delchar = b->data[b->gappos];
+    /*b->gap.col--;*/
+    /*b->gap.size++;*/
 
-    if(delchar == '\n') {
-        update_cache(b);
-    }
+    /*char delchar = b->data[b->gappos];*/
 
-    if(b->gappos + b->gaplen > b->size) {
-        log_fatal(TAG, "ERROR: FIX THIS!");
-    }
+    /*if(delchar == '\n') {*/
+        /*buf_update(b);*/
+    /*}*/
+
+    /*if(b->gappos + b->gaplen > b->size) {*/
+        /*log_fatal(TAG, "%s:ERROR: FIX THIS!", __func__);*/
+    /*}*/
 }
 
 
-void buf_cur_mvf(struct buffer* b, unsigned int n)
+struct line* buf_line(struct buffer* buf, unsigned int num)
 {
-    unsigned int upperbound = b->size - b->gaplen;
-    unsigned int newcur = b->cur + n;
-    // min(newcur, upperbound)
-    b->cur = newcur < upperbound ? newcur : upperbound;
+    assert(num < buf->linecount);
+    return &buf->lines[num];
 }
 
 
-void buf_cur_mvb(struct buffer* b, unsigned int n)
+unsigned int buf_line_count(const struct buffer* buf)
 {
-    // avoid unsigned int underflow
-    if(n >= b->cur) {
-        b->cur = 0;
-    } else {
-        b->cur -= n;
-    }
+    return buf->linecount;
 }
 
 
-unsigned int buf_cur_mveol(struct buffer* buf)
+unsigned int buf_charcount_sec(const struct buffer* b, char ch,
+        struct cursor from, struct cursor to)
 {
-    unsigned int start = buf->cur;
-
-    for(unsigned int i = buf->cur; i < buf->size; ++i) {
-        if(!INGAP(buf, i) && buf->data[i] == '\n') {
-            unsigned int offset = i - buf->cur;
-            buf->cur = i;
-            log_l(__func__, "start: %d, end: %d, offset: %d",
-                    start, buf->cur, offset);
-            return offset;
-        }
-    }
-    // EOB
-    unsigned int eob = buf->size - 1;
-    unsigned int offset = eob - buf->cur;
-    buf->cur = eob;
-    log_l(__func__, "EOB start: %d, end: %d, offset: %d",
-            start, buf->cur, offset);
-    return offset;
-}
-
-
-unsigned int buf_cur_mvbeg(struct buffer* buf)
-{
-    unsigned int offset = buf->cur;
-    buf->cur = 0;
-    return offset;
-}
-
-
-unsigned int buf_cur_line(const struct buffer* buf)
-{
-    return buf->cache.curline;
-
-}
-
-
-unsigned int buf_cur_col(struct buffer* buf)
-{
-    if(buf->cur < buf->cache.curlineindex) {
-        /* Update the cache (cursor has moved to another line) */
-        update_cache(buf);
-    }
-    return buf->cur - buf->cache.curlineindex;
-}
-
-
-unsigned int buf_get_linecount(const struct buffer* b)
-{
-    return b->cache.linecount;
-}
-
-
-char buf_get_char(const struct buffer* b, unsigned int pos)
-{
-    assert(pos < b->size);
-    return b->data[pos];
-}
-
-
-int buf_save_to_disk(const struct buffer* b, const char* path)
-{
-    FILE* f = fopen(path, "w");
-    assert(f);
-    unsigned int wbytes = 0;
-    for(unsigned int i = 0; i < b->size; ++i) {
-        if(! INGAP(b, i)) {
-            fputc(b->data[i], f);
-            wbytes++;
-        }
-    }
-    log_l(TAG, "Buffer saved (%d bytes): %s", wbytes, path);
-    fclose(f);
     return 0;
+    /*assert(from < b->size && to <= b->size && from <= to);*/
+
+    /*unsigned int count = 0;*/
+    /*for(unsigned int i = from; i < to; ++i) {*/
+        /*if((!INGAP(b, i)) && b->data[i] == ch) {*/
+            /*count++;*/
+        /*}*/
+    /*}*/
+    /*return count;*/
 }
 
 
 unsigned int buf_charcount(const struct buffer* b, char ch)
 {
-    unsigned int count = 0;
-    for(unsigned int i = 0; i < b->size; ++i) {
-        if((!INGAP(b, i)) && b->data[i] == ch)
-            count++;
-    }
-    return count;
+    /*return buf_charcount_sec(b, ch, (struct cursor){ }, b->size);*/
 }
 
 
-int buf_ingap(const struct buffer* buf, unsigned int pos)
+char buf_charat(const struct buffer* b, struct cursor cur)
 {
-    return INGAP(buf, pos);
+    /*assert(pos < b->size && !INGAP(b, pos));*/
+    /*return b->data[pos];*/
+}
+
+
+int buf_save_to_disk(const struct buffer* b, const char* path)
+{
+    return 0;
+    /*FILE* f = fopen(path, "w");*/
+    /*assert(f);*/
+    /*unsigned int wbytes = 0;*/
+    /*for(unsigned int i = 0; i < b->size; ++i) {*/
+        /*if(! INGAP(b, i)) {*/
+            /*fputc(b->data[i], f);*/
+            /*wbytes++;*/
+        /*}*/
+    /*}*/
+    /*log_l(TAG, "Buffer saved (%d bytes): %s", wbytes, path);*/
+    /*fclose(f);*/
+    /*return 0;*/
 }
 
 
 void buf_pprint(const struct buffer* b)
 {
-    log_l(TAG, "Buffer{id=%d, cur=%d, gappos=%d, gaplen = %d, size=%d}",
-            b->id, b->cur, b->gappos, b->gaplen, b->size);
+    log_l(TAG, "Buffer{id=%d, gap.pos=%d, gap.size = %d"
+            ", lncount=%d}",
+            b->id, b->gap.col, b->gap.size, b->linecount);
 }
 
 
-void buf_printbuf(const struct buffer* b)
+void buf_pprint_lines(const struct buffer* buf)
 {
-    for(unsigned int i = 0; i < b->size; ++i) {
-        if(INGAP(b, i)) {
-            log_lc("-");
-            continue;
-        }
-        if(b->data[i] == 0) {
-            log_lc("_");
-        } else {
-            log_lc("%c", b->data[i]);
-        }
+    log_l(TAG, " -- line metadata --");
+    for(unsigned int i = 0; i < buf->linecount; ++i) {
+        const struct line* ln = buf_line(buf, i);
+        log_l(TAG, "no: %d, len: %d", i, ln->len);
     }
-    log_lc("\n");
+    log_l(TAG, " --/ line metadata --");
 }
-
 
 /** buffer_internal.h **/
 
-    static
-unsigned int generate_id()
+static unsigned int generate_id()
 {
     static unsigned int ids = 0;
     return ids++;
 }
 
-
-    static
-int update_cache(struct buffer* buf)
+static void gap_add(struct buffer* buf)
 {
-    // Linecount
-    {
-        unsigned int nlcount = buf_charcount(buf, '\n');
-        buf->cache.linecount = nlcount + 1;
-    }
+    struct line* ln = buf_line(buf, buf->gap.line);
+    struct buffer_gap gap = buf->gap;
 
-    // Curline
-    {
-        unsigned int line = 0;
-        for(unsigned int i = 0; i < buf->cur; ++i) {
-            if(!INGAP(buf, i) && buf->data[i] == '\n') {
-                line++;
-            }
-        }
-        buf->cache.curline = line;
-    }
+    unsigned int newlinelen = ln->len + BUFFER_GAPSIZE;
+    unsigned int newgapsize = gap.size + BUFFER_GAPSIZE;
 
-    // Curlineindex
-    {
-        // One line
-        if(buf->cache.curline == 0) {
-            buf->cache.curlineindex = 0;
-        }
+    char* newdata = calloc(newlinelen, sizeof(char));
+    assert(newdata);
 
-        unsigned int linecount = 0;
-        for(unsigned int i = 0; i < buf->size; ++i) {
-            if(!INGAP(buf, i) && buf->data[i] == '\n') {
-                linecount++;
-                if(linecount == buf->cache.curline) {
-                    //Curlineindex == the next char
-                    buf->cache.curlineindex = i + 1;
-                }
-            }
-        }
-    }
-
-    log_l(TAG, "Buffer.cache {linecount: %d, curline: %d, curlineindex: %d}",
-            buf->cache.linecount, buf->cache.curline,
-            buf->cache.curlineindex);
-    return 0;
-}
-
-
-    static
-void gap_add(struct buffer* b)
-{
-    unsigned int newsize = b->size + BUFFER_GAPSIZE;
-    unsigned int newgap = b->gaplen + BUFFER_GAPSIZE;
-
-    char* newbuf = calloc(newsize, sizeof(b->data[0]));
-    assert(newbuf);
-    /*log_l(TAG, "Gap added: %d -> %d", b->size, newsize);*/
-
-    /* Copy memory to new buffer */
-    // from start to cursor
-    memcpy(newbuf, b->data, b->gappos * sizeof(char));
+    /* Copy memory to new data */
+    // from start to gap
+    memcpy(newdata, ln->data, gap.col * sizeof(char));
     // from end of gap to end of buffer
-    memcpy(&newbuf[b->gappos + newgap],
-            &b->data[b->gappos + b->gaplen],
-            b->size - (b->gappos + b->gaplen));
+    memcpy(&newdata[gap.col + newgapsize],
+            &ln->data[gap.col + gap.size],
+            ln->len - (gap.col + gap.size));
     // free old buffer
-    free(b->data);
-    b->data = newbuf;
-    b->size = newsize;
-    b->gaplen = newgap;
+    free(ln->data);
+    ln->data = newdata;
+    ln->len = newlinelen;
+    gap.size = newgapsize;
 }
 
-
-    static
-int gap_sync(struct buffer* b)
+// move gap to another line
+static void gap_move_to_line(struct buffer* buf, unsigned int line)
 {
-    int diff = b->cur - b->gappos;
+    // Delete current gap
+    {
+        struct line* ln = buf_line(buf, buf->gap.line);
+        unsigned int linelength = ln->len - buf->gap.size;
+        char* newdata = malloc(linelength * sizeof(char));
+        assert(newdata);
+        unsigned int count = 0;
+        for(unsigned int i = 0; i < ln->len; ++i) {
+            if(!INGAP(buf, i)) {
+                newdata[count] = ln->data[i];
+                count++;
+            }
+        }
+        assert(count == linelength);
+        free(ln->data);
+
+        // Update line length and data
+        ln->len = linelength;
+        ln->data = newdata;
+    }
+    // Create gap on line
+    {
+        struct line* ln = buf_line(buf, line);
+        unsigned int newlength = ln->len + buf->gap.size;
+        char* newdata = malloc(newlength * sizeof(char));
+        assert(newdata);
+        memcpy(&newdata[buf->gap.size],
+                ln->data,
+                ln->len);
+        free(ln->data);
+
+        // Update line length and data
+        ln->len = newlength;
+        ln->data = newdata;
+
+    }
+    // Update gap location (NOT SIZE!!)
+    buf->gap.line = line;
+    buf->gap.col = 0;
+}
+
+static void gap_move(struct buffer* buf, struct cursor cur)
+{
+    assert(buf);
+    assert(CURVALID(buf, cur));
+
+    // Ensure gap is on the same line as that of the cursor
+    if(buf->gap.line != cur.line) {
+        gap_move_to_line(buf, cur.line);
+    }
+
+    // Cursor and gap lie in the same line
+    struct line* ln = buf_line(buf, cur.line);
     unsigned int offset = 0;
+    int diff = cur.col - buf->gap.col;
 
     if(diff > 0) {
         // Cursor is ahead of the gap
         offset = diff;
         for(unsigned int i = 0; i < offset; ++i) {
-            b->data[b->gappos] = b->data[b->gappos + b->gaplen];
-            b->gappos++;
+            ln->data[buf->gap.col] =
+                ln->data[buf->gap.col + buf->gap.size];
+            buf->gap.col++;
         }
         log_l(TAG, "%s: diff=%d, offset=%d", __func__, diff, offset);
     }
@@ -329,15 +347,16 @@ int gap_sync(struct buffer* b)
         // Cursor is behind the gap
         offset = -1 * diff;
         for(unsigned int i = 0; i < offset; ++i) {
-            b->data[b->gappos + b->gaplen - 1]
-                = b->data[b->gappos - 1];
-            b->gappos--;
+            ln->data[buf->gap.col + buf->gap.size - 1]
+                = ln->data[buf->gap.col - 1];
+            buf->gap.col--;
         }
         log_l(TAG, "%s: diff=%d offset=%d", __func__, diff, offset);
     }
     else {
         // Cursor already in sync
     }
+    return;
 
-    return offset;
 }
+

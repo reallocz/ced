@@ -2,8 +2,27 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+
+enum file_type {
+    F_FILE,
+    F_DIR,
+};
+
+struct file_stats {
+    enum file_type type;
+    const char* path;
+    const char* abspath;
+    unsigned int size;
+    int exists; /* 1 if it does */
+};
+
 /** Read file to buffer */
-char* fu_read_file(const char* path);
+int fu_read_to_buffer(const char* path, char* buffer);
+
+struct file_stats fu_stats(const char* path);
+
+/* Return 0 if file doesn't exists / error / newfile*/
+unsigned int fu_file_size(const char* path);
 
 int fu_write_file(const char* path, const char* data);
 

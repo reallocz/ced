@@ -25,7 +25,8 @@ void ced_run()
     G.quit = 0;
 
     // Create window and set buffer
-    struct buffer* buf = buf_create(SCRATCH);
+    /*struct buffer* buf = buf_create_file(SCRATCH, "doc.txt");*/
+    struct buffer* buf = buf_create_empty(SCRATCH);
     G.win = win_create(buf);
     // Start in normal mode
     G.mode = MODE_NORMAL;
@@ -56,14 +57,14 @@ void ced_insert_input_cb(inpev ev)
             || ev.type == INP_SYMBOL || ev.key == k_space
             || ev.key == k_enter)
     {
-        buf_addch(buf, ev.key);
+        /*buf_addch(buf, ev.key);*/
     }
 
     if(ev.type == INP_SPECIAL)
     {
         switch(ev.key) {
         case k_backspace:
-            buf_delch(buf);
+            /*buf_delch(buf);*/
             break;
         case k_esc:
             G.mode = MODE_NORMAL;
@@ -89,14 +90,12 @@ void ced_normal_input_cb(inpev ev)
         return;
     }
     if(ev.key == k_f2) {
-        buf_save_to_disk(buf, "doc.txt"); // TODO prompt for name
+        /*buf_save_to_disk(buf, "doc.txt"); // TODO prompt for name*/
         return;
     }
     if(ev.key == 'h') {
-        buf_cur_mvb(buf, 1);
     }
     if(ev.key == 'l') {
-        buf_cur_mvf(buf, 1);
     }
 }
 

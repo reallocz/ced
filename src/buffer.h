@@ -1,8 +1,8 @@
 #pragma once
+#include "cursor.h"
 
 /** buffer.h
- * A buffer is just contents of a file and some metadata.
- * It's implemented as a gap-buffer.
+ * A buffer is a collection of lines
  */
 
 enum buffer_type {
@@ -11,66 +11,63 @@ enum buffer_type {
     SCRATCH		// Temporary buffer
 };
 
+
+/** Line metadata */
+struct line {
+    unsigned int len;   /** length of line */
+    char* data;         /** line data */
+};
+
+
+/** A buffer gap is like a cursor in the document */
+struct buffer_gap {
+    unsigned int line;
+    unsigned int col;
+    unsigned int size;
+};
+
 struct buffer {
     /*unique identifier of each buffer for debugging*/
     unsigned int id;
     enum buffer_type type;
-
     const char* name;		/* name of buffer(file) */
-    char* data;			/* file in memory */
-    unsigned int size;		/* size of buffer */
-    unsigned int cur;		/* cursor position */
-    unsigned int gappos;
-    unsigned int gaplen;
 
-    struct {
-        unsigned int linecount;     /* number of '\n' + 1 */
-        unsigned int curline;       /* line the cursor is on */
-        unsigned int curlineindex;  /* beginning of curline*/
-    } cache;
+    /** gap */
+    struct buffer_gap gap;
+    /** lines */
+    struct line* lines;
+    unsigned int linecount;
 };
 
 /** Create a new empty buffer of the specified type */
-struct buffer* buf_create(enum buffer_type type);
+struct buffer* buf_create_empty(enum buffer_type type);
 /** buf_destroy destorys the buffer and free's the data*/
 void buf_destory(struct buffer* buf);
 
 /** Adding and deleting characters **/
-/** Add a char at the current cursor position */
-void buf_addch(struct buffer* buf, char ch);
+/** Add a char at the cursor position */
+void buf_addch(struct buffer* b, char ch, struct cursor cur);
 /** Delete a character at current cursor position */
-void buf_delch(struct buffer* buf);
+void buf_delch(struct buffer* b, struct cursor cur);
 
-/** Cursor **/
-/** Move cursor forward (towards EOB) by 'n' chars */
-void buf_cur_mvf(struct buffer* buf, unsigned int n);
-/** Move cursor backward (beginning of buffer) by 'n' chars */
-void buf_cur_mvb(struct buffer* buf, unsigned int n);
-/** Move cursor to EOL/EOB. Return offset */
-unsigned int buf_cur_mveol(struct buffer* buf);
-/** Move cursor to the beginning of buffer. Return offset */
-unsigned int buf_cur_mvbeg(struct buffer* buf);
-
-/** Return the line on which the cursor is resides */
-unsigned int buf_cur_line(const struct buffer* buf);
-/** Return the "column" - offset from the last newline.
- * NOTE: a cache update may be required, hence the absense
- * of 'const' qualifier */
-unsigned int buf_cur_col(struct buffer* buf);
-
+/** Return pointer to the line number */
+struct line* buf_line(struct buffer* buf, unsigned int num);
 /** Return the number of newlines '\n' in the buffer */
-unsigned int buf_get_linecount(const struct buffer* buf);
-/** Return char at pos. check buf_in_gap().*/
-char buf_get_char(const struct buffer* buf, unsigned int pos);
+unsigned int buf_line_count(const struct buffer* buf);
+
 /** Save buffer to disk at path*/
 int buf_save_to_disk(const struct buffer* buf, const char* path);
 
+/** Count number of occurences of char in buffer between cursors
+ * from and including 'from' upto and excluding 'to' */
+unsigned int buf_charcount_sec(const struct buffer* b, char ch,
+        struct cursor from, struct cursor to);
+/** Count number of occurences of char in the whole buffer */
 unsigned int buf_charcount(const struct buffer* buf, char ch);
+/** Return char at pos. check buf_in_gap().*/
+char buf_charat(const struct buffer* b, struct cursor cur);
 
 /** HELPERS */
-/** Return 1 if the position is inside the gap */
-int buf_ingap(const struct buffer* buf, unsigned int pos);
 
 void buf_pprint(const struct buffer* buf);
-/** Print contents of buffer */
-void buf_printbuf(const struct buffer* buf);
+void buf_pprint_lines(const struct buffer* buf);

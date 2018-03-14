@@ -59,7 +59,7 @@ void win_draw(const struct window* win, const char* mode,
         unsigned int height, unsigned int width)
 {
     int txtpadding = 1;
-    unsigned int linecount = buf_get_linecount(win->buffer);
+    unsigned int linecount = buf_line_count(win->buffer);
     // Saved window cursor positions
     unsigned int curx = win->curx;
     unsigned int cury = win->cury;
@@ -68,12 +68,17 @@ void win_draw(const struct window* win, const char* mode,
     {
         // statusline string
         char stsstring[width];
-        unsigned int row = buf_cur_line(win->buffer);
-        unsigned int col = buf_cur_col(win->buffer);
-        unsigned int cur = win->buffer->cur;
+        // TODO
+        unsigned int row = 0;
+        unsigned int lc = buf_line_count(win->buffer);
+        unsigned int col = 0;
+        unsigned int cur = 0;
         const char* bufname = win->buffer->name;
-        sprintf(stsstring, "%s | %s | row:%d, col: %d | cur: %d",
-                mode, bufname, row, col, cur);
+        sprintf(stsstring,
+                "%s | %s | row:%d/%d, col: %d | cur: %d "
+                "| gap - pos: %d, len: %d ",
+                mode, bufname, row, lc, col, cur,
+                0, 0);
 
         init_pair(1, COLOR_BLACK, COLOR_WHITE);
         wattron(win->nwin, COLOR_PAIR(1));
@@ -120,28 +125,28 @@ void win_draw(const struct window* win, const char* mode,
         wclrtoeol(win->nwin);
 
         // Draw lines
-        for(unsigned int i = 0; i < buf->size; ++i) {
-            if(!buf_ingap(buf, i)) {
-                char c = buf->data[i];
+        for(unsigned int i = 0; i < buf->linecount; ++i) {
+            /*if(!buf_ingap(buf, i)) {*/
+                /*char c = buf->data[i];*/
 
-                if(c == '\n') {
-                    // Clear next row
-                    row++;
-                    col = 0; // Reset col
-                    wmove(win->nwin, row, leftedge + col);
-                    wclrtoeol(win->nwin);
-                } else if (c != 0) {
-                    waddch(win->nwin, c);
-                    /*mvwaddch(win->nwin, row, leftedge + col++, c);*/
-                } else {
-                    log_fatal(TAG, "%s: ERROR: THIS SHOULDN'T HAPPEN", __func__);
-                }
-            }
+                /*if(c == '\n') {*/
+                    /*// Clear next row*/
+                    /*row++;*/
+                    /*col = 0; // Reset col*/
+                    /*wmove(win->nwin, row, leftedge + col);*/
+                    /*wclrtoeol(win->nwin);*/
+                /*} else if (c != 0) {*/
+                    /*waddch(win->nwin, c);*/
+                    /*[>mvwaddch(win->nwin, row, leftedge + col++, c);<]*/
+                /*} else {*/
+                    /*[>log_fatal(TAG, "%s: ERROR: THIS SHOULDN'T HAPPEN", __func__);<]*/
+                /*}*/
+            /*}*/
         }
 
         // Sync window cursor and buffer cursor
-        wmove(win->nwin, buf_cur_line(buf),
-                win->mgn.width + txtpadding + buf_cur_col(buf));
+        /*wmove(win->nwin, buf_line_current(buf),*/
+                /*win->mgn.width + txtpadding + buf_line_column(buf));*/
 
         /*buf_printbuf(buf);  //Debugging gapbuffer*/
 

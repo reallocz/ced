@@ -1,6 +1,7 @@
 #pragma once
 #include <ncurses.h>
 #include "buffer.h"
+#include "cursor.h"
 
 /** window.h
  * A window is a rectangular division of the terminal.
@@ -30,9 +31,18 @@
  *  to it!!
  */
 
+
+/** part of buffer visible in the window */
+struct buffer_view {
+    unsigned int first;
+    unsigned int len;
+};
+
+
 struct window {
     unsigned int id;
     WINDOW* nwin;
+
     struct buffer* buffer;
 
     // Statusline
