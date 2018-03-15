@@ -31,7 +31,7 @@ struct window* win_create(struct buffer* buffer)
     keypad(w->nwin, TRUE);
 
     // Buffer view
-    w->bview = bview_create(buffer, 0, 10); // TODO
+    w->bview = bview_create(buffer, 0, 3); // TODO
 
     // Statusline
     w->stl.bufname = "TODO-BUFNAME";
@@ -42,8 +42,6 @@ struct window* win_create(struct buffer* buffer)
     // Margin
     w->mgn.width = 3;
 
-    // Cursor
-    w->cur.line = w->cur.col = 0;
     log_l(TAG, "Window created: id: %d", w->id);
     win_pprint(w);
     return w;
@@ -108,10 +106,6 @@ void draw_margin(const struct window* win, struct rect area)
 
 void win_draw(const struct window* win, const char* mode, struct rect area)
 {
-    // Saved window cursor positions
-    unsigned int oline = win->cur.line;
-    unsigned int ocol = win->cur.col;
-
     // Stl
     struct rect areastl = RECT(area.height - STATUSLINE_HEIGHT,0,
             area.width, 1);
@@ -128,13 +122,10 @@ void win_draw(const struct window* win, const char* mode, struct rect area)
     bview_draw(win->bview, win->nwin, areabv);
 
     wrefresh(win->nwin);
-    // Move cursor to roiginal pos
-    wmove(win->nwin, oline, ocol);
 }
 
 
 void win_pprint(struct window* win)
 {
-    log_lc(TAG, "Window {id:%d, cur.linex:%d, cur.col: %d",
-            win->id, win->cur.line, win->cur.col);
+    log_lc(TAG, "Window {id:%d}", win->id);
 }

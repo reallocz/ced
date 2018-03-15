@@ -38,9 +38,6 @@ struct window {
     struct buffer_view bview;
     struct statusline stl;
     struct margin mgn;
-
-    // Cursor
-    struct cursor cur;
 };
 
 
@@ -49,8 +46,6 @@ struct window* win_create(struct buffer* buffer);
 
 /** destroys the window. doesn't alter attached buffer*/
 void win_destroy(struct window* win);
-
-struct cursor win_getcur(struct window* win);
 
 /** Draw the window */
 void win_draw(const struct window* win, const char* mode, struct rect area);
