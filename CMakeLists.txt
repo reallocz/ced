@@ -11,14 +11,15 @@ include_directories(SRCDIR)
 add_compile_options(-g -Wall -Wextra -Wpedantic)
 
 add_executable(debug
-        ${SRCDIR}/main.c
-        ${SRCDIR}/fileutils.c
         ${SRCDIR}/log.c
+        ${SRCDIR}/fileutils.c
+        ${SRCDIR}/buffer.c
+        ${SRCDIR}/buffer_view.c
         ${SRCDIR}/window.c
         ${SRCDIR}/input.c
-        ${SRCDIR}/buffer.c
 	${SRCDIR}/term.c
         ${SRCDIR}/ced.c
+        ${SRCDIR}/main.c
 )
 
 target_link_libraries(debug ncurses)

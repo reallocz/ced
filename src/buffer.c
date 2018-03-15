@@ -23,6 +23,35 @@
 #define FLAGSET(flags, f)\
     (flags & f) == f ? 1 : 0
 
+struct buffer* buf_create_test() {
+    struct buffer* buf = malloc(sizeof(struct buffer));
+    assert(buf);
+
+    buf->id = generate_id();
+    buf->type = TESTBUFFER;
+    buf->name = "TEST_BUFFER";
+
+    /** gap */
+    buf->gap.line = 0;
+    buf->gap.col = 0;
+    buf->gap.size = BUFFER_GAPSIZE;
+
+    /** lines */
+    buf->linecount = 3;
+    buf->lines = calloc(buf->linecount, sizeof(struct line));
+    assert(buf->lines);
+
+    buf->lines[0].data = "    First line with gap(4)";
+    buf->lines[0].len = strlen(buf->lines[0].data);
+
+    buf->lines[1].data = "This is the second line.s sldf kasdfj";
+    buf->lines[1].len = strlen(buf->lines[1].data);
+
+    buf->lines[2].data = "the quick brown fox 1375550901, .__12380";
+    buf->lines[2].len = strlen(buf->lines[2].data);
+    return buf;
+}
+
 struct buffer* buf_create_empty(enum buffer_type type)
 {
     struct buffer* buf = malloc(sizeof(struct buffer));
@@ -38,7 +67,7 @@ struct buffer* buf_create_empty(enum buffer_type type)
     buf->gap.size = BUFFER_GAPSIZE;
 
     /** lines */
-    buf->linecount = 1;    // Empty buffer has at least one line
+    buf->linecount = 2;    // Empty buffer has at least one line
     buf->lines = calloc(buf->linecount, sizeof(struct line));
     assert(buf->lines);
 
@@ -46,6 +75,8 @@ struct buffer* buf_create_empty(enum buffer_type type)
     struct line* fln = buf_line(buf, 0);
     fln->len = BUFFER_GAPSIZE;
     fln->data = calloc(fln->len, sizeof(char));
+    buf->lines[1].data = "Yolo";
+    buf->lines[1].len = 4;
     return buf;
 }
 
@@ -222,6 +253,11 @@ int buf_save_to_disk(const struct buffer* b, const char* path)
     /*return 0;*/
 }
 
+int buf_ingap(const struct buffer* b, unsigned int i)
+{
+    return INGAP(b, i);
+}
+
 
 void buf_pprint(const struct buffer* b)
 {
@@ -360,3 +396,11 @@ static void gap_move(struct buffer* buf, struct cursor cur)
 
 }
 
+void buf_printline(const struct buffer* buf, unsigned int i)
+{
+    assert(i < buf->linecount);
+    int hasgap = i == buf->gap.line ? 1 : 0;
+    const struct line* ln = buf_line(buf, i);
+    log_l("LINE", "no: %d, len: %d, has_gap: %d",
+            i, ln->len, hasgap);
+}

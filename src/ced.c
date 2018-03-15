@@ -26,7 +26,7 @@ void ced_run()
 
     // Create window and set buffer
     /*struct buffer* buf = buf_create_file(SCRATCH, "doc.txt");*/
-    struct buffer* buf = buf_create_empty(SCRATCH);
+    struct buffer* buf = buf_create_test();
     G.win = win_create(buf);
     // Start in normal mode
     G.mode = MODE_NORMAL;
@@ -45,13 +45,14 @@ void ced_run()
             win_draw(G.win, "MODE: INSERT", 0, 0, height, width);
             inp_poll("NORMAL", G.win, ced_insert_input_cb);
         }
+
     }
 }
 
 
 void ced_insert_input_cb(inpev ev)
 {
-    struct buffer* buf = G.win->buffer;
+    /*struct buffer* buf = G.win->buffer;*/
 
     if(ev.type == INP_ALPHA || ev.type == INP_NUM
             || ev.type == INP_SYMBOL || ev.key == k_space
@@ -78,7 +79,7 @@ void ced_insert_input_cb(inpev ev)
 
 void ced_normal_input_cb(inpev ev)
 {
-    struct buffer* buf = G.win->buffer;
+    /*struct buffer* buf = G.win->buffer;*/
 
     if(ev.key == 'i') {
         // Switch to insert mode

@@ -8,7 +8,8 @@
 enum buffer_type {
     DEFAULT,	// Empty buffer
     DOCUMENT,	// Saved on disk
-    SCRATCH		// Temporary buffer
+    SCRATCH,	// Temporary buffer
+    TESTBUFFER,
 };
 
 
@@ -39,6 +40,8 @@ struct buffer {
     unsigned int linecount;
 };
 
+/** Create a test buffer */
+struct buffer* buf_create_test();
 /** Create a new empty buffer of the specified type */
 struct buffer* buf_create_empty(enum buffer_type type);
 /** buf_destroy destorys the buffer and free's the data*/
@@ -67,7 +70,10 @@ unsigned int buf_charcount(const struct buffer* buf, char ch);
 /** Return char at pos. check buf_in_gap().*/
 char buf_charat(const struct buffer* b, struct cursor cur);
 
+int buf_ingap(const struct buffer* b, unsigned int i);
+
 /** HELPERS */
 
 void buf_pprint(const struct buffer* buf);
+void buf_printline(const struct buffer* buf, unsigned int i);
 void buf_pprint_lines(const struct buffer* buf);
