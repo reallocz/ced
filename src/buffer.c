@@ -19,6 +19,13 @@
 
 #define TAG "BUFFER"
 
+const char* testlines[] = {
+    "    First line with 4 gaps at the start must stay hidden",
+    "Second line: @{*(U! 08cv09c8xv c0v89x09cv80xbv8lk123jl1k23",
+    "Third - the quick brown fox jumped over the lazy dog\\",
+    "Romeo and Juliet :) :( :/ :* ",
+};
+const int testlinecount = 4;
 
 struct buffer* buf_create_test() {
     struct buffer* buf = malloc(sizeof(struct buffer));
@@ -34,18 +41,26 @@ struct buffer* buf_create_test() {
     buf->gap.size = BUFFER_GAPSIZE;
 
     /** lines */
-    buf->linecount = 3;
+    buf->linecount = testlinecount;
     buf->lines = calloc(buf->linecount, sizeof(struct line));
     assert(buf->lines);
 
-    buf->lines[0].data = "    First line with gap(4)";
-    buf->lines[0].len = strlen(buf->lines[0].data);
+    for(int i = 0; i < buf->linecount; ++i) {
+        buf->lines[i].data = testlines[i];
+        buf->lines[i].len = strlen(testlines[i]);
+    }
 
-    buf->lines[1].data = "This is the second line.s sldf kasdfj";
-    buf->lines[1].len = strlen(buf->lines[1].data);
+    /*buf->lines[0].data = "    First line with gap(4)";*/
+    /*buf->lines[0].len = strlen(buf->lines[0].data);*/
 
-    buf->lines[2].data = "the quick brown fox 1375550901, .__12380";
-    buf->lines[2].len = strlen(buf->lines[2].data);
+    /*buf->lines[1].data = "This is the second line.s sldf kasdfj";*/
+    /*buf->lines[1].len = strlen(buf->lines[1].data);*/
+
+    /*buf->lines[2].data = "the quick brown fox 1375550901, .__12380";*/
+    /*buf->lines[2].len = strlen(buf->lines[2].data);*/
+
+    /*buf->lines[3].data = "the quick brown fox 1375550901, .__12380";*/
+    /*buf->lines[3].len = strlen(buf->lines[2].data);*/
     return buf;
 }
 

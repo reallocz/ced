@@ -31,7 +31,7 @@ struct window* win_create(struct buffer* buffer)
     keypad(w->nwin, TRUE);
 
     // Buffer view
-    w->bview = bview_create(buffer, 0, 3); // TODO
+    w->bview = bview_create(buffer, 0, buffer->linecount);
 
     // Statusline
     w->stl.bufname = "TODO-BUFNAME";
