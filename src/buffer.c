@@ -20,7 +20,7 @@
 #define TAG "BUFFER"
 
 const char* testlines[] = {
-    "    First line with 4 gaps at the start must stay hidden",
+    "    First line with 4 gaps at the start that must stay hidden",
     "Second line: @{*(U! 08cv09c8xv c0v89x09cv80xbv8lk123jl1k23",
     "Third - the quick brown fox jumped over the lazy dog\\",
     "Romeo and Juliet :) :( :/ :* ",

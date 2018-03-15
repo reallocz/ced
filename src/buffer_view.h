@@ -9,6 +9,7 @@
 struct buffer_view {
     unsigned int start; // View starts from
     unsigned int len;   // Number of lines of the view
+    struct cursor cur;
     struct buffer* buffer;
 };
 
