@@ -45,22 +45,11 @@ struct buffer* buf_create_test() {
     buf->lines = calloc(buf->linecount, sizeof(struct line));
     assert(buf->lines);
 
-    for(int i = 0; i < buf->linecount; ++i) {
+    for(unsigned int i = 0; i < buf->linecount; ++i) {
         buf->lines[i].data = testlines[i];
         buf->lines[i].len = strlen(testlines[i]);
     }
 
-    /*buf->lines[0].data = "    First line with gap(4)";*/
-    /*buf->lines[0].len = strlen(buf->lines[0].data);*/
-
-    /*buf->lines[1].data = "This is the second line.s sldf kasdfj";*/
-    /*buf->lines[1].len = strlen(buf->lines[1].data);*/
-
-    /*buf->lines[2].data = "the quick brown fox 1375550901, .__12380";*/
-    /*buf->lines[2].len = strlen(buf->lines[2].data);*/
-
-    /*buf->lines[3].data = "the quick brown fox 1375550901, .__12380";*/
-    /*buf->lines[3].len = strlen(buf->lines[2].data);*/
     return buf;
 }
 
@@ -79,7 +68,7 @@ struct buffer* buf_create_empty(enum buffer_type type)
     buf->gap.size = BUFFER_GAPSIZE;
 
     /** lines */
-    buf->linecount = 2;    // Empty buffer has at least one line
+    buf->linecount = 1;    // Empty buffer has at least one line
     buf->lines = calloc(buf->linecount, sizeof(struct line));
     assert(buf->lines);
 
@@ -87,50 +76,48 @@ struct buffer* buf_create_empty(enum buffer_type type)
     struct line* fln = buf_line(buf, 0);
     fln->len = BUFFER_GAPSIZE;
     fln->data = calloc(fln->len, sizeof(char));
-    buf->lines[1].data = "Yolo";
-    buf->lines[1].len = 4;
     return buf;
 }
 
-#if 0
 struct buffer* buf_create_file(enum buffer_type type,
         const char* filename)
 {
     struct file_stats fstats = fu_stats(filename);
-    /*log_l(TAG, "%s: loading file: %s", __func__, filename);*/
     if(!(fstats.exists == 1 && F_FILE == fstats.type)) {
         if(fstats.type == F_DIR) {
             log_fatal(TAG, "%s: cannot open:%s. (Its a directory)",
                     __func__, filename);
         } else {
-            log_l(TAG, "%s: couldn't open:%s. Creating empty buffer",
+            log_fatal(TAG, "%s: couldn't open:%s. exiting.",
                     __func__, filename);
-            // Return a new empty buffer;
-            struct buffer* buf = buf_create_empty(type);
-            buf->name = filename;
-            return buf;
+            /*// Return a new empty buffer;*/
+            /*struct buffer* buf = buf_create_empty(type);*/
+            /*buf->name = filename;*/
+            /*return buf;*/
         }
     }
-    struct buffer* b = malloc(sizeof(struct buffer));
-    assert(b);
-    b->id = generate_id();
-    b->type = type;
-    b->name = filename;
 
-    b->size = fstats.size + BUFFER_GAPSIZE;
-    b->cur = 0;
-    b->gappos = 0;
-    b->gaplen = BUFFER_GAPSIZE;
+    struct buffer* buf = malloc(sizeof(struct buffer));
+    assert(buf);
 
-    b->data = calloc(b->size, sizeof(char));
-    assert(b->data);
+    buf->id = generate_id();
+    buf->type = type;
+    buf->name = filename;
 
-    fu_read_to_buffer(fstats.path, &b->data[b->gappos + b->gaplen]);
+    /** gap */
+    buf->gap.line = 0;
+    buf->gap.col = 0;
+    buf->gap.size = BUFFER_GAPSIZE;
 
-    buf_update(b);
-    return b;
+
+    /** lines */
+    buf->lines = NULL;
+    buf->linecount = fu_read_file_lines(fstats.path, &buf->lines);
+    assert(buf->lines);
+
+    return buf;
 }
-#endif
+
 
 void buf_destroy(struct buffer* buf)
 {

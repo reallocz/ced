@@ -44,6 +44,8 @@ struct buffer {
 struct buffer* buf_create_test();
 /** Create a new empty buffer of the specified type */
 struct buffer* buf_create_empty(enum buffer_type type);
+struct buffer* buf_create_file(enum buffer_type type,
+        const char* filename);
 /** buf_destroy destorys the buffer and free's the data*/
 void buf_destory(struct buffer* buf);
 

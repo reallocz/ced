@@ -26,8 +26,8 @@ void ced_run()
     G.quit = 0;
 
     // Create window and set buffer
-    /*struct buffer* buf = buf_create_file(SCRATCH, "doc.txt");*/
-    struct buffer* buf = buf_create_test();
+    struct buffer* buf = buf_create_file(SCRATCH, "interject.txt");
+    /*struct buffer* buf = buf_create_test();*/
     G.win = win_create(buf);
     // Start in normal mode
     G.mode = MODE_NORMAL;

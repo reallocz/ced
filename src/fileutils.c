@@ -29,16 +29,19 @@ struct file_stats fu_stats(const char* path)
         }
         return fs;
     } else {
-        // man 7 inode
-        if(S_ISREG(s.st_mode)) { // S_IFREG = regular file
-            fs.type = F_FILE;
-        } else if(S_ISDIR(s.st_mode)) {
-            fs.type = F_DIR;
-        }
         fs.path = path;
         fs.abspath = abspath;
         fs.size = s.st_size;
         fs.exists = 1;
+
+        // set type specific stuff (man 7 inode)
+        if(S_ISREG(s.st_mode)) { // S_IFREG = regular file
+            fs.type = F_FILE;
+        } else if(S_ISDIR(s.st_mode)) {
+            fs.type = F_DIR;
+        } else {
+            fs.type = F_UNKNOWN;
+        }
         log_l(TAG, "%s: path: %s, apath: %s, fsize: %d, type: %s",
                 __func__, fs.path, fs.abspath, fs.size,
                 fs.type == F_FILE ? "file" : "dir");
@@ -47,25 +50,56 @@ struct file_stats fu_stats(const char* path)
 }
 
 
-int fu_read_to_buffer(const char* path, char* buffer)
+unsigned int fu_read_file_lines(const char* path,
+        struct line** lines)
 {
     FILE* f = fopen(path, "r");
     assert(f);
-    long bytes = 0;
     fseek(f, 0, SEEK_END);
-    bytes = ftell(f);
+    unsigned int size = ftell(f);
     rewind(f);
-    fread(buffer, sizeof(char), bytes, f);
+
+    // Count number of lines
+    unsigned int linecount = 0;
+    char ch;
+    while(1) {
+        ch = fgetc(f);
+        if(ch == '\n') {
+            linecount++;
+            continue;
+        }
+        if(ch == EOF) {
+            break;
+        }
+    }
+    rewind(f);
+
+    struct line* mlines = malloc(linecount * sizeof(struct line));
+    assert(mlines);
+
+    unsigned int count = 0;
+    // getline allocates buffer if tmpdata and tmplen == 0
+    int linelen = 0;
+    size_t wtfits = 0;
+    char* tmpdata = NULL;
+    while(1) {
+        linelen = getline(&tmpdata, &wtfits, f);
+        if(linelen == -1) break;
+        struct line* ln = &mlines[count++]; // First line
+        ln->len = linelen;
+        ln->data = tmpdata;
+        log_l("count", "%d - %s", ln->len, ln->data);
+        tmpdata = 0;
+        wtfits = 0;
+    }
     fclose(f);
-    return 0;
+    log_l(TAG, "%d lines read (%d bytes)", linecount, size);
+    assert(count == linecount);
+
+    *lines = mlines;
+    return linecount;
 }
 
-
-int fu_write_file(const char* path, const char* data)
-{
-    // TODO
-    return 0;
-}
 
 void fu_abspath(const char* relpath, char* abspath)
 {
