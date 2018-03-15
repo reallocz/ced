@@ -19,9 +19,6 @@
 
 #define TAG "BUFFER"
 
-/** Eval to 1 if 'f' is set in 'flags' */
-#define FLAGSET(flags, f)\
-    (flags & f) == f ? 1 : 0
 
 struct buffer* buf_create_test() {
     struct buffer* buf = malloc(sizeof(struct buffer));

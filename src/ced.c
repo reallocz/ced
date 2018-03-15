@@ -8,12 +8,13 @@
 #include "buffer.h"
 #include "term.h"
 #include "input_keys.h"
+#include "common.h"
 
 #define TAG "CED"
 
 
 static struct {
-    enum ced_mode mode;
+    enum mode mode;
     int quit; // Return to main if 1
     struct window *win;
 } G;
@@ -35,14 +36,13 @@ void ced_run()
     while(!G.quit) {
         // Check for window resize
         term_update();
-        unsigned int width = term_cols();
-        unsigned int height = term_rows();
+        struct rect areawin = RECT(0, 0, term_cols(), term_rows());
 
         if(G.mode == MODE_NORMAL) {
-            win_draw(G.win, "MODE: NORMAL", 0, 0, height, width);
+            win_draw(G.win, "MODE: NORMAL", areawin);
             inp_poll("NORMAL", G.win, ced_normal_input_cb);
         } else {
-            win_draw(G.win, "MODE: INSERT", 0, 0, height, width);
+            win_draw(G.win, "MODE: INSERT", areawin);
             inp_poll("NORMAL", G.win, ced_insert_input_cb);
         }
 

@@ -15,13 +15,11 @@ struct buffer_view bview_create(struct buffer* buf,
     return bv;
 }
 
-void bview_draw(WINDOW* nwin, struct buffer_view bv,
-        unsigned int y, unsigned int x,
-        unsigned int rows, unsigned int cols)
+void bview_draw(struct buffer_view bv, WINDOW* nwin,
+        struct rect area)
 {
     log_l(TAG, "Drawing buffer: %d lines", bv.buffer->linecount);
-    x++; // Add padding
-    unsigned int ox = x;
+    unsigned int ox = area.x;
 
     for(unsigned int i = 0; i < bv.buffer->linecount; ++i) {
         struct line* ln = buf_line(bv.buffer, i);
@@ -31,16 +29,16 @@ void bview_draw(WINDOW* nwin, struct buffer_view bv,
         if(bv.buffer->gap.line == i) {
             for(unsigned int j = 0; j < ln->len; ++j) {
                 if(!buf_ingap(bv.buffer, j)) {
-                    mvwaddch(nwin, y, x++, ln->data[j]);
+                    mvwaddch(nwin, area.y, area.x++, ln->data[j]);
                 }
             }
         } else {
             for(unsigned int j = 0; j < ln->len; ++j) {
-                mvwaddch(nwin, y, x++, ln->data[j]);
+                mvwaddch(nwin, area.y, area.x++, ln->data[j]);
             }
         }
-        y++;
-        x = ox;
+        area.y++;
+        area.x = ox;
     }
 }
 

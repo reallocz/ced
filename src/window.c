@@ -43,8 +43,9 @@ struct window* win_create(struct buffer* buffer)
     w->mgn.width = 3;
 
     // Cursor
-    w->curx = w->cury = 0;
+    w->cur.line = w->cur.col = 0;
     log_l(TAG, "Window created: id: %d", w->id);
+    win_pprint(w);
     return w;
 }
 
@@ -58,10 +59,10 @@ void win_destroy(struct window* win)
 
 static
 void draw_stl(const struct window* win, const char* mode,
-        unsigned y, unsigned int width)
+        struct rect area)
 {
     // statusline string
-    char stsstring[width];
+    char stsstring[area.width];
     // TODO
     unsigned int row = 0;
     unsigned int lc = buf_line_count(win->bview.buffer);
@@ -76,14 +77,14 @@ void draw_stl(const struct window* win, const char* mode,
 
     init_pair(1, COLOR_BLACK, COLOR_WHITE);
     wattron(win->nwin, COLOR_PAIR(1));
-    wmove(win->nwin, y, 0);
+    wmove(win->nwin, area.y, 0);
     wclrtoeol(win->nwin);
     waddstr(win->nwin, stsstring);
     wattroff(win->nwin, COLOR_PAIR(1));
 }
 
 static
-void draw_margin(const struct window* win, unsigned int height)
+void draw_margin(const struct window* win, struct rect area)
 {
     wattron(win->nwin, A_BOLD);
     unsigned int linecount = buf_line_count(win->bview.buffer);
@@ -91,7 +92,7 @@ void draw_margin(const struct window* win, unsigned int height)
     int txtpadding = 1;
     // line number to string
     char lnstr[win->mgn.width + txtpadding];
-    for(unsigned int i = 0; i < height; ++i) {
+    for(unsigned int i = 0; i < area.height; ++i) {
         wmove(win->nwin, i, 0);
         if(i < linecount) {
             sprintf(lnstr, "%3d", i + 1);  // 1 - indexed
@@ -105,28 +106,35 @@ void draw_margin(const struct window* win, unsigned int height)
 }
 
 
-void win_draw(const struct window* win, const char* mode,
-        unsigned int y, unsigned int x,
-        unsigned int height, unsigned int width)
+void win_draw(const struct window* win, const char* mode, struct rect area)
 {
-    unsigned int linecount = buf_line_count(win->bview.buffer);
     // Saved window cursor positions
-    unsigned int curx = win->curx;
-    unsigned int cury = win->cury;
+    unsigned int oline = win->cur.line;
+    unsigned int ocol = win->cur.col;
 
-    draw_stl(win, mode, height - STATUSLINE_HEIGHT, width);
-    draw_margin(win, height - STATUSLINE_HEIGHT);
+    // Stl
+    struct rect areastl = RECT(area.height - STATUSLINE_HEIGHT,0,
+            area.width, 1);
+    draw_stl(win, mode, areastl);
 
-    bview_draw(win->nwin, win->bview, 0, win->mgn.width, height - STATUSLINE_HEIGHT, width - win->mgn.width);
+    // Margin
+    struct rect areamgn = RECT(0, 0, win->mgn.width, area.height - STATUSLINE_HEIGHT);
+    draw_margin(win, areamgn);
+
+    // Bufferview
+    struct rect areabv = RECT(0, win->mgn.width + 1,
+            area.width - win->mgn.width,
+            area.height - STATUSLINE_HEIGHT);
+    bview_draw(win->bview, win->nwin, areabv);
 
     wrefresh(win->nwin);
     // Move cursor to roiginal pos
-    wmove(win->nwin, cury, curx);
+    wmove(win->nwin, oline, ocol);
 }
 
 
 void win_pprint(struct window* win)
 {
-    log_lc(TAG, "Window {id:%d, curx:%d, cury: %d", win->id,
-            win->curx, win->cury);
+    log_lc(TAG, "Window {id:%d, cur.linex:%d, cur.col: %d",
+            win->id, win->cur.line, win->cur.col);
 }

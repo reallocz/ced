@@ -1,5 +1,6 @@
 #pragma once
 #include "buffer.h"
+#include "common.h"
 #include "ncurses.h"
 
 /** buffer_view.h
@@ -15,16 +16,13 @@ struct buffer_view {
 struct buffer_view bview_create(struct buffer* buf,
         unsigned int start, unsigned int len);
 
-/** Draw function */
-void bview_draw(WINDOW* nwin, struct buffer_view bv,
-        unsigned int y, unsigned int x,
-        unsigned int rows, unsigned int cols);
+/** Draw buffer on window in specified area */
+void bview_draw(struct buffer_view bv, WINDOW* nwin,
+        struct rect area);
 
 /** Sroll buffer view up by n lines */
 void bview_scrollup(struct buffer_view* bv, unsigned int n);
 /** Sroll buffer view down by n lines */
 void bview_scrolldown(struct buffer_view* bv, unsigned int n);
-
-
 
 

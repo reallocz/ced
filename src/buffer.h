@@ -1,5 +1,5 @@
 #pragma once
-#include "cursor.h"
+#include "common.h"
 
 /** buffer.h
  * A buffer is a collection of lines

@@ -8,20 +8,11 @@
  */
 
 
-/** Editor modes */
-enum ced_mode {
-    MODE_NORMAL,
-    MODE_INSERT,
-};
-
 /** Initialize logic and run.
  * NOTE: All the submodules must be initialized before calling
  * ced_run()
  */
 void ced_run();
-
-/** Set the editor mode for the focussed window */
-void ced_set_mode(enum ced_mode mode);
 
 // Input callbacks
 /** Input callback for MODE_INSERT */

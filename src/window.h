@@ -1,7 +1,7 @@
 #pragma once
 #include <ncurses.h>
 #include "buffer.h"
-#include "cursor.h"
+#include "common.h"
 #include "buffer_view.h"
 
 /** window.h
@@ -16,15 +16,9 @@
  * Anatomy of a window:
  *	 _______________
  *	| |		|	1 - margin
- *	| |		|	2 - statusline
- *	|1|	3	|	3 - buffer view
- *	| |		|
- *	|_|_____________|
- *	|	2 	|
- *	|_______________|
- *
- *  NOTE: A window must always have a valid buffer_view attached
- *  to it!!
+ *	|1|	3	|	2 - statusline
+ *	|_|_____________|       3 - buffer view
+ *	|_______________|<- 2
  */
 
 
@@ -46,7 +40,7 @@ struct window {
     struct margin mgn;
 
     // Cursor
-    unsigned int curx, cury;
+    struct cursor cur;
 };
 
 
@@ -56,10 +50,10 @@ struct window* win_create(struct buffer* buffer);
 /** destroys the window. doesn't alter attached buffer*/
 void win_destroy(struct window* win);
 
+struct cursor win_getcur(struct window* win);
+
 /** Draw the window */
-void win_draw(const struct window* win, const char* mode,
-        unsigned int y, unsigned int x,
-        unsigned int height, unsigned int width);
+void win_draw(const struct window* win, const char* mode, struct rect area);
 
 void win_pprint(struct window* win);
 
