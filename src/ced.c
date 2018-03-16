@@ -26,9 +26,11 @@ void ced_run()
     G.quit = 0;
 
     // Create window and set buffer
-    struct buffer* buf = buf_create_file(SCRATCH, "interject.txt");
-    /*struct buffer* buf = buf_create_test();*/
-    G.win = win_create(buf);
+    struct buffer_view bview = bview_create( buf_create_file(SCRATCH, "interject.txt") );
+
+    /*struct buffer_view bview = bview_create(buf_create_test());*/
+
+    G.win = win_create(bview);
     // Start in normal mode
     G.mode = MODE_NORMAL;
 
@@ -39,9 +41,11 @@ void ced_run()
         struct rect areawin = RECT(0, 0, term_cols(), term_rows());
 
         if(G.mode == MODE_NORMAL) {
+            win_update(G.win);
             win_draw(G.win, "MODE: NORMAL", areawin);
             inp_poll("NORMAL", G.win, ced_normal_input_cb);
         } else {
+            win_update(G.win);
             win_draw(G.win, "MODE: INSERT", areawin);
             inp_poll("NORMAL", G.win, ced_insert_input_cb);
         }

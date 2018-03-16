@@ -14,12 +14,8 @@ struct buffer_view {
 };
 
 /** Create a new buffer_view */
-struct buffer_view bview_create(struct buffer* buf,
-        unsigned int start, unsigned int len);
+struct buffer_view bview_create(struct buffer* buf);
 
-/** Draw buffer on window in specified area */
-void bview_draw(struct buffer_view bv, WINDOW* nwin,
-        struct rect area);
 
 /** Sroll buffer view up by n lines */
 void bview_scrollup(struct buffer_view* bv, unsigned int n);

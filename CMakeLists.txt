@@ -18,6 +18,7 @@ add_executable(debug
         ${SRCDIR}/window.c
         ${SRCDIR}/input.c
 	${SRCDIR}/term.c
+	${SRCDIR}/draw.c
         ${SRCDIR}/ced.c
         ${SRCDIR}/main.c
 )
