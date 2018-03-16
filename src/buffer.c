@@ -106,7 +106,7 @@ struct buffer* buf_create_file(enum buffer_type type,
 
     /** gap */
     buf->gap.line = 0;
-    buf->gap.col = 0;
+    buf->gap.col = 5;       // TODO temporary for interject.txt
     buf->gap.size = BUFFER_GAPSIZE;
 
 
@@ -193,7 +193,7 @@ void buf_delch(struct buffer* buf, struct cursor cur)
 }
 
 
-struct line* buf_line(struct buffer* buf, unsigned int num)
+struct line* buf_line(const struct buffer* buf, unsigned int num)
 {
     assert(num < buf->linecount);
     return &buf->lines[num];
@@ -205,6 +205,10 @@ unsigned int buf_line_count(const struct buffer* buf)
     return buf->linecount;
 }
 
+int buf_line_hasgap(const struct buffer* buf, unsigned int line)
+{
+    return buf->gap.line == line;
+}
 
 unsigned int buf_charcount_sec(const struct buffer* b, char ch,
         struct cursor from, struct cursor to)

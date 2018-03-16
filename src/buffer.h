@@ -56,9 +56,11 @@ void buf_addch(struct buffer* b, char ch, struct cursor cur);
 void buf_delch(struct buffer* b, struct cursor cur);
 
 /** Return pointer to the line number */
-struct line* buf_line(struct buffer* buf, unsigned int num);
+struct line* buf_line(const struct buffer* buf, unsigned int num);
 /** Return the number of newlines '\n' in the buffer */
 unsigned int buf_line_count(const struct buffer* buf);
+/** Return 1 if line has gap */
+int buf_line_hasgap(const struct buffer* buf, unsigned int line);
 
 /** Save buffer to disk at path*/
 int buf_save_to_disk(const struct buffer* buf, const char* path);
