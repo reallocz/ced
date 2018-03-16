@@ -99,8 +99,16 @@ void ced_normal_input_cb(inpev ev)
         return;
     }
     if(ev.key == 'h') {
+        bview_curmove_b(&G.win->bview, 1);
     }
     if(ev.key == 'l') {
+        bview_curmove_f(&G.win->bview, 1);
+    }
+    if(ev.key == 'j') {
+        bview_curmove_nextline(&G.win->bview, 1);
+    }
+    if(ev.key == 'k') {
+        bview_curmove_prevline(&G.win->bview, 1);
     }
 }
 
