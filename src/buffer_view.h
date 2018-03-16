@@ -16,6 +16,11 @@ struct buffer_view {
 /** Create a new buffer_view */
 struct buffer_view bview_create(struct buffer* buf);
 
+/** CURSOR **/
+void bview_curmove_f(struct buffer_view* bv, unsigned int n);
+void bview_curmove_b(struct buffer_view* bv, unsigned int n);
+void bview_curmove_nextline(struct buffer_view* bv, unsigned int n);
+void bview_curmove_prevline(struct buffer_view* bv, unsigned int n);
 
 /** Sroll buffer view up by n lines */
 void bview_scrollup(struct buffer_view* bv, unsigned int n);
