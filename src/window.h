@@ -29,7 +29,7 @@ struct statusline {
 struct margin {
     unsigned int width;
     unsigned int start; // First line number
-    unsigned int end;   // Last line number
+    unsigned int linecount;
 };
 
 struct window {

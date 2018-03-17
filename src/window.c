@@ -40,8 +40,8 @@ struct window* win_create(struct buffer_view bview)
 
     // Margin
     w->margin.width = 3;
-    w->margin.start = bview.start;
-    w->margin.end = bview.len;
+    w->margin.start = bview_start(&bview);
+    w->margin.linecount = w->bview.buffer->linecount;
 
     log_l(TAG, "Window created: id: %d", w->id);
     win_pprint(w);
@@ -65,8 +65,8 @@ void win_update(struct window* win)
 
     // Margin
     win->margin.width = 3;
-    win->margin.start = win->bview.start;
-    win->margin.end = win->bview.len;
+    win->margin.start = bview_start(&win->bview);
+    win->margin.linecount = win->bview.buffer->linecount;
 }
 
 

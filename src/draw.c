@@ -3,17 +3,30 @@
 
 #define TAG "DRAW"
 
+/**** IMPORTANT:
+ * The drawing order must be:
+ *  1 - statusline
+ *  2 - margin
+ *  3 - textarea
+ * This is because drawing margin clear each line and drawing textarea does NOT!
+ */
+
 void draw_bview(WINDOW* nwin, struct buffer_view bv, struct rect area)
 {
-    log_l(TAG, "Drawing buffer: %d lines", bv.buffer->linecount);
+    log_l(TAG, "Drawing buffer %d (%d lines)...", bv.buffer->id, bv.buffer->linecount);
     unsigned int ox = area.x;
     unsigned int oy = area.y;
 
-    for(unsigned int i = 0; i < bv.len; ++i) {
-        struct line* ln = buf_line(bv.buffer, bv.start + i);
-        log_lc(TAG, "Drawing line: ");
-        buf_printline(bv.buffer, i);
+    unsigned int linesdrawn = 0;
+    unsigned int firstline = bview_start(&bv);
+    for(unsigned int i = 0; i < area.height; ++i) {
+        struct line* ln = buf_line(bv.buffer, firstline + i);
+        if(ln == NULL) {
+            // Empty line: clear eol
+            break;
+        }
 
+        linesdrawn++;
         if(bv.buffer->gap.line == i) {
             for(unsigned int j = 0; j < ln->len; ++j) {
                 if(!buf_ingap(bv.buffer, j)) {
@@ -29,6 +42,8 @@ void draw_bview(WINDOW* nwin, struct buffer_view bv, struct rect area)
         area.x = ox;
     }
 
+    log_l(TAG, "%d lines drawn", linesdrawn);
+
     // Move cursor to the original position
     wmove(nwin, oy + bv.cur.line, ox + bv.cur.col);
 }
@@ -43,8 +58,9 @@ void draw_margin(WINDOW* nwin, struct margin mgn, struct rect area)
     char lnstr[mgn.width + txtpadding];
     for(unsigned int i = 0; i < area.height; ++i) {
         wmove(nwin, i, 0);
-        if(i < mgn.end) {
-            sprintf(lnstr, "%3d", i + 1);  // 1 - indexed
+        unsigned int lnnumber = mgn.start + i;
+        if(lnnumber < mgn.linecount) {
+            sprintf(lnstr, "%3d", lnnumber + 1);    // 1 indexed
         } else {
             sprintf(lnstr, "%3c", '~');
         }
