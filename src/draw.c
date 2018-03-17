@@ -11,7 +11,7 @@
  * This is because drawing margin clear each line and drawing textarea does NOT!
  */
 
-void draw_bview(WINDOW* nwin, struct buffer_view bv, struct rect area)
+void draw_bview(WINDOW* nwin, struct buffer_view bv, struct rect area, struct context* context)
 {
     log_l(TAG, "Drawing buffer %d (%d lines)...", bv.buffer->id, bv.buffer->linecount);
     unsigned int ox = area.x;
@@ -49,7 +49,7 @@ void draw_bview(WINDOW* nwin, struct buffer_view bv, struct rect area)
 }
 
 
-void draw_margin(WINDOW* nwin, struct margin mgn, struct rect area)
+void draw_margin(WINDOW* nwin, struct margin mgn, struct rect area, struct context* context)
 {
     wattron(nwin, A_BOLD);
 
@@ -58,6 +58,7 @@ void draw_margin(WINDOW* nwin, struct margin mgn, struct rect area)
     char lnstr[mgn.width + txtpadding];
     for(unsigned int i = 0; i < area.height; ++i) {
         wmove(nwin, i, 0);
+        wclrtoeol(nwin);
         unsigned int lnnumber = mgn.start + i;
         if(lnnumber < mgn.linecount) {
             sprintf(lnstr, "%3d", lnnumber + 1);    // 1 indexed
@@ -70,13 +71,13 @@ void draw_margin(WINDOW* nwin, struct margin mgn, struct rect area)
 }
 
 
-void draw_statusline(WINDOW* nwin, struct statusline sline, struct rect area)
+void draw_statusline(WINDOW* nwin, struct statusline sline, struct rect area, struct context* context)
 {
     // statusline string
     char stsstring[area.width];
     sprintf(stsstring,
             "   %s | %s | CUR %d:%d | GAP: line: %d col: %d size: %d",
-            sline.mode, sline.bufname, sline.cur.line, sline.cur.col,
+            context->modestr, sline.bufname, sline.cur.line, sline.cur.col,
             sline.gap.line, sline.gap.col, sline.gap.size);
 
     init_pair(1, COLOR_BLACK, COLOR_WHITE);

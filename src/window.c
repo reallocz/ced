@@ -34,7 +34,6 @@ struct window* win_create(struct buffer_view bview)
 
     // Statusline
     w->sline.bufname = bview.buffer->name;
-    w->sline.mode = "TODO-MODE";
     w->sline.cur.line = 0;
     w->sline.cur.col = 0;
 
@@ -70,22 +69,23 @@ void win_update(struct window* win)
 }
 
 
-void win_draw(const struct window* win, const char* mode, struct rect area)
+void win_draw(const struct window* win, struct rect area,
+        struct context* context)
 {
     // Stl
     struct rect areastl = RECT(area.height - STATUSLINE_HEIGHT,0,
             area.width, 1);
-    draw_statusline(win->nwin, win->sline, areastl);
+    draw_statusline(win->nwin, win->sline, areastl, context);
 
     // Margin
     struct rect areamgn = RECT(0, 0, win->margin.width, area.height - STATUSLINE_HEIGHT);
-    draw_margin(win->nwin, win->margin, areamgn);
+    draw_margin(win->nwin, win->margin, areamgn, context);
 
     // Bufferview
     struct rect areabv = RECT(0, win->margin.width + 1,
             area.width - win->margin.width,
             area.height - STATUSLINE_HEIGHT);
-    draw_bview(win->nwin, win->bview, areabv);
+    draw_bview(win->nwin, win->bview, areabv, context);
 
     wrefresh(win->nwin);
 }

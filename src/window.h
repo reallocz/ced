@@ -21,7 +21,7 @@
  */
 
 struct statusline {
-    const char *mode, *bufname;
+    const char *bufname;
     struct cursor cur;
     struct buffer_gap gap;
 };
@@ -52,7 +52,7 @@ void win_destroy(struct window* win);
 void win_update(struct window* win);
 
 /** Draw the window */
-void win_draw(const struct window* win, const char* mode, struct rect area);
+void win_draw(const struct window* win,  struct rect area, struct context* context);
 
 void win_pprint(struct window* win);
 

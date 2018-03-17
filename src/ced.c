@@ -12,11 +12,16 @@
 
 #define TAG "CED"
 
+/** Map for mode -> string */
+static const char* mode_str[] = {
+    "NORMAL",
+    "INSERT"
+};
 
 static struct {
-    enum mode mode;
     int quit; // Return to main if 1
     struct window *win;
+    struct context *context;
 } G;
 
 
@@ -25,14 +30,21 @@ void ced_run()
     // Initialize globals
     G.quit = 0;
 
+    // Context
+    struct context* ctx = malloc(sizeof( struct context));
+    assert(ctx);
+    ctx->mode = MODE_NORMAL;
+    ctx->modestr = mode_str[MODE_NORMAL];
+    G.context = ctx;
+
     // Create window and set buffer
     struct buffer_view bview = bview_create( buf_create_file(SCRATCH, "interject.txt") );
+    /*struct buffer_view bview = bview_create( buf_create_test() );*/
+    /*struct buffer_view bview = bview_create( buf_create_empty(DOCUMENT) );*/
 
     /*struct buffer_view bview = bview_create(buf_create_test());*/
 
     G.win = win_create(bview);
-    // Start in normal mode
-    G.mode = MODE_NORMAL;
 
     // Main loop
     while(!G.quit) {
@@ -40,14 +52,14 @@ void ced_run()
         term_update();
         struct rect areawin = RECT(0, 0, term_cols(), term_rows());
 
-        if(G.mode == MODE_NORMAL) {
+        if(G.context->mode == MODE_NORMAL) {
             win_update(G.win);
-            win_draw(G.win, "MODE: NORMAL", areawin);
+            win_draw(G.win, areawin, G.context);
             inp_poll("NORMAL", G.win, ced_normal_input_cb);
         } else {
             win_update(G.win);
-            win_draw(G.win, "MODE: INSERT", areawin);
-            inp_poll("NORMAL", G.win, ced_insert_input_cb);
+            win_draw(G.win, areawin, G.context);
+            inp_poll("INSERT", G.win, ced_insert_input_cb);
         }
 
     }
@@ -72,7 +84,7 @@ void ced_insert_input_cb(inpev ev)
             /*buf_delch(buf);*/
             break;
         case k_esc:
-            G.mode = MODE_NORMAL;
+            G.context->mode = MODE_NORMAL;
             break;
         default:
             break;
@@ -87,7 +99,7 @@ void ced_normal_input_cb(inpev ev)
 
     if(ev.key == 'i') {
         // Switch to insert mode
-        G.mode = MODE_INSERT;
+        G.context->mode = MODE_INSERT;
         return;
     }
     if (ev.key == k_f1) {

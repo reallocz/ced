@@ -28,3 +28,8 @@ enum mode {
     MODE_INSERT,
 };
 
+struct context {
+    enum mode mode;
+    const char* modestr;
+};
+
