@@ -192,10 +192,13 @@ void buf_delch(struct buffer* buf, struct cursor cur)
     /*}*/
 }
 
-
+/** Returns pointer to line in buffer. NULL if 'num' is out of bounds*/
 struct line* buf_line(const struct buffer* buf, unsigned int num)
 {
-    assert(num < buf->linecount);
+    if(num >= buf->linecount) {
+        log_e(TAG, "Invalid line request: buf: %d (%d lines), request: %d", buf->id, buf->linecount, num);
+        return NULL;
+    }
     return &buf->lines[num];
 }
 
