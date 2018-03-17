@@ -88,7 +88,7 @@ unsigned int fu_read_file_lines(const char* path,
         struct line* ln = &mlines[count++]; // First line
         ln->len = linelen;
         ln->data = tmpdata;
-        log_l("count", "%d - %s", ln->len, ln->data);
+        /*log_l(TAG, "line: size=%d", ln->len, ln->data);*/
         tmpdata = 0;
         wtfits = 0;
     }
