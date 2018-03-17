@@ -8,7 +8,6 @@
 
 struct buffer_view {
     unsigned int start; // View starts from
-    unsigned int len;   // Number of lines of the view
     struct cursor cur;
     struct buffer* buffer;
 };
@@ -22,9 +21,12 @@ void bview_curmove_b(struct buffer_view* bv, unsigned int n);
 void bview_curmove_nextline(struct buffer_view* bv, unsigned int n);
 void bview_curmove_prevline(struct buffer_view* bv, unsigned int n);
 
-/** Sroll buffer view up by n lines */
+/** Sroll buffer view up by n lines. (LIKE PAGE UP) */
 void bview_scrollup(struct buffer_view* bv, unsigned int n);
-/** Sroll buffer view down by n lines */
+/** Sroll buffer view down by n lines. (LIKE PAGE DOWN)*/
 void bview_scrolldown(struct buffer_view* bv, unsigned int n);
 
+/** Get bounds/extents of the view */
+/** Return's the number(0 indexed) of the first line of the buffer_view */
+unsigned int bview_start(struct buffer_view* bv);
 

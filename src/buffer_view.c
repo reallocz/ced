@@ -13,7 +13,6 @@ struct buffer_view bview_create(struct buffer* buf)
 
     bv.buffer = buf;
     bv.start = 0;
-    bv.len = buf->linecount;
 
     return bv;
 }
@@ -68,3 +67,33 @@ void bview_curmove_prevline(struct buffer_view* bv, unsigned int n)
         bv->cur.line -= n;
     }
 }
+
+
+void bview_scrollup(struct buffer_view* bv, unsigned int n)
+{
+    log_l(TAG, "SCROLLING UP!");
+    if(n > bv->start) {
+        bv->start = 0;
+    } else {
+        bv->start -= n;
+    }
+}
+
+
+void bview_scrolldown(struct buffer_view* bv, unsigned int n)
+{
+    log_l(TAG, "SCROLLING DOWN!");
+    unsigned int newstart = bv->start + n;
+    if(!(newstart < bv->buffer->linecount)) {
+        // last line
+        newstart = bv->buffer->linecount - 1;
+    }
+    bv->start = newstart;
+}
+
+
+unsigned int bview_start(struct buffer_view* bv)
+{
+    return bv->start;
+}
+
