@@ -10,7 +10,7 @@ static unsigned int generate_id();
 static void gap_add(struct buffer* buf);
 
 /** Resize buffer gap if needed */
-static int gap_resize_if_required(struct buffer* buf);
+static int gap_resize_optional(struct buffer* buf);
 
 /** move gap to cursor */
 static void gap_move(struct buffer* buf, struct cursor cur);

@@ -68,20 +68,23 @@ void ced_run()
 
 void ced_insert_input_cb(inpev ev)
 {
-    /*struct buffer* buf = G.win->buffer;*/
+    struct buffer* buf = G.win->bview.buffer;
+    struct cursor cur = G.win->bview.cur;
 
     if(ev.type == INP_ALPHA || ev.type == INP_NUM
             || ev.type == INP_SYMBOL || ev.key == k_space
             || ev.key == k_enter)
     {
-        /*buf_addch(buf, ev.key);*/
+        buf_addch(buf, ev.key, cur);
+        bview_curmove_f(&G.win->bview, 1);
     }
 
     if(ev.type == INP_SPECIAL)
     {
         switch(ev.key) {
         case k_backspace:
-            /*buf_delch(buf);*/
+            buf_delch(buf, cur);
+            bview_curmove_b(&G.win->bview, 1);
             break;
         case k_esc:
             G.context->mode = MODE_NORMAL;

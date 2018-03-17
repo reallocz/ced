@@ -132,16 +132,7 @@ void buf_destroy(struct buffer* buf)
     buf = NULL;
 }
 
-static int gap_resize_if_required(struct buffer* buf)
-{
-    if(buf->gap.size < 1) {
-        unsigned int oldgap = buf->gap.size;
-        gap_add(buf);
-        log_l(TAG, "Gap resized %d -> %d", oldgap, buf->gap.size);
-        return 1;
-    }
-    return 0;
-}
+
 
 /** Adding a character to the buffer requires a gap synchronization.
  * It may also require a gap resize(increase). The order of the two
@@ -150,21 +141,13 @@ static int gap_resize_if_required(struct buffer* buf)
 void buf_addch(struct buffer* buf, char ch, struct cursor cur)
 {
     gap_move(buf, cur);
-    gap_resize_if_required(buf);
+    gap_resize_optional(buf);
 
-    /*if(b->gap.size < 1) {*/
-        /*gap_add(b);*/
-    /*}*/
-
-    /*b->data[b->gappos] = ch;*/
-    /*b->gaplen--;*/
-    /*b->gappos++;*/
-    /*b->cur = b->gappos;*/
-
-    /*if(ch == '\n') {*/
-        /*buf_update(b);*/
-    /*}*/
-    /*return;*/
+    struct line* ln = buf_line(buf, cur.line);
+    ln->data[buf->gap.col] = ch;
+    // shrink gap
+    buf->gap.col++;
+    buf->gap.size--;
 }
 
 /** Deleting a character in the buffer has the same constraints as
@@ -174,29 +157,16 @@ void buf_delch(struct buffer* buf, struct cursor cur)
     if(cur.col < 1) {
         return;
     }
-
     gap_move(buf, cur);
-    gap_resize_if_required(buf);
-
-    /*b->gap.col--;*/
-    /*b->gap.size++;*/
-
-    /*char delchar = b->data[b->gappos];*/
-
-    /*if(delchar == '\n') {*/
-        /*buf_update(b);*/
-    /*}*/
-
-    /*if(b->gappos + b->gaplen > b->size) {*/
-        /*log_fatal(TAG, "%s:ERROR: FIX THIS!", __func__);*/
-    /*}*/
+    buf->gap.col--;
+    buf->gap.size++;
 }
 
 /** Returns pointer to line in buffer. NULL if 'num' is out of bounds*/
 struct line* buf_line(const struct buffer* buf, unsigned int num)
 {
     if(num >= buf->linecount) {
-        log_e(TAG, "Invalid line request: buf: %d (%d lines), request: %d", buf->id, buf->linecount, num);
+        /*log_e(TAG, "Invalid line request: buf: %d (%d lines), request: %d", buf->id, buf->linecount, num);*/
         return NULL;
     }
     return &buf->lines[num];
@@ -294,31 +264,32 @@ static unsigned int generate_id()
 static void gap_add(struct buffer* buf)
 {
     struct line* ln = buf_line(buf, buf->gap.line);
-    struct buffer_gap gap = buf->gap;
+    struct buffer_gap* gap = &buf->gap;
 
     unsigned int newlinelen = ln->len + BUFFER_GAPSIZE;
-    unsigned int newgapsize = gap.size + BUFFER_GAPSIZE;
+    unsigned int newgapsize = gap->size + BUFFER_GAPSIZE;
 
     char* newdata = calloc(newlinelen, sizeof(char));
     assert(newdata);
 
     /* Copy memory to new data */
     // from start to gap
-    memcpy(newdata, ln->data, gap.col * sizeof(char));
+    memcpy(newdata, ln->data, gap->col * sizeof(char));
     // from end of gap to end of buffer
-    memcpy(&newdata[gap.col + newgapsize],
-            &ln->data[gap.col + gap.size],
-            ln->len - (gap.col + gap.size));
+    memcpy(&newdata[gap->col + newgapsize],
+            &ln->data[gap->col + gap->size],
+            ln->len - (gap->col + gap->size));
     // free old buffer
     free(ln->data);
     ln->data = newdata;
     ln->len = newlinelen;
-    gap.size = newgapsize;
+    gap->size = newgapsize;
 }
 
-// move gap to another line
-static void gap_move_to_line(struct buffer* buf, unsigned int line)
+/* NOTE: toline must NOT be same as gap.line! */
+static void gap_move_to_line(struct buffer* buf, unsigned int toline)
 {
+    assert(buf->gap.line != toline);
     // Delete current gap
     {
         struct line* ln = buf_line(buf, buf->gap.line);
@@ -339,9 +310,9 @@ static void gap_move_to_line(struct buffer* buf, unsigned int line)
         ln->len = linelength;
         ln->data = newdata;
     }
-    // Create gap on line
+    // Create gap on toline
     {
-        struct line* ln = buf_line(buf, line);
+        struct line* ln = buf_line(buf, toline);
         unsigned int newlength = ln->len + buf->gap.size;
         char* newdata = malloc(newlength * sizeof(char));
         assert(newdata);
@@ -356,21 +327,22 @@ static void gap_move_to_line(struct buffer* buf, unsigned int line)
 
     }
     // Update gap location (NOT SIZE!!)
-    buf->gap.line = line;
+    buf->gap.line = toline;
     buf->gap.col = 0;
 }
 
+/** move gap to cursor */
 static void gap_move(struct buffer* buf, struct cursor cur)
 {
     assert(buf);
     assert(CURVALID(buf, cur));
 
-    // Ensure gap is on the same line as that of the cursor
+    // Ensure that the gap is on the same line as that of the cursor
     if(buf->gap.line != cur.line) {
         gap_move_to_line(buf, cur.line);
     }
+    // Now, the cursor and the gap are on the same line
 
-    // Cursor and gap lie in the same line
     struct line* ln = buf_line(buf, cur.line);
     unsigned int offset = 0;
     int diff = cur.col - buf->gap.col;
@@ -396,11 +368,24 @@ static void gap_move(struct buffer* buf, struct cursor cur)
         log_l(TAG, "%s: diff=%d offset=%d", __func__, diff, offset);
     }
     else {
-        // Cursor already in sync
+        // gap is in sync do nothing.
     }
     return;
 
 }
+
+
+static int gap_resize_optional(struct buffer* buf)
+{
+    if(buf->gap.size < 1) {
+        unsigned int oldgap = buf->gap.size;
+        gap_add(buf);
+        log_l(TAG, "Gap resized %d -> %d", oldgap, buf->gap.size);
+        return 1;
+    }
+    return 0;
+}
+
 
 void buf_printline(const struct buffer* buf, unsigned int i)
 {
