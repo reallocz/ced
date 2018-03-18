@@ -54,9 +54,10 @@ void buf_destory(struct buffer* buf);
 void buf_addch(struct buffer* b, char ch, struct cursor cur);
 /** Delete a character at current cursor position */
 void buf_delch(struct buffer* b, struct cursor cur);
-/** Add a new line at the cursor. Copy the portion after the
+/** INTERNALAdd a new line at the cursor. Copy the portion after the
  * cursor on the newline and place it at the beginning of the
- * newline */
+ * newline. NOTE: the '\n' (newline) character must be passed to
+ * the addch function. */
 void buf_addline(struct buffer* b, struct cursor cur);
 
 /** Return pointer to the line number */

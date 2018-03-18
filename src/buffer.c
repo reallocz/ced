@@ -104,16 +104,18 @@ struct buffer* buf_create_file(enum buffer_type type,
     buf->type = type;
     buf->name = filename;
 
-    /** gap */
-    buf->gap.line = 0;
-    buf->gap.col = 5;       // TODO temporary for interject.txt
-    buf->gap.size = BUFFER_GAPSIZE;
-
-
     /** lines */
     buf->lines = NULL;
     buf->linecount = fu_read_file_lines(fstats.path, &buf->lines);
     assert(buf->lines);
+
+
+    /** gap */
+    buf->gap.line = 0;
+    buf->gap.col = 0;
+    buf->gap.size = 0;  // Gap starts at 0
+    gap_add(buf);
+    buf_printline(buf, 0);
 
     return buf;
 }
@@ -212,21 +214,9 @@ char buf_charat(const struct buffer* b, struct cursor cur)
 }
 
 
-int buf_save_to_disk(const struct buffer* b, const char* path)
+int buf_save_to_disk(const struct buffer* buf, const char* path)
 {
-    return 0;
-    /*FILE* f = fopen(path, "w");*/
-    /*assert(f);*/
-    /*unsigned int wbytes = 0;*/
-    /*for(unsigned int i = 0; i < b->size; ++i) {*/
-        /*if(! INGAP(b, i)) {*/
-            /*fputc(b->data[i], f);*/
-            /*wbytes++;*/
-        /*}*/
-    /*}*/
-    /*log_l(TAG, "Buffer saved (%d bytes): %s", wbytes, path);*/
-    /*fclose(f);*/
-    /*return 0;*/
+    return fu_save_buffer(buf, path);
 }
 
 int buf_ingap(const struct buffer* b, unsigned int i)
@@ -394,4 +384,12 @@ void buf_printline(const struct buffer* buf, unsigned int i)
     const struct line* ln = buf_line(buf, i);
     log_l("LINE", "no: %d, len: %d, has_gap: %d",
             i, ln->len, hasgap);
+    for(unsigned int i = 0; i < ln->len; ++i) {
+        if(INGAP(buf, i)) {
+            log_lc("-");
+        } else {
+            log_lc("%c", ln->data[i]);
+        }
+    }
+    log_lc("\n");
 }
