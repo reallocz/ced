@@ -152,3 +152,33 @@ char* fu_cwd()
 {
     return getcwd(NULL, PATH_MAX);
 }
+
+int fu_save_buffer(const struct buffer* buf, const char* path)
+{
+    log_l(TAG, "Saving buffer...");
+    FILE* f = fopen(path, "w");
+    assert(f);
+    unsigned int wbytes = 0;
+    unsigned int lcount = 0;
+    for(unsigned int lnum = 0; lnum < buf->linecount; ++lnum) {
+        struct line* ln = buf_line(buf, lnum);
+        lcount++;
+        for(unsigned int i = 0; i < ln->len; ++i) {
+            if(buf->gap.line == lnum) {
+                // Line with the gap
+                if(! buf_ingap(buf, i)) {
+                    fputc(ln->data[i], f);
+                    wbytes++;
+                }
+            } else {
+                // Lines without the gap
+                fputc(ln->data[i], f);
+                wbytes++;
+            }
+        }
+    }
+    log_l(TAG, "Buffer saved (%d lines, %d bytes): %s", lcount, wbytes, path);
+    fclose(f);
+    return 0;
+}
+

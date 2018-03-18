@@ -46,3 +46,7 @@ void fu_abspath(const char* relpath, char* abspath);
 char* fu_cwd();
 
 void fu_pprint_stats(const struct file_stats fs);
+
+/** Save buffer to path */
+int fu_save_buffer(const struct buffer* buf, const char* path);
+
