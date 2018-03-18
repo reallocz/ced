@@ -38,11 +38,11 @@ void ced_run()
     G.context = ctx;
 
     // Create window and set buffer
-    struct buffer_view bview = bview_create( buf_create_file(SCRATCH, "interject.txt") );
-    /*struct buffer_view bview = bview_create( buf_create_test() );*/
-    /*struct buffer_view bview = bview_create( buf_create_empty(DOCUMENT) );*/
+    struct buffer_view bview = bv_create( buf_create_file(SCRATCH, "interject.txt") );
+    /*struct buffer_view bview = bv_create( buf_create_test() );*/
+    /*struct buffer_view bview = bv_create( buf_create_empty(DOCUMENT) );*/
 
-    /*struct buffer_view bview = bview_create(buf_create_test());*/
+    /*struct buffer_view bview = bv_create(buf_create_test());*/
 
     G.win = win_create(bview);
 
@@ -76,7 +76,7 @@ void ced_insert_input_cb(inpev ev)
             || ev.key == k_enter)
     {
         buf_addch(buf, ev.key, cur);
-        bview_curmove_f(&G.win->bview, 1);
+        bv_cmov_fwd(&G.win->bview, 1);
     }
 
     if(ev.type == INP_SPECIAL)
@@ -84,7 +84,7 @@ void ced_insert_input_cb(inpev ev)
         switch(ev.key) {
         case k_backspace:
             buf_delch(buf, cur);
-            bview_curmove_b(&G.win->bview, 1);
+            bv_cmov_back(&G.win->bview, 1);
             break;
         case k_esc:
             G.context->mode = MODE_NORMAL;
@@ -110,31 +110,39 @@ void ced_normal_input_cb(inpev ev)
         return;
     }
     if(ev.key == k_f2) {
-        /*buf_save_to_disk(buf, "doc.txt"); // TODO prompt for name*/
+        buf_save_to_disk(G.win->bview.buffer, "doc.txt"); // TODO prompt for name
         return;
     }
     if(ev.key == 'h') {
-        bview_curmove_b(&G.win->bview, 1);
+        bv_cmov_back(&G.win->bview, 1);
         return;
     }
     if(ev.key == 'l') {
-        bview_curmove_f(&G.win->bview, 1);
+        bv_cmov_fwd(&G.win->bview, 1);
         return;
     }
     if(ev.key == 'j') {
-        bview_curmove_nextline(&G.win->bview, 1);
+        bv_cmov_lnext(&G.win->bview, 1);
         return;
     }
     if(ev.key == 'k') {
-        bview_curmove_prevline(&G.win->bview, 1);
+        bv_cmov_lprev(&G.win->bview, 1);
         return;
     }
     if(ev.key == 'u') {
-        bview_scrollup(&G.win->bview, 1);
+        bv_scrollup(&G.win->bview, 1);
         return;
     }
     if(ev.key == 'd') {
-        bview_scrolldown(&G.win->bview, 1);
+        bv_scrolldown(&G.win->bview, 1);
+        return;
+    }
+    if(ev.key == '$') {
+        bv_cmov_lend(&G.win->bview);
+        return;
+    }
+    if(ev.key == '0') {
+        bv_cmov_lstart(&G.win->bview);
         return;
     }
 }

@@ -18,7 +18,7 @@ void draw_bview(WINDOW* nwin, struct buffer_view bv, struct rect area, struct co
     unsigned int oy = area.y;
 
     unsigned int linesdrawn = 0;
-    unsigned int firstline = bview_start(&bv);
+    unsigned int firstline = bv_start(&bv);
     for(unsigned int i = 0; i < area.height; ++i) {
         struct line* ln = buf_line(bv.buffer, firstline + i);
         if(ln == NULL) {
