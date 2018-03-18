@@ -4,7 +4,7 @@
 
 #define TAG "BVIEW"
 
-struct buffer_view bview_create(struct buffer* buf)
+struct buffer_view bv_create(struct buffer* buf)
 {
     assert(buf);
     struct buffer_view bv;
@@ -17,31 +17,28 @@ struct buffer_view bview_create(struct buffer* buf)
     return bv;
 }
 
-void bview_curmove_f(struct buffer_view* bv, unsigned int n)
+
+void bv_cmov_fwd(struct buffer_view* bv, unsigned int n)
 {
+    assert(bv);
     const struct buffer* buf = bv->buffer;
     const struct line* ln = buf_line(buf, bv->cur.line);
 
-    if(!buf_line_hasgap(buf, bv->cur.line)) {
-        // no gap
-        unsigned int newcol = bv->cur.col + n;
-        if(newcol > ln->len)
-            newcol = ln->len;
-        bv->cur.col = newcol;
-    } else {
-        // gap
-        unsigned int newcol = bv->cur.col + n;
-        if(newcol > ln->len - buf->gap.size) {
-            bv->cur.col = ln->len - buf->gap.size;
-        } else {
-            bv->cur.col = newcol;
-        }
-    }
+    unsigned int newcol = bv->cur.col + n;
+    unsigned int maxcol = buf_line_hasgap(buf, bv->cur.line)
+        ? (ln->len - buf->gap.size) : ln->len;
 
+    if(newcol > maxcol) {
+        bv_cmov_lend(bv);
+    } else {
+        bv->cur.col = newcol;
+    }
 }
 
-void bview_curmove_b(struct buffer_view* bv, unsigned int n)
+
+void bv_cmov_back(struct buffer_view* bv, unsigned int n)
 {
+    assert(bv);
     if(n > bv->cur.col) {
         bv->cur.col = 0;
     } else {
@@ -49,27 +46,63 @@ void bview_curmove_b(struct buffer_view* bv, unsigned int n)
     }
 }
 
-void bview_curmove_nextline(struct buffer_view* bv, unsigned int n)
+
+void bv_cmov_lnext(struct buffer_view* bv, unsigned int n)
 {
-    unsigned int newline = bv->cur.line + n;
-    if(!(newline < bv->buffer->linecount)) {
-        newline = bv->buffer->linecount - 1;
+    assert(bv);
+    // Move to next line
+    if((bv->cur.line + n) < bv->buffer->linecount) {
+        bv->cur.line += n;
+    } else {
+        bv->cur.line = bv->buffer->linecount - 1;
     }
-    bv->cur.line = newline;
+
+    // Check next line's bounds and move accordingly
+    struct line* ln = buf_line(bv->buffer, bv->cur.line);
+    if(bv->cur.col >= ln->len) {
+        bv_cmov_lend(bv);
+    }
 }
 
 
-void bview_curmove_prevline(struct buffer_view* bv, unsigned int n)
+void bv_cmov_lprev(struct buffer_view* bv, unsigned int n)
 {
+    assert(bv);
+    // Move to prev line
     if(n > bv->cur.line) {
-        bv->cur.line = 0;
+        bv_cmov_lstart(bv);
     } else {
         bv->cur.line -= n;
     }
+
+    // Check prev line's bounds and move accordingly
+    struct line* ln = buf_line(bv->buffer, bv->cur.line);
+    if(bv->cur.col >= ln->len) {
+        bv_cmov_lend(bv);
+    }
 }
 
 
-void bview_scrollup(struct buffer_view* bv, unsigned int n)
+void bv_cmov_lstart(struct buffer_view* bv)
+{
+    assert(bv);
+    bv->cur.col = 0;
+}
+
+
+void bv_cmov_lend(struct buffer_view* bv)
+{
+    assert(bv);
+    struct line* ln = buf_line(bv->buffer, bv->cur.line);
+    if(buf_line_hasgap(bv->buffer, bv->cur.line)) {
+        bv->cur.col = ln->len - bv->buffer->gap.size;
+    } else {
+        bv->cur.col = ln->len;
+    }
+}
+
+
+void bv_scrollup(struct buffer_view* bv, unsigned int n)
 {
     log_l(TAG, "SCROLLING UP!");
     if(n > bv->start) {
@@ -80,7 +113,7 @@ void bview_scrollup(struct buffer_view* bv, unsigned int n)
 }
 
 
-void bview_scrolldown(struct buffer_view* bv, unsigned int n)
+void bv_scrolldown(struct buffer_view* bv, unsigned int n)
 {
     log_l(TAG, "SCROLLING DOWN!");
     unsigned int newstart = bv->start + n;
@@ -92,7 +125,7 @@ void bview_scrolldown(struct buffer_view* bv, unsigned int n)
 }
 
 
-unsigned int bview_start(struct buffer_view* bv)
+unsigned int bv_start(struct buffer_view* bv)
 {
     return bv->start;
 }

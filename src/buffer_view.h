@@ -13,20 +13,25 @@ struct buffer_view {
 };
 
 /** Create a new buffer_view */
-struct buffer_view bview_create(struct buffer* buf);
+struct buffer_view bv_create(struct buffer* buf);
 
 /** CURSOR **/
-void bview_curmove_f(struct buffer_view* bv, unsigned int n);
-void bview_curmove_b(struct buffer_view* bv, unsigned int n);
-void bview_curmove_nextline(struct buffer_view* bv, unsigned int n);
-void bview_curmove_prevline(struct buffer_view* bv, unsigned int n);
+void bv_cmov_fwd(struct buffer_view* bv, unsigned int n);
+void bv_cmov_back(struct buffer_view* bv, unsigned int n);
+void bv_cmov_lnext(struct buffer_view* bv, unsigned int n);
+void bv_cmov_lprev(struct buffer_view* bv, unsigned int n);
+
+/** Move cursor to the start of the line */
+void bv_cmov_lstart(struct buffer_view* bv);
+/** Move cursor to the end of the line */
+void bv_cmov_lend(struct buffer_view* bv);
 
 /** Sroll buffer view up by n lines. (LIKE PAGE UP) */
-void bview_scrollup(struct buffer_view* bv, unsigned int n);
+void bv_scrollup(struct buffer_view* bv, unsigned int n);
 /** Sroll buffer view down by n lines. (LIKE PAGE DOWN)*/
-void bview_scrolldown(struct buffer_view* bv, unsigned int n);
+void bv_scrolldown(struct buffer_view* bv, unsigned int n);
 
 /** Get bounds/extents of the view */
 /** Return's the number(0 indexed) of the first line of the buffer_view */
-unsigned int bview_start(struct buffer_view* bv);
+unsigned int bv_start(struct buffer_view* bv);
 
