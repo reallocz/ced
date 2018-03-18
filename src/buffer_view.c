@@ -130,3 +130,13 @@ unsigned int bv_start(struct buffer_view* bv)
     return bv->start;
 }
 
+
+struct cursor bv_relcur(struct buffer_view* bv)
+{
+    struct cursor c = {
+        .line = bv->cur.line - bv->start,
+        .col = bv->cur.col
+    };
+    return c;
+}
+

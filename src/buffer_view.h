@@ -35,3 +35,6 @@ void bv_scrolldown(struct buffer_view* bv, unsigned int n);
 /** Return's the number(0 indexed) of the first line of the buffer_view */
 unsigned int bv_start(struct buffer_view* bv);
 
+/** Return cursor relative to bview.start */
+struct cursor bv_relcur(struct buffer_view* bv);
+

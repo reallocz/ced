@@ -44,7 +44,9 @@ void draw_bview(WINDOW* nwin, struct buffer_view bv, struct rect area, struct co
     log_l(TAG, "%d lines drawn", linesdrawn);
 
     // Move cursor to the original position
-    wmove(nwin, oy + bv.cur.line, ox + bv.cur.col);
+    /*wmove(nwin, oy + bv.cur.line, ox + bv.cur.col);*/
+    struct cursor c = bv_relcur(&bv);
+    wmove(nwin, oy + c.line, ox + c.col);
 }
 
 
