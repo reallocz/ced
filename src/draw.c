@@ -20,14 +20,13 @@ void draw_bview(WINDOW* nwin, struct buffer_view bv, struct rect area, struct co
     unsigned int linesdrawn = 0;
     unsigned int firstline = bv_start(&bv);
     for(unsigned int i = 0; i < area.height; ++i) {
-        struct line* ln = buf_line(bv.buffer, firstline + i);
-        if(ln == NULL) {
-            // Empty line: clear eol
-            break;
-        }
+
+        unsigned int linenumber = firstline + i;
+        struct line* ln = buf_line(bv.buffer, linenumber);
+        if(ln == NULL) { break; } // No more lines in buffer
 
         linesdrawn++;
-        if(bv.buffer->gap.line == i) {
+        if(buf_line_hasgap(bv.buffer, linenumber)) {
             for(unsigned int j = 0; j < ln->len; ++j) {
                 if(!buf_ingap(bv.buffer, j)) {
                     mvwaddch(nwin, area.y, area.x++, ln->data[j]);
