@@ -16,6 +16,7 @@ struct buffer_view {
 struct buffer_view bv_create(struct buffer* buf);
 
 /** CURSOR **/
+void bv_cset(struct buffer_view* bv, struct cursor cur);
 void bv_cmov_fwd(struct buffer_view* bv, unsigned int n);
 void bv_cmov_back(struct buffer_view* bv, unsigned int n);
 void bv_cmov_lnext(struct buffer_view* bv, unsigned int n);

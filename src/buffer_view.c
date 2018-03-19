@@ -18,6 +18,16 @@ struct buffer_view bv_create(struct buffer* buf)
 }
 
 
+void bv_cset(struct buffer_view* bv, struct cursor cur)
+{
+    assert(bv);
+    log_l(TAG, "Setting cursor: line: %d -> %d, col: %d -> %d",
+            bv->cur.line, cur.line, bv->cur.col, cur.col);
+    bv->cur = cur;
+    // TODO BOUNDS CHECK;
+}
+
+
 void bv_cmov_fwd(struct buffer_view* bv, unsigned int n)
 {
     assert(bv);

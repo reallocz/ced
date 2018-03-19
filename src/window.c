@@ -55,8 +55,30 @@ void win_destroy(struct window* win)
 }
 
 
-void win_update(struct window* win)
+void win_update(struct window* win, struct rect area, const struct context *context)
 {
+    // Buffer
+    {
+        struct rect bvarea = RECT(0, win->margin.width + 1,
+                area.width - win->margin.width,
+                area.height - STATUSLINE_HEIGHT);
+        // Keep cursor on the screen
+        struct buffer_view* bv = &win->bview;
+        unsigned int firstline = bv_start(bv);
+        unsigned int linesleft = buf_line_count(bv->buffer);
+        if(bv->cur.line < firstline) {
+            struct cursor cur = bv->cur;
+            cur.line = firstline;
+            bv_cset(bv, cur);
+        }
+
+        if(bv->cur.line > firstline + bvarea.height - 1) {
+            struct cursor cur = bv->cur;
+            cur.line = firstline + bvarea.height - 1;
+            bv_cset(bv, cur);
+        }
+    }
+
     // statusline
     win->sline.bufname = win->bview.buffer->name;
     win->sline.cur = win->bview.cur;

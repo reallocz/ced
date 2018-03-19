@@ -53,11 +53,11 @@ void ced_run()
         struct rect areawin = RECT(0, 0, term_cols(), term_rows());
 
         if(G.context->mode == MODE_NORMAL) {
-            win_update(G.win);
+            win_update(G.win, areawin, G.context);
             win_draw(G.win, areawin, G.context);
             inp_poll("NORMAL", G.win, ced_normal_input_cb);
         } else {
-            win_update(G.win);
+            win_update(G.win, areawin, G.context);
             win_draw(G.win, areawin, G.context);
             inp_poll("INSERT", G.win, ced_insert_input_cb);
         }

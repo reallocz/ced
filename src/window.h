@@ -49,7 +49,7 @@ struct window* win_create(struct buffer_view bview);
 void win_destroy(struct window* win);
 
 /** Update window margin, statusline etc */
-void win_update(struct window* win);
+void win_update(struct window* win, struct rect area, const struct context *context);
 
 /** Draw the window */
 void win_draw(const struct window* win,  struct rect area, struct context* context);

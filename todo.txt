@@ -1,9 +1,9 @@
 TODO: 
-- Impl scroll on cursor out of bounds
 - Impl relative_cursor and abs_cursor to buffer_view
 - Add relative line number
 - Prompt for path while saving file
 - Clean up fileutils
+- Impl a scripting language!
 
 DONE:
 - Fix curmove_next and prev line
