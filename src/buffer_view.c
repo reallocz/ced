@@ -50,7 +50,7 @@ void bv_bounds_set(struct buffer_view* bv, struct rect bounds)
 }
 
 
-struct rect bv_bounds(struct buffer_view* bv)
+struct rect bv_bounds(const struct buffer_view* bv)
 {
     assert(bv);
     return bv->bounds;
@@ -176,13 +176,13 @@ void bv_scrolldown(struct buffer_view* bv, unsigned int n)
 }
 
 
-unsigned int bv_start(struct buffer_view* bv)
+unsigned int bv_start(const struct buffer_view* bv)
 {
     return bv->start;
 }
 
 
-struct cursor bv_relcur(struct buffer_view* bv)
+struct cursor bv_relcur(const struct buffer_view* bv)
 {
     struct cursor c = {
         .line = bv->cur.line - bv->start,
