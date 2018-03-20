@@ -2,7 +2,7 @@
 
 /** Create a rect */
 #define RECT(py, px, pw, ph)\
-    (struct rect) {.y = py, .x = px, .width = pw, .height = ph}
+    {.y = py, .x = px, .width = pw, .height = ph}
 
 /** Evals to 1 if two rects are identical */
 #define RECTSAME(A, B)\
@@ -49,3 +49,6 @@ struct context {
     unsigned long flags;
 };
 
+static void printrect(const char* name, struct rect r) {
+    log_l(name, "{y: %d, x: %d, w: %d, h: %d}", r.y, r.x, r.width, r.height);
+}
