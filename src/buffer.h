@@ -40,8 +40,6 @@ struct buffer {
     unsigned int linecount;
 };
 
-/** Create a test buffer */
-struct buffer* buf_create_test();
 /** Create a new empty buffer of the specified type */
 struct buffer* buf_create_empty(enum buffer_type type);
 struct buffer buf_create_file(enum buffer_type type,

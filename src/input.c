@@ -4,7 +4,7 @@
 
 #define TAG "INPUT"
 
-void inp_poll(const char* name, struct window* win,
+void inp_poll(const char* name __attribute__((unused)), struct window* win,
         void (*callback) (inpev))
 {
 

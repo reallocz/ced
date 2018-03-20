@@ -25,7 +25,6 @@ void bv_update(struct buffer_view* bv)
     // Keep cursor on the screen
     struct rect bvarea = bv_bounds(bv);
     unsigned int firstline = bv_start(bv);
-    unsigned int linesleft = buf_line_count(&bv->buffer);
 
     if(bv->cur.line < firstline) {
         struct cursor cur = bv->cur;

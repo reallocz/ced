@@ -19,40 +19,6 @@
 
 #define TAG "BUFFER"
 
-const char* testlines[] = {
-    "    First line with 4 gaps at the start that must stay hidden",
-    "Second line: @{*(U! 08cv09c8xv c0v89x09cv80xbv8lk123jl1k23",
-    "Third - the quick brown fox jumped over the lazy dog\\",
-    "Romeo and Juliet :) :( :/ :* ",
-};
-const int testlinecount = 4;
-
-struct buffer* buf_create_test() {
-    struct buffer* buf = malloc(sizeof(struct buffer));
-    assert(buf);
-
-    buf->id = generate_id();
-    buf->type = TESTBUFFER;
-    buf->name = "TEST_BUFFER";
-
-    /** gap */
-    buf->gap.line = 0;
-    buf->gap.col = 0;
-    buf->gap.size = BUFFER_GAPSIZE;
-
-    /** lines */
-    buf->linecount = testlinecount;
-    buf->lines = calloc(buf->linecount, sizeof(struct line));
-    assert(buf->lines);
-
-    for(unsigned int i = 0; i < buf->linecount; ++i) {
-        buf->lines[i].data = testlines[i];
-        buf->lines[i].len = strlen(testlines[i]);
-    }
-
-    return buf;
-}
-
 struct buffer* buf_create_empty(enum buffer_type type)
 {
     struct buffer* buf = malloc(sizeof(struct buffer));
@@ -182,34 +148,6 @@ unsigned int buf_line_count(const struct buffer* buf)
 int buf_line_hasgap(const struct buffer* buf, unsigned int line)
 {
     return buf->gap.line == line;
-}
-
-unsigned int buf_charcount_sec(const struct buffer* b, char ch,
-        struct cursor from, struct cursor to)
-{
-    return 0;
-    /*assert(from < b->size && to <= b->size && from <= to);*/
-
-    /*unsigned int count = 0;*/
-    /*for(unsigned int i = from; i < to; ++i) {*/
-        /*if((!INGAP(b, i)) && b->data[i] == ch) {*/
-            /*count++;*/
-        /*}*/
-    /*}*/
-    /*return count;*/
-}
-
-
-unsigned int buf_charcount(const struct buffer* b, char ch)
-{
-    /*return buf_charcount_sec(b, ch, (struct cursor){ }, b->size);*/
-}
-
-
-char buf_charat(const struct buffer* b, struct cursor cur)
-{
-    /*assert(pos < b->size && !INGAP(b, pos));*/
-    /*return b->data[pos];*/
 }
 
 

@@ -11,7 +11,7 @@
  * This is because drawing margin clear each line and drawing textarea does NOT!
  */
 
-void draw_bview(WINDOW* nwin, struct buffer_view bv, const struct context* context)
+void draw_bview(WINDOW* nwin, struct buffer_view bv, const struct context* context __attribute__((unused)))
 {
     log_l(TAG, "Drawing buffer %d (%d lines)...", bv.buffer.id, bv.buffer.linecount);
     struct rect area = bv_bounds(&bv);
@@ -51,7 +51,7 @@ void draw_bview(WINDOW* nwin, struct buffer_view bv, const struct context* conte
 }
 
 
-void draw_margin(WINDOW* nwin, struct margin mgn, struct rect area, const struct context* context)
+void draw_margin(WINDOW* nwin, struct margin mgn, struct rect area, const struct context* context __attribute__((unused)))
 {
     wattron(nwin, A_BOLD);
 
