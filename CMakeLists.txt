@@ -12,6 +12,7 @@ add_compile_options(-g -Wall -Wextra -Wpedantic)
 
 add_executable(debug
         ${SRCDIR}/log.c
+        ${SRCDIR}/common.c
         ${SRCDIR}/fileutils.c
         ${SRCDIR}/buffer.c
         ${SRCDIR}/buffer_view.c
