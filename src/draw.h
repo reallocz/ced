@@ -5,10 +5,10 @@
 
 
 void draw_bview(WINDOW* nwin, struct buffer_view bv,
-        struct context* context);
+        const struct context* context);
 
 void draw_margin(WINDOW* nwin, struct margin mgn, struct rect area,
-        struct context* context);
+        const struct context* context);
 
 void draw_statusline(WINDOW* nwin, struct statusline sline,
-        struct rect area, struct context* context);
+        struct rect area, const struct context* context);
