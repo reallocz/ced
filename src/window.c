@@ -45,6 +45,12 @@ void win_destroy(struct window* win)
 }
 
 
+void win_setbview(struct window* win, struct buffer_view* bv)
+{
+    assert(win && bv);
+    win->bview = bv;
+}
+
 void win_update(struct window* win, struct context *context)
 {
     struct buffer_view* bv = win->bview;
@@ -59,15 +65,12 @@ void win_update(struct window* win, struct context *context)
     win->margin.linecount = bv->buffer.linecount;
 
     // buffer
-    if(ISFLAGSET(context->flags, Farea_update)) {
-        // Update bview bounds
-        struct rect area = context->bounds;
-        struct rect bvbounds = RECT(0, win->margin.width + 1,
-                area.width - win->margin.width,
-                area.height - STATUSLINE_HEIGHT);
-        bv_bounds_set(bv, bvbounds);
-        UNSETFLAG(context->flags, Farea_update);
-    }
+    // Update bview bounds
+    struct rect area = context->bounds;
+    struct rect bvbounds = RECT(0, win->margin.width + 1,
+            area.width - win->margin.width,
+            area.height - STATUSLINE_HEIGHT);
+    bv_bounds_set(bv, bvbounds);
     bv_update(bv);
 }
 

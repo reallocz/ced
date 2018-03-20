@@ -22,6 +22,9 @@ static struct {
     int quit; // Return to main if 1
     struct window *win;
     struct context *context;
+
+    struct buffer_view bv1;
+    struct buffer_view bv2;
 } G;
 
 
@@ -40,15 +43,17 @@ void ced_run()
     ctx->flags = 0;
     SETFLAG(ctx->flags, Farea_update);
     G.context = ctx;
+    G.bv1 = bv_create(DOCUMENT, "interject.txt");
+    G.bv2 = bv_create(DOCUMENT, "test.txt");
 
     // Create window and set buffer
-    struct buffer_view bview = bv_create(SCRATCH, "interject.txt");
+    /*struct buffer_view bview = bv_create(SCRATCH, "interject.txt");*/
     /*struct buffer_view bview = bv_create( buf_create_test() );*/
     /*struct buffer_view bview = bv_create( buf_create_empty(DOCUMENT) );*/
 
     /*struct buffer_view bview = bv_create(buf_create_test());*/
 
-    G.win = win_create(&bview);
+    G.win = win_create(&G.bv1);
 
     // Main loop
     while(!G.quit) {
@@ -56,11 +61,8 @@ void ced_run()
         {
             term_update();
             struct rect newbounds = RECT(0, 0, term_cols(), term_rows());
-            if(!RECTSAME(newbounds, G.context->bounds)) {
-                SETFLAG(G.context->flags, Farea_update);
-                G.context->bounds = newbounds;
-                log_l(TAG, "window resized!");
-            }
+            G.context->bounds = newbounds;
+            log_l(TAG, "window resized!");
         }
 
         if(G.context->mode == MODE_NORMAL) {
@@ -154,6 +156,14 @@ void ced_normal_input_cb(inpev ev)
     }
     if(ev.key == '0') {
         bv_cmov_lstart(G.win->bview);
+        return;
+    }
+    if(ev.key == '1') {
+        win_setbview(G.win, &G.bv1);
+        return;
+    }
+    if(ev.key == '2') {
+        win_setbview(G.win, &G.bv2);
         return;
     }
 }

@@ -48,6 +48,9 @@ struct window* win_create(struct buffer_view* bview);
 /** destroys the window. doesn't alter attached buffer*/
 void win_destroy(struct window* win);
 
+/** attach a buffer_view to the window*/
+void win_setbview(struct window* win, struct buffer_view* bv);
+
 /** Update window margin, statusline etc */
 void win_update(struct window* win, struct context *context);
 
