@@ -9,12 +9,12 @@
 struct buffer_view {
     unsigned int start; // View starts from
     struct cursor cur;
-    struct buffer* buffer;
+    struct buffer buffer;
     struct rect bounds;
 };
 
 /** Create a new buffer_view */
-struct buffer_view bv_create(struct buffer* buf);
+struct buffer_view bv_create(enum buffer_type type, const char* filename);
 /** Update tick function */
 void bv_update(struct buffer_view* bv);
 

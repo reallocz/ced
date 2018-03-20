@@ -13,7 +13,7 @@
 
 void draw_bview(WINDOW* nwin, struct buffer_view bv, struct context* context)
 {
-    log_l(TAG, "Drawing buffer %d (%d lines)...", bv.buffer->id, bv.buffer->linecount);
+    log_l(TAG, "Drawing buffer %d (%d lines)...", bv.buffer.id, bv.buffer.linecount);
     struct rect area = bv_bounds(&bv);
     unsigned int ox = area.x;
     unsigned int oy = area.y;
@@ -23,13 +23,13 @@ void draw_bview(WINDOW* nwin, struct buffer_view bv, struct context* context)
     for(unsigned int i = 0; i < area.height; ++i) {
 
         unsigned int linenumber = firstline + i;
-        struct line* ln = buf_line(bv.buffer, linenumber);
+        struct line* ln = buf_line(&bv.buffer, linenumber);
         if(ln == NULL) { break; } // No more lines in buffer
 
         linesdrawn++;
-        if(buf_line_hasgap(bv.buffer, linenumber)) {
+        if(buf_line_hasgap(&bv.buffer, linenumber)) {
             for(unsigned int j = 0; j < ln->len; ++j) {
-                if(!buf_ingap(bv.buffer, j)) {
+                if(!buf_ingap(&bv.buffer, j)) {
                     mvwaddch(nwin, area.y, area.x++, ln->data[j]);
                 }
             }

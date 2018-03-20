@@ -29,19 +29,20 @@ void ced_run()
 {
     // Initialize globals
     G.quit = 0;
+    term_update();
 
     // Context
     struct context* ctx = malloc(sizeof( struct context));
     assert(ctx);
     ctx->mode = MODE_NORMAL;
     ctx->modestr = mode_str[MODE_NORMAL];
-    ctx->bounds = RECT(0, 0, term_cols(), term_rows());
+    ctx->bounds = (struct rect) RECT(0, 0, term_cols(), term_rows());
     ctx->flags = 0;
     SETFLAG(ctx->flags, Farea_update);
     G.context = ctx;
 
     // Create window and set buffer
-    struct buffer_view bview = bv_create( buf_create_file(SCRATCH, "interject.txt") );
+    struct buffer_view bview = bv_create(SCRATCH, "interject.txt");
     /*struct buffer_view bview = bv_create( buf_create_test() );*/
     /*struct buffer_view bview = bv_create( buf_create_empty(DOCUMENT) );*/
 
@@ -78,7 +79,7 @@ void ced_run()
 
 void ced_insert_input_cb(inpev ev)
 {
-    struct buffer* buf = G.win->bview.buffer;
+    struct buffer* buf = &G.win->bview.buffer;
     struct cursor cur = G.win->bview.cur;
 
     if(ev.type == INP_ALPHA || ev.type == INP_NUM
@@ -120,7 +121,7 @@ void ced_normal_input_cb(inpev ev)
         return;
     }
     if(ev.key == k_f2) {
-        buf_save_to_disk(G.win->bview.buffer, "doc.txt"); // TODO prompt for name
+        buf_save_to_disk(&G.win->bview.buffer, "doc.txt"); // TODO prompt for name
         return;
     }
     if(ev.key == 'h') {

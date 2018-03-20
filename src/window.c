@@ -32,17 +32,7 @@ struct window* win_create(struct buffer_view bview)
     // Buffer view
     w->bview = bview;
 
-    // Statusline
-    w->sline.bufname = bview.buffer->name;
-    w->sline.cur.line = 0;
-    w->sline.cur.col = 0;
-
-    // Margin
-    w->margin.width = 3;
-    w->margin.start = bv_start(&bview);
-    w->margin.linecount = w->bview.buffer->linecount;
-
-    log_l(TAG, "Window created: id: %d", w->id);
+    log_l(TAG, "Window created:");
     win_pprint(w);
     return w;
 }
@@ -57,6 +47,16 @@ void win_destroy(struct window* win)
 
 void win_update(struct window* win, struct context *context)
 {
+    // statusline
+    win->sline.bufname = win->bview.buffer.name;
+    win->sline.cur = win->bview.cur;
+    win->sline.gap = win->bview.buffer.gap;
+
+    // Margin
+    win->margin.width = 3;
+    win->margin.start = bv_start(&win->bview);
+    win->margin.linecount = win->bview.buffer.linecount;
+
     // buffer
     if(ISFLAGSET(context->flags, Farea_update)) {
         // Update bview bounds
@@ -64,21 +64,11 @@ void win_update(struct window* win, struct context *context)
         struct rect bvbounds = RECT(0, win->margin.width + 1,
                 area.width - win->margin.width,
                 area.height - STATUSLINE_HEIGHT);
-
         bv_bounds_set(&win->bview, bvbounds);
         UNSETFLAG(context->flags, Farea_update);
     }
     bv_update(&win->bview);
 
-    // statusline
-    win->sline.bufname = win->bview.buffer->name;
-    win->sline.cur = win->bview.cur;
-    win->sline.gap = win->bview.buffer->gap;
-
-    // Margin
-    win->margin.width = 3;
-    win->margin.start = bv_start(&win->bview);
-    win->margin.linecount = win->bview.buffer->linecount;
 }
 
 
@@ -104,5 +94,5 @@ void win_draw(const struct window* win, const struct context* context)
 
 void win_pprint(struct window* win)
 {
-    log_lc(TAG, "Window {id:%d}", win->id);
+    log_l(TAG, "Window {id:%d}", win->id);
 }

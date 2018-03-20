@@ -4,14 +4,15 @@
 
 #define TAG "BVIEW"
 
-struct buffer_view bv_create(struct buffer* buf)
+struct buffer_view bv_create(enum buffer_type type, const char* filename)
 {
-    assert(buf);
+    assert(filename);
     struct buffer_view bv;
     bv.cur.line = 0;
     bv.cur.col = 0;
 
-    bv.buffer = buf;
+    bv.buffer = buf_create_file(type, filename);
+
     bv.start = 0;
     bv.bounds = (struct rect) RECT(0, 0, 0, 0);
 
@@ -24,7 +25,7 @@ void bv_update(struct buffer_view* bv)
     // Keep cursor on the screen
     struct rect bvarea = bv_bounds(bv);
     unsigned int firstline = bv_start(bv);
-    unsigned int linesleft = buf_line_count(bv->buffer);
+    unsigned int linesleft = buf_line_count(&bv->buffer);
 
     if(bv->cur.line < firstline) {
         struct cursor cur = bv->cur;
@@ -72,7 +73,7 @@ void bv_cset(struct buffer_view* bv, struct cursor cur)
 void bv_cmov_fwd(struct buffer_view* bv, unsigned int n)
 {
     assert(bv);
-    const struct buffer* buf = bv->buffer;
+    const struct buffer* buf = &bv->buffer;
     const struct line* ln = buf_line(buf, bv->cur.line);
 
     unsigned int newcol = bv->cur.col + n;
@@ -102,10 +103,10 @@ void bv_cmov_lnext(struct buffer_view* bv, unsigned int n)
 {
     assert(bv);
     // Move to next line
-    if((bv->cur.line + n) < bv->buffer->linecount) {
+    if((bv->cur.line + n) < bv->buffer.linecount) {
         bv->cur.line += n;
     } else {
-        bv->cur.line = bv->buffer->linecount - 1;
+        bv->cur.line = bv->buffer.linecount - 1;
     }
     bv_cmov_inline(bv);
 }
@@ -134,9 +135,9 @@ void bv_cmov_lstart(struct buffer_view* bv)
 void bv_cmov_lend(struct buffer_view* bv)
 {
     assert(bv);
-    struct line* ln = buf_line(bv->buffer, bv->cur.line);
-    if(buf_line_hasgap(bv->buffer, bv->cur.line)) {
-        bv->cur.col = ln->len - bv->buffer->gap.size;
+    struct line* ln = buf_line(&bv->buffer, bv->cur.line);
+    if(buf_line_hasgap(&bv->buffer, bv->cur.line)) {
+        bv->cur.col = ln->len - bv->buffer.gap.size;
     } else {
         bv->cur.col = ln->len;
     }
@@ -146,7 +147,7 @@ void bv_cmov_lend(struct buffer_view* bv)
 void bv_cmov_inline(struct buffer_view* bv)
 {
     assert(bv);
-    struct line* ln = buf_line(bv->buffer, bv->cur.line);
+    struct line* ln = buf_line(&bv->buffer, bv->cur.line);
     if(bv->cur.col >= ln->len) {
         bv_cmov_lend(bv);
     }
@@ -168,9 +169,9 @@ void bv_scrolldown(struct buffer_view* bv, unsigned int n)
 {
     log_l(TAG, "SCROLLING DOWN!");
     unsigned int newstart = bv->start + n;
-    if(!(newstart < bv->buffer->linecount)) {
+    if(!(newstart < bv->buffer.linecount)) {
         // last line
-        newstart = bv->buffer->linecount - 1;
+        newstart = bv->buffer.linecount - 1;
     }
     bv->start = newstart;
 }

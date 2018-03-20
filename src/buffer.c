@@ -79,7 +79,7 @@ struct buffer* buf_create_empty(enum buffer_type type)
     return buf;
 }
 
-struct buffer* buf_create_file(enum buffer_type type,
+struct buffer buf_create_file(enum buffer_type type,
         const char* filename)
 {
     struct file_stats fstats = fu_stats(filename);
@@ -97,25 +97,24 @@ struct buffer* buf_create_file(enum buffer_type type,
         }
     }
 
-    struct buffer* buf = malloc(sizeof(struct buffer));
-    assert(buf);
+    struct buffer buf = {0};
 
-    buf->id = generate_id();
-    buf->type = type;
-    buf->name = filename;
+    buf.id = generate_id();
+    buf.type = type;
+    buf.name = filename;
 
     /** lines */
-    buf->lines = NULL;
-    buf->linecount = fu_read_file_lines(fstats.path, &buf->lines);
-    assert(buf->lines);
+    buf.lines = NULL;
+    buf.linecount = fu_read_file_lines(fstats.path, &buf.lines);
+    assert(buf.lines);
 
 
     /** gap */
-    buf->gap.line = 0;
-    buf->gap.col = 0;
-    buf->gap.size = 0;  // Gap starts at 0
-    gap_add(buf);
-    buf_printline(buf, 0);
+    buf.gap.line = 0;
+    buf.gap.col = 0;
+    buf.gap.size = 0;  // Gap starts at 0
+    gap_add(&buf);
+    buf_printline(&buf, 0);
 
     return buf;
 }
