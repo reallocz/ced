@@ -57,36 +57,18 @@ void win_destroy(struct window* win)
 
 void win_update(struct window* win, struct context *context)
 {
-    // TODO if flagsset(area change)
+    // buffer
     if(ISFLAGSET(context->flags, Farea_update)) {
+        // Update bview bounds
         struct rect area = context->bounds;
-        struct rect bvarea = RECT(0, win->margin.width + 1,
+        struct rect bvbounds = RECT(0, win->margin.width + 1,
                 area.width - win->margin.width,
                 area.height - STATUSLINE_HEIGHT);
 
-        bv_bounds_set(&win->bview, bvarea);
+        bv_bounds_set(&win->bview, bvbounds);
         UNSETFLAG(context->flags, Farea_update);
     }
-    // Buffer
-    {
-        // Keep cursor on the screen
-        struct buffer_view* bv = &win->bview;
-        struct rect bvarea = bv_bounds(bv);
-        unsigned int firstline = bv_start(bv);
-        unsigned int linesleft = buf_line_count(bv->buffer);
-
-        if(bv->cur.line < firstline) {
-            struct cursor cur = bv->cur;
-            cur.line = firstline;
-            bv_cset(bv, cur);
-        }
-
-        if(bv->cur.line > firstline + bvarea.height - 1) {
-            struct cursor cur = bv->cur;
-            cur.line = firstline + bvarea.height - 1;
-            bv_cset(bv, cur);
-        }
-    }
+    bv_update(&win->bview);
 
     // statusline
     win->sline.bufname = win->bview.buffer->name;

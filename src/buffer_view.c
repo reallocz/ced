@@ -19,6 +19,27 @@ struct buffer_view bv_create(struct buffer* buf)
 }
 
 
+void bv_update(struct buffer_view* bv)
+{
+    // Keep cursor on the screen
+    struct rect bvarea = bv_bounds(bv);
+    unsigned int firstline = bv_start(bv);
+    unsigned int linesleft = buf_line_count(bv->buffer);
+
+    if(bv->cur.line < firstline) {
+        struct cursor cur = bv->cur;
+        cur.line = firstline;
+        bv_cset(bv, cur);
+    }
+
+    if(bv->cur.line > firstline + bvarea.height - 1) {
+        struct cursor cur = bv->cur;
+        cur.line = firstline + bvarea.height - 1;
+        bv_cset(bv, cur);
+    }
+}
+
+
 void bv_bounds_set(struct buffer_view* bv, struct rect bounds)
 {
     assert(bv);

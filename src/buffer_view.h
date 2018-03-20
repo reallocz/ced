@@ -15,6 +15,8 @@ struct buffer_view {
 
 /** Create a new buffer_view */
 struct buffer_view bv_create(struct buffer* buf);
+/** Update tick function */
+void bv_update(struct buffer_view* bv);
 
 /** Set buffer_views bounds */
 void bv_bounds_set(struct buffer_view* bv, struct rect bounds);
