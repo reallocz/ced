@@ -11,9 +11,10 @@
  * This is because drawing margin clear each line and drawing textarea does NOT!
  */
 
-void draw_bview(WINDOW* nwin, struct buffer_view bv, struct rect area, struct context* context)
+void draw_bview(WINDOW* nwin, struct buffer_view bv, struct context* context)
 {
     log_l(TAG, "Drawing buffer %d (%d lines)...", bv.buffer->id, bv.buffer->linecount);
+    struct rect area = bv_bounds(&bv);
     unsigned int ox = area.x;
     unsigned int oy = area.y;
 

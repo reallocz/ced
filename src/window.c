@@ -55,17 +55,26 @@ void win_destroy(struct window* win)
 }
 
 
-void win_update(struct window* win, struct rect area, const struct context *context)
+void win_update(struct window* win, struct context *context)
 {
-    // Buffer
-    {
+    // TODO if flagsset(area change)
+    if(ISFLAGSET(context->flags, Farea_update)) {
+        struct rect area = context->bounds;
         struct rect bvarea = RECT(0, win->margin.width + 1,
                 area.width - win->margin.width,
                 area.height - STATUSLINE_HEIGHT);
+
+        bv_bounds_set(&win->bview, bvarea);
+        UNSETFLAG(context->flags, Farea_update);
+    }
+    // Buffer
+    {
         // Keep cursor on the screen
         struct buffer_view* bv = &win->bview;
+        struct rect bvarea = bv_bounds(bv);
         unsigned int firstline = bv_start(bv);
         unsigned int linesleft = buf_line_count(bv->buffer);
+
         if(bv->cur.line < firstline) {
             struct cursor cur = bv->cur;
             cur.line = firstline;
@@ -91,9 +100,9 @@ void win_update(struct window* win, struct rect area, const struct context *cont
 }
 
 
-void win_draw(const struct window* win, struct rect area,
-        struct context* context)
+void win_draw(const struct window* win, const struct context* context)
 {
+    struct rect area = context->bounds;
     // Stl
     struct rect areastl = RECT(area.height - STATUSLINE_HEIGHT,0,
             area.width, 1);
@@ -104,12 +113,10 @@ void win_draw(const struct window* win, struct rect area,
     draw_margin(win->nwin, win->margin, areamgn, context);
 
     // Bufferview
-    struct rect areabv = RECT(0, win->margin.width + 1,
-            area.width - win->margin.width,
-            area.height - STATUSLINE_HEIGHT);
-    draw_bview(win->nwin, win->bview, areabv, context);
+    draw_bview(win->nwin, win->bview, context);
 
     wrefresh(win->nwin);
+
 }
 
 

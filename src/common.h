@@ -2,11 +2,25 @@
 
 /** Create a rect */
 #define RECT(py, px, pw, ph)\
-    {.y = py, .x = px, .width = pw, .height = ph}
+    (struct rect) {.y = py, .x = px, .width = pw, .height = ph}
+
+/** Evals to 1 if two rects are identical */
+#define RECTSAME(A, B)\
+    (A.y == B.y && A.x == B.x && A.width == B.width && A.height == B.height)
 
 /** Eval to 1 if 'f' is set in 'flags' */
-#define FLAGSET(flags, f)\
+#define ISFLAGSET(flags, f)\
     (flags & f) == f ? 1 : 0
+
+#define SETFLAG(flags, f)\
+    flags |= f
+
+#define UNSETFLAG(flags, f)\
+    flags &= ~f
+
+enum flags {
+    Farea_update = 1 << 1,
+};
 
 /** Cursor.h */
 struct cursor {
@@ -31,5 +45,7 @@ enum mode {
 struct context {
     enum mode mode;
     const char* modestr;
+    struct rect bounds;
+    unsigned long flags;
 };
 

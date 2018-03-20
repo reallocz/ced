@@ -35,6 +35,9 @@ void ced_run()
     assert(ctx);
     ctx->mode = MODE_NORMAL;
     ctx->modestr = mode_str[MODE_NORMAL];
+    ctx->bounds = RECT(0, 0, term_cols(), term_rows());
+    ctx->flags = 0;
+    SETFLAG(ctx->flags, Farea_update);
     G.context = ctx;
 
     // Create window and set buffer
@@ -49,16 +52,23 @@ void ced_run()
     // Main loop
     while(!G.quit) {
         // Check for window resize
-        term_update();
-        struct rect areawin = RECT(0, 0, term_cols(), term_rows());
+        {
+            term_update();
+            struct rect newbounds = RECT(0, 0, term_cols(), term_rows());
+            if(!RECTSAME(newbounds, G.context->bounds)) {
+                SETFLAG(G.context->flags, Farea_update);
+                G.context->bounds = newbounds;
+                log_l(TAG, "window resized!");
+            }
+        }
 
         if(G.context->mode == MODE_NORMAL) {
-            win_update(G.win, areawin, G.context);
-            win_draw(G.win, areawin, G.context);
+            win_update(G.win, G.context);
+            win_draw(G.win, G.context);
             inp_poll("NORMAL", G.win, ced_normal_input_cb);
         } else {
-            win_update(G.win, areawin, G.context);
-            win_draw(G.win, areawin, G.context);
+            win_update(G.win, G.context);
+            win_draw(G.win, G.context);
             inp_poll("INSERT", G.win, ced_insert_input_cb);
         }
 

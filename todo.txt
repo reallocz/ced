@@ -1,4 +1,5 @@
 TODO: 
+- Move areas to their respective structs
 - Impl relative_cursor and abs_cursor to buffer_view
 - Add relative line number
 - Prompt for path while saving file

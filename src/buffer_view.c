@@ -13,10 +13,30 @@ struct buffer_view bv_create(struct buffer* buf)
 
     bv.buffer = buf;
     bv.start = 0;
+    bv.bounds = (struct rect) RECT(0, 0, 0, 0);
 
     return bv;
 }
 
+
+void bv_bounds_set(struct buffer_view* bv, struct rect bounds)
+{
+    assert(bv);
+    log_l(TAG, "bounds set: {%d, %d, %d, %d} -> {%d, %d, %d, %d}",
+            bv->bounds.y, bv->bounds.x, bv->bounds.width, bv->bounds.height,
+            bounds.y, bounds.x, bounds.width, bounds.height);
+    bv->bounds = bounds;
+}
+
+
+struct rect bv_bounds(struct buffer_view* bv)
+{
+    assert(bv);
+    return bv->bounds;
+}
+
+
+/** Cursor **/
 
 void bv_cset(struct buffer_view* bv, struct cursor cur)
 {

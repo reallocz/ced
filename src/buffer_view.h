@@ -10,10 +10,16 @@ struct buffer_view {
     unsigned int start; // View starts from
     struct cursor cur;
     struct buffer* buffer;
+    struct rect bounds;
 };
 
 /** Create a new buffer_view */
 struct buffer_view bv_create(struct buffer* buf);
+
+/** Set buffer_views bounds */
+void bv_bounds_set(struct buffer_view* bv, struct rect bounds);
+/** Return a copy of bounds */
+struct rect bv_bounds(struct buffer_view* bv);
 
 /** CURSOR **/
 void bv_cset(struct buffer_view* bv, struct cursor cur);
