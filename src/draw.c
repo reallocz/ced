@@ -11,25 +11,27 @@
  * This is because drawing margin clear each line and drawing textarea does NOT!
  */
 
-void draw_bview(WINDOW* nwin, struct buffer_view bv, const struct context* context __attribute__((unused)))
+void draw_bview(WINDOW* nwin, const struct buffer_view* bv, const struct context* context __attribute__((unused)))
 {
-    log_l(TAG, "Drawing buffer %d (%d lines)...", bv.buffer.id, bv.buffer.linecount);
-    struct rect area = bv_bounds(&bv);
+    log_l(TAG, "Drawing buffer %d (%d lines)...",
+            bv->buffer.id, bv->buffer.linecount);
+
+    struct rect area = bv_bounds(bv);
     unsigned int ox = area.x;
     unsigned int oy = area.y;
 
     unsigned int linesdrawn = 0;
-    unsigned int firstline = bv_start(&bv);
+    unsigned int firstline = bv_start(bv);
     for(unsigned int i = 0; i < area.height; ++i) {
 
         unsigned int linenumber = firstline + i;
-        struct line* ln = buf_line(&bv.buffer, linenumber);
+        struct line* ln = buf_line(&bv->buffer, linenumber);
         if(ln == NULL) { break; } // No more lines in buffer
 
         linesdrawn++;
-        if(buf_line_hasgap(&bv.buffer, linenumber)) {
+        if(buf_line_hasgap(&bv->buffer, linenumber)) {
             for(unsigned int j = 0; j < ln->len; ++j) {
-                if(!buf_ingap(&bv.buffer, j)) {
+                if(!buf_ingap(&bv->buffer, j)) {
                     mvwaddch(nwin, area.y, area.x++, ln->data[j]);
                 }
             }
@@ -46,7 +48,7 @@ void draw_bview(WINDOW* nwin, struct buffer_view bv, const struct context* conte
 
     // Move cursor to the original position
     /*wmove(nwin, oy + bv.cur.line, ox + bv.cur.col);*/
-    struct cursor c = bv_relcur(&bv);
+    struct cursor c = bv_relcur(bv);
     wmove(nwin, oy + c.line, ox + c.col);
 }
 

@@ -36,14 +36,14 @@ struct window {
     unsigned int id;
     WINDOW* nwin;
 
-    struct buffer_view bview;
     struct statusline sline;
     struct margin margin;
+    struct buffer_view* bview;
 };
 
 
 /** Create a window */
-struct window* win_create(struct buffer_view bview);
+struct window* win_create(struct buffer_view* bview);
 
 /** destroys the window. doesn't alter attached buffer*/
 void win_destroy(struct window* win);
