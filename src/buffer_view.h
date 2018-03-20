@@ -32,6 +32,8 @@ void bv_cmov_lprev(struct buffer_view* bv, unsigned int n);
 void bv_cmov_lstart(struct buffer_view* bv);
 /** Move cursor to the end of the line */
 void bv_cmov_lend(struct buffer_view* bv);
+/** If cursor's outside the line bounds, move it in [0, line.len) */
+void bv_cmov_inline(struct buffer_view* bv);
 
 /** Sroll buffer view up by n lines. (LIKE PAGE UP) */
 void bv_scrollup(struct buffer_view* bv, unsigned int n);

@@ -44,7 +44,7 @@ void bv_cset(struct buffer_view* bv, struct cursor cur)
     log_l(TAG, "Setting cursor: line: %d -> %d, col: %d -> %d",
             bv->cur.line, cur.line, bv->cur.col, cur.col);
     bv->cur = cur;
-    // TODO BOUNDS CHECK;
+    bv_cmov_inline(bv);
 }
 
 
@@ -86,12 +86,7 @@ void bv_cmov_lnext(struct buffer_view* bv, unsigned int n)
     } else {
         bv->cur.line = bv->buffer->linecount - 1;
     }
-
-    // Check next line's bounds and move accordingly
-    struct line* ln = buf_line(bv->buffer, bv->cur.line);
-    if(bv->cur.col >= ln->len) {
-        bv_cmov_lend(bv);
-    }
+    bv_cmov_inline(bv);
 }
 
 
@@ -104,12 +99,7 @@ void bv_cmov_lprev(struct buffer_view* bv, unsigned int n)
     } else {
         bv->cur.line -= n;
     }
-
-    // Check prev line's bounds and move accordingly
-    struct line* ln = buf_line(bv->buffer, bv->cur.line);
-    if(bv->cur.col >= ln->len) {
-        bv_cmov_lend(bv);
-    }
+    bv_cmov_inline(bv);
 }
 
 
@@ -128,6 +118,16 @@ void bv_cmov_lend(struct buffer_view* bv)
         bv->cur.col = ln->len - bv->buffer->gap.size;
     } else {
         bv->cur.col = ln->len;
+    }
+}
+
+
+void bv_cmov_inline(struct buffer_view* bv)
+{
+    assert(bv);
+    struct line* ln = buf_line(bv->buffer, bv->cur.line);
+    if(bv->cur.col >= ln->len) {
+        bv_cmov_lend(bv);
     }
 }
 
