@@ -4,6 +4,7 @@ set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
 
 project(ced)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 #Dirs
 set(LIBDIR "libs")
