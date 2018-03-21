@@ -7,7 +7,7 @@
  * renders parts of a buffer */
 
 struct buffer_view {
-    unsigned int start; // View starts from
+    unsigned int start;    // View starts from
     struct cursor cur;
     struct buffer buffer;
     struct rect bounds;
@@ -48,4 +48,3 @@ unsigned int bv_start(const struct buffer_view* bv);
 
 /** Return cursor relative to bview.start */
 struct cursor bv_relcur(const struct buffer_view* bv);
-

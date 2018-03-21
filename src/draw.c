@@ -14,29 +14,31 @@
 void draw_bview(WINDOW* nwin, const struct buffer_view* bv, const struct context* context __attribute__((unused)))
 {
     log_l(TAG, "Drawing buffer %d (%d lines)...",
-            bv->buffer.id, bv->buffer.linecount);
+          bv->buffer.id, bv->buffer.linecount);
 
     struct rect area = bv_bounds(bv);
-    unsigned int ox = area.x;
-    unsigned int oy = area.y;
+    unsigned int ox  = area.x;
+    unsigned int oy  = area.y;
 
     unsigned int linesdrawn = 0;
-    unsigned int firstline = bv_start(bv);
-    for(unsigned int i = 0; i < area.height; ++i) {
+    unsigned int firstline  = bv_start(bv);
+    for (unsigned int i = 0; i < area.height; ++i) {
 
         unsigned int linenumber = firstline + i;
-        struct line* ln = buf_line(&bv->buffer, linenumber);
-        if(ln == NULL) { break; } // No more lines in buffer
+        struct line* ln         = buf_line(&bv->buffer, linenumber);
+        if (ln == NULL) {
+            break;
+        }    // No more lines in buffer
 
         linesdrawn++;
-        if(buf_line_hasgap(&bv->buffer, linenumber)) {
-            for(unsigned int j = 0; j < ln->len; ++j) {
-                if(!buf_ingap(&bv->buffer, j)) {
+        if (buf_line_hasgap(&bv->buffer, linenumber)) {
+            for (unsigned int j = 0; j < ln->len; ++j) {
+                if (!buf_ingap(&bv->buffer, j)) {
                     mvwaddch(nwin, area.y, area.x++, ln->data[j]);
                 }
             }
         } else {
-            for(unsigned int j = 0; j < ln->len; ++j) {
+            for (unsigned int j = 0; j < ln->len; ++j) {
                 mvwaddch(nwin, area.y, area.x++, ln->data[j]);
             }
         }
@@ -60,11 +62,11 @@ void draw_margin(WINDOW* nwin, struct margin mgn, struct rect area, const struct
     int txtpadding = 1;
     // line number to string
     char lnstr[mgn.width + txtpadding];
-    for(unsigned int i = 0; i < area.height; ++i) {
+    for (unsigned int i = 0; i < area.height; ++i) {
         wmove(nwin, i, 0);
         wclrtoeol(nwin);
         unsigned int lnnumber = mgn.start + i;
-        if(lnnumber < mgn.linecount) {
+        if (lnnumber < mgn.linecount) {
             sprintf(lnstr, "%3d", lnnumber + 1);    // 1 indexed
         } else {
             sprintf(lnstr, "%3c", '~');

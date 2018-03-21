@@ -16,4 +16,3 @@ void term_update();
 int term_rows();
 int term_cols();
 void term_size(unsigned int *rows, unsigned int *cols);
-

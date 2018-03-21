@@ -1,12 +1,12 @@
-#include <stdio.h>
-#include <ncurses.h>
-#include <locale.h>
 #include <assert.h>
+#include <locale.h>
+#include <ncurses.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include "ced.h"
 #include "log.h"
 #include "term.h"
-#include "ced.h"
 
 /** Cleanup submodules */
 void onexit()
@@ -32,4 +32,3 @@ int main()
     // Run program
     ced_run();
 }
-

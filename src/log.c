@@ -1,8 +1,8 @@
 #include "log.h"
+#include <assert.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
-#include <assert.h>
 #include "fileutils.h"
 
 #define LOG_LOGFILE "log.txt"
@@ -16,7 +16,7 @@ static struct {
 void log_init(void)
 {
     G.logfilename = LOG_LOGFILE;
-    G.logfile = fopen(G.logfilename, "w");
+    G.logfile     = fopen(G.logfilename, "w");
     assert(G.logfile);
     fprintf(G.logfile, "--LOG BEGIN--\n");
 }
@@ -24,7 +24,7 @@ void log_init(void)
 
 void log_exit(void)
 {
-    if(G.logfile != NULL) {
+    if (G.logfile != NULL) {
         fprintf(G.logfile, "\n--LOG END--\n");
         fflush(G.logfile);
         fclose(G.logfile);

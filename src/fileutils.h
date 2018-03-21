@@ -23,7 +23,7 @@ struct file_stats {
 /** Read's file contents into lines and returns number of lines
  * read */
 unsigned int fu_read_file_lines(const char* path,
-        struct line** lines);
+                                struct line** lines);
 
 struct file_stats fu_stats(const char* path);
 
@@ -49,4 +49,3 @@ void fu_pprint_stats(const struct file_stats fs);
 
 /** Save buffer to path */
 int fu_save_buffer(const struct buffer* buf, const char* path);
-

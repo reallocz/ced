@@ -6,17 +6,17 @@
  */
 
 enum buffer_type {
-    DEFAULT,	// Empty buffer
-    DOCUMENT,	// Saved on disk
-    SCRATCH,	// Temporary buffer
+    DEFAULT,     // Empty buffer
+    DOCUMENT,    // Saved on disk
+    SCRATCH,     // Temporary buffer
     TESTBUFFER,
 };
 
 
 /** Line metadata */
 struct line {
-    unsigned int len;   /** length of line */
-    char* data;         /** line data */
+    unsigned int len; /** length of line */
+    char* data;       /** line data */
 };
 
 
@@ -31,7 +31,7 @@ struct buffer {
     /*unique identifier of each buffer for debugging*/
     unsigned int id;
     enum buffer_type type;
-    const char* name;		/* name of buffer(file) */
+    const char* name; /* name of buffer(file) */
 
     /** gap */
     struct buffer_gap gap;
@@ -43,7 +43,7 @@ struct buffer {
 /** Create a new empty buffer of the specified type */
 struct buffer* buf_create_empty(enum buffer_type type);
 struct buffer buf_create_file(enum buffer_type type,
-        const char* filename);
+                              const char* filename);
 /** buf_destroy destorys the buffer and free's the data*/
 void buf_destory(struct buffer* buf);
 
@@ -71,7 +71,7 @@ int buf_save_to_disk(const struct buffer* buf, const char* path);
 /** Count number of occurences of char in buffer between cursors
  * from and including 'from' upto and excluding 'to' */
 unsigned int buf_charcount_sec(const struct buffer* b, char ch,
-        struct cursor from, struct cursor to);
+                               struct cursor from, struct cursor to);
 /** Count number of occurences of char in the whole buffer */
 unsigned int buf_charcount(const struct buffer* buf, char ch);
 /** Return char at pos. check buf_in_gap().*/

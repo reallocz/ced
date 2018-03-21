@@ -1,7 +1,7 @@
 #pragma once
 #include <ncurses.h>
-#include "common.h"
 #include "buffer_view.h"
+#include "common.h"
 
 /** window.h
  * A window is a rectangular division of the terminal.
@@ -21,14 +21,14 @@
  */
 
 struct statusline {
-    const char *bufname;
+    const char* bufname;
     struct cursor cur;
     struct buffer_gap gap;
 };
 
 struct margin {
     unsigned int width;
-    unsigned int start; // First line number
+    unsigned int start;    // First line number
     unsigned int linecount;
 };
 
@@ -52,10 +52,9 @@ void win_destroy(struct window* win);
 void win_setbview(struct window* win, struct buffer_view* bv);
 
 /** Update window margin, statusline etc */
-void win_update(struct window* win, struct context *context);
+void win_update(struct window* win, struct context* context);
 
 /** Draw the window */
 void win_draw(const struct window* win, const struct context* context);
 
 void win_pprint(struct window* win);
-

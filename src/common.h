@@ -50,3 +50,5 @@ struct context {
     unsigned long flags;
 };
 
+void printrect(const char* name, struct rect r);
+
