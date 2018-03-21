@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.0)
+set(CMAKE_C_COMPILER "/usr/bin/clang-5.0")
+set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
+
 project(ced)
+
 
 #Dirs
 set(LIBDIR "libs")
@@ -8,7 +12,7 @@ set(SRCDIR "src")
 
 include_directories(SRCDIR)
 
-add_compile_options(-g -Wall -Wextra -Wpedantic)
+add_compile_options(-g -Wall)
 
 add_executable(debug
         ${SRCDIR}/log.c
