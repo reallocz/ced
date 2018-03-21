@@ -117,7 +117,7 @@ void ced_normal_input_cb(inpev ev)
         return;
     }
     if (ev.key == k_f2) {
-        buf_save_to_disk(&G.win->bview->buffer, "doc.txt");    // TODO prompt for name
+        buf_save_to_disk(&G.win->bview->buffer, "doc.txt");    // TODO(realloc): prompt for name
         return;
     }
     if (ev.key == 'h') {

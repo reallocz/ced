@@ -84,8 +84,9 @@ unsigned int fu_read_file_lines(const char* path,
     char* tmpdata = NULL;
     while (1) {
         linelen = getline(&tmpdata, &wtfits, f);
-        if (linelen == -1)
+        if (linelen == -1) {
             break;
+        }
         struct line* ln = &mlines[count++];    // First line
         ln->len         = linelen;
         ln->data        = tmpdata;

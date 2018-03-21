@@ -12,10 +12,10 @@
 
 /** Evals to 1 if i is inside buffer gap */
 #define INGAP(buf, i) \
-    ((i >= buf->gap.col && i < buf->gap.col + buf->gap.size))
+    (((i) >= (buf)->gap.col && (i) < (buf)->gap.col + (buf)->gap.size))
 
 #define CURVALID(buf, cur) \
-    (cur.line < buf->linecount)
+    ((cur).line < (buf)->linecount)
 
 #define TAG "BUFFER"
 
@@ -25,7 +25,7 @@ struct buffer* buf_create_empty(enum buffer_type type)
     assert(buf);
 
     buf->id   = generate_id();
-    buf->type = type;    // TODO type specific setup
+    buf->type = type;    // TODO(realloc): type specific setup
     buf->name = "[NEWBUF]";
 
     /** gap */
