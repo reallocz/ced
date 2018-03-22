@@ -7,6 +7,7 @@
 #include "ced.h"
 #include "log.h"
 #include "term.h"
+#include "common.h"
 
 /** Cleanup submodules */
 void onexit()
@@ -29,6 +30,11 @@ int main()
     term_init();
     log_l("MAIN", "\n---------INIT END--------\n");
 
-    // Run program
+    struct cedopts opts;
+    opts.bcount = 2;
+    opts.bviews[0] = bv_create(DOCUMENT, TEXTPATH "table.txt");
+    opts.bviews[1] = bv_create(DOCUMENT, TEXTPATH "kepler.txt");
+
+    ced_init(opts);
     ced_run();
 }

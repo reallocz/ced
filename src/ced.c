@@ -22,18 +22,30 @@ static struct {
     struct window* win;
     struct context* context;
 
-    struct buffer_view bv1;
-    struct buffer_view bv2;
+    struct buffer_view* bviews;
+    unsigned int bcount;
 } G;
 
 
-void ced_run()
+void ced_init(struct cedopts opts)
 {
     // Initialize globals
     G.quit = 0;
+
+    // Set up buffer_views
+    if(opts.bcount == 0) {
+        // Init scratch buffer
+        G.bcount = 1;
+        G.bviews[0] = bv_create(SCRATCH, TEXTPATH "scratch.txt");
+    } else {
+        assert(opts.bviews);
+        G.bcount = opts.bcount;
+        G.bviews = opts.bviews;
+    }
+
     term_update();
 
-    // Context
+    // Create context
     struct context* ctx = malloc(sizeof(struct context));
     assert(ctx);
     ctx->mode    = MODE_NORMAL;
@@ -42,8 +54,20 @@ void ced_run()
     ctx->flags   = 0;
     SETFLAG(ctx->flags, Farea_update);
     G.context = ctx;
-    G.bv1     = bv_create(DOCUMENT, "interject.txt");
-    G.bv2     = bv_create(DOCUMENT, "test.txt");
+}
+
+static unsigned int currentbview = 0;
+static struct buffer_view* next_bview()
+{
+    currentbview++;
+    if(currentbview >= G.bcount) {
+        currentbview = 0;
+    }
+    return &G.bviews[currentbview];
+}
+
+void ced_run()
+{
 
     // Create window and set buffer
     /*struct buffer_view bview = bv_create(SCRATCH, "interject.txt");*/
@@ -52,7 +76,7 @@ void ced_run()
 
     /*struct buffer_view bview = bv_create(buf_create_test());*/
 
-    G.win = win_create(&G.bv1);
+    G.win = win_create(&G.bviews[0]);
 
     // Main loop
     while (!G.quit) {
@@ -153,11 +177,7 @@ void ced_normal_input_cb(inpev ev)
         return;
     }
     if (ev.key == '1') {
-        win_setbview(G.win, &G.bv1);
-        return;
-    }
-    if (ev.key == '2') {
-        win_setbview(G.win, &G.bv2);
+        win_setbview(G.win, next_bview());
         return;
     }
 }

@@ -1,4 +1,5 @@
 TODO: 
+- Specify startup options (ced file1 file2.c)
 - Scroll buffer when cursor reaches the edge
 - Impl relative_cursor and abs_cursor to buffer_view
 - Add relative line number

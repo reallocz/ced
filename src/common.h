@@ -1,6 +1,8 @@
 #pragma once
 #include "log.h"
 
+#define TEXTPATH "../text/"
+
 /** Create a rect */
 #define RECT(py, px, pw, ph)\
     {.y = py, .x = px, .width = pw, .height = ph}
