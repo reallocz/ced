@@ -1,7 +1,7 @@
 #include "fileutils.h"
 #include <assert.h>
 #include <errno.h>
-#include <limits.h>
+#include <linux/limits.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include "log.h"
