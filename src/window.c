@@ -4,11 +4,13 @@
 #include <ncurses.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "draw.h"
 #include "log.h"
 
 #define TAG "WINDOW"
-#define STATUSLINE_HEIGHT 2
+#define STATUSLINE_HEIGHT 1
+#define CMDLINE_HEIGHT 1
 
 /** return a new id for a window */
 static unsigned int generate_id()
@@ -51,6 +53,7 @@ void win_setbview(struct window* win, struct buffer_view* bv)
     win->bview = bv;
 }
 
+
 void win_update(struct window* win, struct context* context)
 {
     struct buffer_view* bv = win->bview;
@@ -69,7 +72,8 @@ void win_update(struct window* win, struct context* context)
     struct rect area     = context->bounds;
     struct rect bvbounds = RECT(0, win->margin.width + 1,
                                 area.width - win->margin.width,
-                                area.height - STATUSLINE_HEIGHT);
+                                area.height - STATUSLINE_HEIGHT
+                                - CMDLINE_HEIGHT);
     bv_bounds_set(bv, bvbounds);
     bv_update(bv);
 }
@@ -79,16 +83,36 @@ void win_draw(const struct window* win, const struct context* context)
 {
     struct rect area = context->bounds;
     // Stl
-    struct rect areastl = RECT(area.height - STATUSLINE_HEIGHT, 0,
-                               area.width, 1);
+    struct rect areastl = RECT(area.height - STATUSLINE_HEIGHT
+                               - CMDLINE_HEIGHT, 0,
+                               area.width, STATUSLINE_HEIGHT);
     draw_statusline(win->nwin, win->sline, areastl, context);
 
     // Margin
-    struct rect areamgn = RECT(0, 0, win->margin.width, area.height - STATUSLINE_HEIGHT);
+    struct rect areamgn = RECT(0, 0, win->margin.width, area.height - STATUSLINE_HEIGHT - CMDLINE_HEIGHT);
     draw_margin(win->nwin, win->margin, areamgn, context);
+
+    // Cmdline
+    struct rect areacmd = RECT(area.height - CMDLINE_HEIGHT, 0,
+                                area.width, CMDLINE_HEIGHT);
+    draw_cmdline(win->nwin, win->cmdline, areacmd, context);
 
     // Bufferview
     draw_bview(win->nwin, win->bview, context);
+
+    // Draw cursor
+    if(context->mode == MODE_NORMAL || context->mode == MODE_INSERT){
+        // Cursor in buffer_view
+        struct cursor c = bv_relcur(win->bview);
+        struct rect areabv = bv_bounds(win->bview);
+        wmove(win->nwin, areabv.y + c.line, areabv.x + c.col);
+    } else if (context->mode == MODE_COMMAND) {
+        int x = strlen(win->cmdline.buffer) + 1; // +1 for ':' prefix
+        wmove(win->nwin, areacmd.y, x);
+    } else {
+        // ERROR
+        wmove(win->nwin, 0, 0);
+    }
 
     wrefresh(win->nwin);
 }

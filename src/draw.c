@@ -8,7 +8,7 @@
  * The drawing order must be:
  *  1 - statusline
  *  2 - margin
- *  3 - textarea
+ *  ... - cmdline, textarea etc
  * This is because drawing margin clear each line and drawing textarea does NOT!
  */
 
@@ -48,11 +48,6 @@ void draw_bview(WINDOW* nwin, const struct buffer_view* bv, const struct context
     }
 
     log_l(TAG, "%d lines drawn", linesdrawn);
-
-    // Move cursor to the original position
-    /*wmove(nwin, oy + bv.cur.line, ox + bv.cur.col);*/
-    struct cursor c = bv_relcur(bv);
-    wmove(nwin, oy + c.line, ox + c.col);
 }
 
 
@@ -93,4 +88,17 @@ void draw_statusline(WINDOW* nwin, struct statusline sline, struct rect area, co
     wclrtoeol(nwin);
     waddstr(nwin, stsstring);
     wattroff(nwin, COLOR_PAIR(1));
+}
+
+void draw_cmdline(WINDOW* nwin, struct cmdline cline,
+                  struct rect area, const struct context* context)
+{
+    wmove(nwin, area.y, 0);
+    wclrtoeol(nwin);
+
+    if(context->mode != MODE_COMMAND) {
+        return;
+    }
+    waddch(nwin, ':');
+    waddstr(nwin, cline.buffer);
 }

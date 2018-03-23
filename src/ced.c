@@ -56,9 +56,9 @@ void ced_init(struct cedopts opts)
     // Create context
     struct context* ctx = malloc(sizeof(struct context));
     assert(ctx);
-    ctx->mode    = MODE_NORMAL;
-    ctx->bounds  = (struct rect) RECT(0, 0, term_cols(), term_rows());
-    ctx->flags   = 0;
+    ctx->mode   = MODE_NORMAL;
+    ctx->bounds = (struct rect) RECT(0, 0, term_cols(), term_rows());
+    ctx->flags  = 0;
     SETFLAG(ctx->flags, Farea_update);
     G.context = ctx;
 }
@@ -92,17 +92,17 @@ void ced_run()
             term_update();
             struct rect newbounds = RECT(0, 0, term_cols(), term_rows());
             G.context->bounds     = newbounds;
-            log_l(TAG, "window resized!");
         }
 
+        win_update(G.win, G.context);
+        win_draw(G.win, G.context);
+
         if (G.context->mode == MODE_NORMAL) {
-            win_update(G.win, G.context);
-            win_draw(G.win, G.context);
             inp_poll("NORMAL", G.win, ced_normal_input_cb);
-        } else {
-            win_update(G.win, G.context);
-            win_draw(G.win, G.context);
+        } else if (G.context->mode == MODE_INSERT) {
             inp_poll("INSERT", G.win, ced_insert_input_cb);
+        } else if (G.context->mode == MODE_COMMAND) {
+            inp_poll("INSERT", G.win, ced_command_input_cb);
         }
     }
 }
@@ -173,7 +173,21 @@ void ced_normal_input_cb(inpev ev)
 
 void ced_command_input_cb(inpev ev)
 {
-    if(ev.key == k_esc) {
+    static int i = 0;
+    if (ev.key == k_esc) {
+        G.context->mode = MODE_NORMAL;
+    } else if (ev.key == k_enter) {
+        // Execute command and clear buffer
+        log_l(TAG, "Executing cmd: '%s'", G.win->cmdline.buffer);
+        G.win->cmdline.buffer[0] = 0;
+        G.context->mode          = MODE_NORMAL;
+    } else if (ev.type == INP_ALPHA || ev.type == INP_NUM || ev.type == INP_SYMBOL || ev.key == k_space) {
+        G.win->cmdline.buffer[i++] = ev.key;
+    } else if (ev.key == k_backspace) {
+        // TODO execute
+        G.win->cmdline.buffer[--i] = 0;
+    } else {
+        // Go back to MODE_NORMAL
         G.context->mode = MODE_NORMAL;
     }
 }

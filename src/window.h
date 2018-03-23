@@ -3,6 +3,8 @@
 #include "buffer_view.h"
 #include "common.h"
 
+#define CMDLINE_SIZE 256
+
 /** window.h
  * A window is a rectangular division of the terminal.
  * Windows can:
@@ -32,12 +34,17 @@ struct margin {
     unsigned int linecount;
 };
 
+struct cmdline {
+    char buffer[CMDLINE_SIZE];
+};
+
 struct window {
     unsigned int id;
     WINDOW* nwin;
 
     struct statusline sline;
     struct margin margin;
+    struct cmdline cmdline;
     struct buffer_view* bview;
 };
 

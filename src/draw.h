@@ -12,3 +12,7 @@ void draw_margin(WINDOW* nwin, struct margin mgn, struct rect area,
 
 void draw_statusline(WINDOW* nwin, struct statusline sline,
                      struct rect area, const struct context* context);
+
+void draw_cmdline(WINDOW* nwin, struct cmdline cline,
+                  struct rect area, const struct context* context);
+
