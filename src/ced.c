@@ -22,16 +22,14 @@ static struct {
     struct window* win;
     struct context* context;
 
-    struct buffer_view* bviews;
+    struct buffer_view bviews[BVIEW_LIMIT];
     unsigned int bcount;
 } G;
 
 
-void ced_init(struct cedopts opts)
+/** Return 1 on parse error */
+static int ced_parseopts(struct cedopts opts)
 {
-    // Initialize globals
-    G.quit = 0;
-
     // Set up buffer_views
     if(opts.bcount == 0) {
         // Init scratch buffer
@@ -40,8 +38,23 @@ void ced_init(struct cedopts opts)
     } else {
         assert(opts.bviews);
         G.bcount = opts.bcount;
-        G.bviews = opts.bviews;
+        for(int i = 0; i < G.bcount; ++i) {
+            G.bviews[i] = opts.bviews[i];
+        }
     }
+    return 0;
+}
+
+void ced_init(struct cedopts opts)
+{
+    if(ced_parseopts(opts) != 0) {
+        log_l(TAG, "Invalid opts. quitting");
+        // TODO more diag
+        return;
+    }
+
+    // Initialize globals
+    G.quit = 0;
 
     term_update();
 
