@@ -26,4 +26,6 @@ void ced_run();
 void ced_insert_input_cb(inpev ev);
 /** Input callback for MODE_NORMAL */
 void ced_normal_input_cb(inpev ev);
+/** Input callback for MODE_COMMAND */
+void ced_command_input_cb(inpev ev);
 

@@ -26,14 +26,14 @@ static struct {
 static int ced_parseopts(struct cedopts opts)
 {
     // Set up buffer_views
-    if(opts.bcount == 0) {
+    if (opts.bcount == 0) {
         // Init scratch buffer
-        G.bcount = 1;
+        G.bcount    = 1;
         G.bviews[0] = bv_create(SCRATCH, TEXTPATH "scratch.txt");
     } else {
         assert(opts.bviews);
         G.bcount = opts.bcount;
-        for(int i = 0; i < G.bcount; ++i) {
+        for (int i = 0; i < G.bcount; ++i) {
             G.bviews[i] = opts.bviews[i];
         }
     }
@@ -42,7 +42,7 @@ static int ced_parseopts(struct cedopts opts)
 
 void ced_init(struct cedopts opts)
 {
-    if(ced_parseopts(opts) != 0) {
+    if (ced_parseopts(opts) != 0) {
         log_l(TAG, "Invalid opts. quitting");
         // TODO more diag
         return;
@@ -67,7 +67,7 @@ static unsigned int currentbview = 0;
 static struct buffer_view* next_bview()
 {
     currentbview++;
-    if(currentbview >= G.bcount) {
+    if (currentbview >= G.bcount) {
         currentbview = 0;
     }
     return &G.bviews[currentbview];
@@ -141,50 +141,39 @@ void ced_normal_input_cb(inpev ev)
     if (ev.key == 'i') {
         // Switch to insert mode
         G.context->mode = MODE_INSERT;
-        return;
-    }
-    if (ev.key == k_f1) {
+    } else if (ev.key == ':') {
+        // Switch to comman mode
+        G.context->mode = MODE_COMMAND;
+    } else if (ev.key == k_f1) {
         G.quit = 1;
-        return;
-    }
-    if (ev.key == k_f2) {
-        buf_save_to_disk(&G.win->bview->buffer, "doc.txt");    // TODO(realloc): prompt for name
-        return;
-    }
-    if (ev.key == 'h') {
+    } else if (ev.key == k_f2) {
+        buf_save_to_disk(&G.win->bview->buffer, "doc.txt");
+        // TODO(realloc): prompt for name
+    } else if (ev.key == 'h') {
         bv_cmov_back(G.win->bview, 1);
-        return;
-    }
-    if (ev.key == 'l') {
+    } else if (ev.key == 'l') {
         bv_cmov_fwd(G.win->bview, 1);
-        return;
-    }
-    if (ev.key == 'j') {
+    } else if (ev.key == 'j') {
         bv_cmov_lnext(G.win->bview, 1);
-        return;
-    }
-    if (ev.key == 'k') {
+    } else if (ev.key == 'k') {
         bv_cmov_lprev(G.win->bview, 1);
-        return;
-    }
-    if (ev.key == 'u') {
+    } else if (ev.key == 'u') {
         bv_scrollup(G.win->bview, 1);
-        return;
-    }
-    if (ev.key == 'd') {
+    } else if (ev.key == 'd') {
         bv_scrolldown(G.win->bview, 1);
-        return;
-    }
-    if (ev.key == '$') {
+    } else if (ev.key == '$') {
         bv_cmov_lend(G.win->bview);
-        return;
-    }
-    if (ev.key == '0') {
+    } else if (ev.key == '0') {
         bv_cmov_lstart(G.win->bview);
-        return;
-    }
-    if (ev.key == '1') {
+    } else if (ev.key == '1') {
         win_setbview(G.win, next_bview());
-        return;
+    }
+}
+
+
+void ced_command_input_cb(inpev ev)
+{
+    if(ev.key == k_esc) {
+        G.context->mode = MODE_NORMAL;
     }
 }
