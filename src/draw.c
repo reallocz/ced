@@ -1,5 +1,6 @@
 #include "draw.h"
 #include "log.h"
+#include "common.h"
 
 #define TAG "DRAW"
 
@@ -83,7 +84,7 @@ void draw_statusline(WINDOW* nwin, struct statusline sline, struct rect area, co
     char stsstring[area.width];
     sprintf(stsstring,
             "   %s | %s | CUR %d:%d | GAP: line: %d col: %d size: %d",
-            context->modestr, sline.bufname, sline.cur.line, sline.cur.col,
+            mode_str[context->mode], sline.bufname, sline.cur.line, sline.cur.col,
             sline.gap.line, sline.gap.col, sline.gap.size);
 
     init_pair(1, COLOR_BLACK, COLOR_WHITE);

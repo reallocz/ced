@@ -12,11 +12,6 @@
 
 #define TAG "CED"
 
-/** Map for mode -> string */
-static const char* mode_str[] = {
-    "NORMAL",
-    "INSERT"};
-
 static struct {
     int quit;    // Return to main if 1
     struct window* win;
@@ -62,7 +57,6 @@ void ced_init(struct cedopts opts)
     struct context* ctx = malloc(sizeof(struct context));
     assert(ctx);
     ctx->mode    = MODE_NORMAL;
-    ctx->modestr = mode_str[MODE_NORMAL];
     ctx->bounds  = (struct rect) RECT(0, 0, term_cols(), term_rows());
     ctx->flags   = 0;
     SETFLAG(ctx->flags, Farea_update);

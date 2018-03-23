@@ -43,11 +43,18 @@ struct rect {
 enum mode {
     MODE_NORMAL,
     MODE_INSERT,
+    MODE_COMMAND
+};
+
+/** Map for mode -> string */
+static const char* mode_str[] = {
+    "NORMAL",
+    "INSERT",
+    "COMMAND",
 };
 
 struct context {
     enum mode mode;
-    const char* modestr;
     struct rect bounds;
     unsigned long flags;
 };
