@@ -1,10 +1,10 @@
 #include "fileutils.h"
+#include "log.h"
 #include <assert.h>
 #include <errno.h>
 #include <linux/limits.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include "log.h"
 
 #define TAG "FUTILS"
 

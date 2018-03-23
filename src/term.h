@@ -15,4 +15,4 @@ void term_update();
 /** query terminal props */
 int term_rows();
 int term_cols();
-void term_size(unsigned int *rows, unsigned int *cols);
+void term_size(unsigned int* rows, unsigned int* cols);

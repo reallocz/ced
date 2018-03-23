@@ -1,6 +1,6 @@
 #include "input.h"
-#include <assert.h>
 #include "log.h"
+#include <assert.h>
 
 #define TAG "INPUT"
 

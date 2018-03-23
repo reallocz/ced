@@ -1,7 +1,7 @@
 #pragma once
+#include "buffer.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include "buffer.h"
 
 
 enum file_type {

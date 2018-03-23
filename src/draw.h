@@ -15,4 +15,3 @@ void draw_statusline(WINDOW* nwin, struct statusline sline,
 
 void draw_cmdline(WINDOW* nwin, struct cmdline cline,
                   struct rect area, const struct context* context);
-

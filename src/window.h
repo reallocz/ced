@@ -1,7 +1,7 @@
 #pragma once
-#include <ncurses.h>
 #include "buffer_view.h"
 #include "common.h"
+#include <ncurses.h>
 
 #define CMDLINE_SIZE 256
 

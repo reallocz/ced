@@ -1,13 +1,13 @@
+#include "ced.h"
+#include "common.h"
+#include "log.h"
+#include "term.h"
 #include <assert.h>
 #include <locale.h>
 #include <ncurses.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include "ced.h"
-#include "log.h"
-#include "term.h"
-#include "common.h"
 
 /** Cleanup submodules */
 void onexit()
@@ -31,7 +31,7 @@ int main()
     log_l("MAIN", "\n---------INIT END--------\n");
 
     struct cedopts opts;
-    opts.bcount = 2;
+    opts.bcount    = 2;
     opts.bviews[0] = bv_create(DOCUMENT, TEXTPATH "table.txt");
     opts.bviews[1] = bv_create(DOCUMENT, TEXTPATH "kepler.txt");
 

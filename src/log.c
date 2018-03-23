@@ -1,9 +1,9 @@
 #include "log.h"
+#include "fileutils.h"
 #include <assert.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
-#include "fileutils.h"
 
 #define LOG_LOGFILE "log.txt"
 

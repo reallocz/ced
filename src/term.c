@@ -1,9 +1,9 @@
 #include "term.h"
+#include "log.h"
 #include <locale.h>
 #include <ncurses.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "log.h"
 
 
 static struct {

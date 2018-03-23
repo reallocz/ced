@@ -1,12 +1,12 @@
 #include "buffer.h"
-#include <assert.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include "buffer_internal.h"
 #include "fileutils.h"
 #include "input_keys.h"
 #include "log.h"
+#include <assert.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #define BUFFER_GAPSIZE 4
 

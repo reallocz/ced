@@ -1,6 +1,6 @@
 #include "draw.h"
-#include "log.h"
 #include "common.h"
+#include "log.h"
 
 #define TAG "DRAW"
 
@@ -96,7 +96,7 @@ void draw_cmdline(WINDOW* nwin, struct cmdline cline,
     wmove(nwin, area.y, 0);
     wclrtoeol(nwin);
 
-    if(context->mode != MODE_COMMAND) {
+    if (context->mode != MODE_COMMAND) {
         return;
     }
     waddch(nwin, ':');

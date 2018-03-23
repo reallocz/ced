@@ -1,7 +1,4 @@
 #include "ced.h"
-#include <assert.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include "buffer.h"
 #include "common.h"
 #include "input.h"
@@ -9,6 +6,9 @@
 #include "log.h"
 #include "term.h"
 #include "window.h"
+#include <assert.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #define TAG "CED"
 
@@ -178,13 +178,13 @@ void ced_command_input_cb(inpev ev)
         G.context->mode = MODE_NORMAL;
     } else if (ev.key == k_enter) {
         // Execute command and clear buffer
+        // TODO execute
         log_l(TAG, "Executing cmd: '%s'", G.win->cmdline.buffer);
         G.win->cmdline.buffer[0] = 0;
         G.context->mode          = MODE_NORMAL;
     } else if (ev.type == INP_ALPHA || ev.type == INP_NUM || ev.type == INP_SYMBOL || ev.key == k_space) {
         G.win->cmdline.buffer[i++] = ev.key;
     } else if (ev.key == k_backspace) {
-        // TODO execute
         G.win->cmdline.buffer[--i] = 0;
     } else {
         // Go back to MODE_NORMAL
