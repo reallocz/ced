@@ -10,6 +10,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define TAG "CED"
 
@@ -207,7 +208,17 @@ static void exec_command(struct command cmd)
 
 
     if (cmd.type == CMD_BUFSAVE) {
-        buf_save_to_disk(&G.win->bview->buffer, "doc.txt");
+        if (strlen(cmd.args) == 0) {
+            // Save
+            buf_save_to_disk(&G.win->bview->buffer,
+                             G.win->bview->buffer.name);
+        } else {
+            // Save As arg
+            buf_save_to_disk(&G.win->bview->buffer,
+                             cmd.args);
+            // TODO add error checking
+            // TODO update buffer name to arg
+        }
         return;
     }
 }
