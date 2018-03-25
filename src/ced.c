@@ -1,5 +1,6 @@
 #include "ced.h"
 #include "buffer.h"
+#include "commands.h"
 #include "common.h"
 #include "input.h"
 #include "input_keys.h"
@@ -77,12 +78,6 @@ void ced_run()
 {
 
     // Create window and set buffer
-    /*struct buffer_view bview = bv_create(SCRATCH, "interject.txt");*/
-    /*struct buffer_view bview = bv_create( buf_create_test() );*/
-    /*struct buffer_view bview = bv_create( buf_create_empty(DOCUMENT) );*/
-
-    /*struct buffer_view bview = bv_create(buf_create_test());*/
-
     G.win = win_create(&G.bviews[0]);
 
     // Main loop
@@ -170,24 +165,49 @@ void ced_normal_input_cb(inpev ev)
     }
 }
 
+// Proto
+static void exec_command(struct command cmd);
 
 void ced_command_input_cb(inpev ev)
 {
     static int i = 0;
     if (ev.key == k_esc) {
+        // Switch to normal mode
         G.context->mode = MODE_NORMAL;
     } else if (ev.key == k_enter) {
-        // Execute command and clear buffer
-        // TODO execute
-        log_l(TAG, "Executing cmd: '%s'", G.win->cmdline.buffer);
-        G.win->cmdline.buffer[0] = 0;
+        // Execute command and clear cmdline buffer
+        exec_command(cmd_parse_string(G.win->cmdline.buffer));
+        // Reset buffer
+        i                        = 0;
+        G.win->cmdline.buffer[i] = '\0';
         G.context->mode          = MODE_NORMAL;
     } else if (ev.type == INP_ALPHA || ev.type == INP_NUM || ev.type == INP_SYMBOL || ev.key == k_space) {
         G.win->cmdline.buffer[i++] = ev.key;
+        G.win->cmdline.buffer[i]   = '\0';
     } else if (ev.key == k_backspace) {
-        G.win->cmdline.buffer[--i] = 0;
+        i--;
+        if (i < 0) {
+            i = 0;
+        }
+        G.win->cmdline.buffer[i] = '\0';
     } else {
         // Go back to MODE_NORMAL
         G.context->mode = MODE_NORMAL;
+    }
+}
+
+
+static void exec_command(struct command cmd)
+{
+    cmd_pprint(cmd);
+    if (!cmd.valid) {
+        log_e(TAG, "Unknown command: %s", cmd.cmdstr);
+        return;
+    }
+
+
+    if (cmd.type == CMD_BUFSAVE) {
+        buf_save_to_disk(&G.win->bview->buffer, "doc.txt");
+        return;
     }
 }

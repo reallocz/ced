@@ -19,6 +19,7 @@ add_executable(debug
         ${SRCDIR}/log.c
         ${SRCDIR}/common.c
         ${SRCDIR}/fileutils.c
+        ${SRCDIR}/commands.c
         ${SRCDIR}/buffer.c
         ${SRCDIR}/buffer_view.c
         ${SRCDIR}/window.c
@@ -29,4 +30,4 @@ add_executable(debug
         ${SRCDIR}/main.c
 )
 
-target_link_libraries(debug ncurses)
+target_link_libraries(debug ncursesw)
