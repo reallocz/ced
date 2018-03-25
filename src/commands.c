@@ -6,13 +6,6 @@
 
 #define TAG "CMD"
 
-/** Command definitions corresponding to cmd_type */
-static const char* cmd_defs[] = {
-    "w",    // BUFSAVE
-    "w",    // BUFSAVEAS
-    "e",    // BUFOPEN
-};
-
 
 struct command cmd_parse_string(const char* cmdstr)
 {
@@ -31,10 +24,22 @@ struct command cmd_parse_string(const char* cmdstr)
                 break;
             }
         }
+
+        // Skip space
+        unsigned int space = 0;    // Whitespace b/w cmd and arg
+        unsigned int k;
+        for (k = i; k < len; ++k) {
+            if (cmdstr[k] != ' ') {
+                break;
+            } else {
+                space++;
+            }
+        }
+
         // args
         unsigned int j;
-        for (j = 0; i < len; ++i, ++j) {
-            c.args[j] = cmdstr[i];
+        for (j = 0; k < len; ++k, ++j) {
+            c.args[j] = cmdstr[k];
         }
         c.args[j + 1] = '\0';
     }

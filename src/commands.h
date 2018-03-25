@@ -3,7 +3,6 @@
 /** Each command has a unique id which corresponds to cmd_str[] */
 enum cmd_type {
     CMD_BUFSAVE = 0,
-    CMD_BUFSAVEAS,
     CMD_BUFOPEN,
 
     CMD_ENUMCOUNT,    // Number of commands (last element)
@@ -13,9 +12,16 @@ enum cmd_type {
 /** String repr of command_type */
 static const char* cmd_str[] = {
     "BUFSAVE",
-    "BUFSAVEAS",
     "BUFOPEN",
 };
+
+
+/** Command definitions corresponding to cmd_type */
+static const char* cmd_defs[] = {
+    "w",    // BUFSAVE
+    "e",    // BUFOPEN
+};
+
 
 
 union cmd_data {
