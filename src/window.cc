@@ -21,7 +21,7 @@ static unsigned int generate_id()
 
 struct window* win_create(struct buffer_view* bview)
 {
-    struct window* w = malloc(sizeof(struct window));
+    struct window* w = (struct window*) malloc(sizeof(struct window));
     assert(w);
 
     w->id = generate_id();

@@ -74,7 +74,7 @@ unsigned int fu_read_file_lines(const char* path,
     }
     rewind(f);
 
-    struct line* mlines = malloc(linecount * sizeof(struct line));
+    struct line* mlines = (struct line*) malloc(linecount * sizeof(struct line));
     assert(mlines);
 
     unsigned int count = 0;

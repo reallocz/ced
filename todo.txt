@@ -3,10 +3,10 @@ TODO:
 - Scroll buffer when cursor reaches the edge
 - Add relative line number
 - Clean up fileutils
-- Specify startup options (ced file1 file2.c)
 - Line wrapping
 - cmdline wrapping
 - statusline sections
+- Self hostign
 
 
 - Add wide char support
@@ -15,3 +15,4 @@ TODO:
 DONE:
 - Fix curmove_next and prev line
 - Move area to their buffer_view
+- Specify startup options (ced file1 file2.c)

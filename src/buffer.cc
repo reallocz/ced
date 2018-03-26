@@ -21,7 +21,7 @@
 
 struct buffer* buf_create_empty(enum buffer_type type)
 {
-    struct buffer* buf = malloc(sizeof(struct buffer));
+    struct buffer* buf = (struct buffer*) malloc(sizeof(struct buffer));
     assert(buf);
 
     buf->id   = generate_id();
@@ -35,13 +35,13 @@ struct buffer* buf_create_empty(enum buffer_type type)
 
     /** lines */
     buf->linecount = 1;    // Empty buffer has at least one line
-    buf->lines     = calloc(buf->linecount, sizeof(struct line));
+    buf->lines     = (struct line*) calloc(buf->linecount, sizeof(struct line));
     assert(buf->lines);
 
     // Set gap on the first line
     struct line* fln = buf_line(buf, 0);
     fln->len         = BUFFER_GAPSIZE;
-    fln->data        = calloc(fln->len, sizeof(char));
+    fln->data        = (char*) calloc(fln->len, sizeof(char));
     return buf;
 }
 
@@ -194,7 +194,7 @@ static void gap_add(struct buffer* buf)
     unsigned int newlinelen = ln->len + BUFFER_GAPSIZE;
     unsigned int newgapsize = gap->size + BUFFER_GAPSIZE;
 
-    char* newdata = calloc(newlinelen, sizeof(char));
+    char* newdata = (char*) calloc(newlinelen, sizeof(char));
     assert(newdata);
 
     /* Copy memory to new data */
@@ -219,7 +219,7 @@ static void gap_move_to_line(struct buffer* buf, unsigned int toline)
     {
         struct line* ln         = buf_line(buf, buf->gap.line);
         unsigned int linelength = ln->len - buf->gap.size;
-        char* newdata           = malloc(linelength * sizeof(char));
+        char* newdata           = (char*) malloc(linelength * sizeof(char));
         assert(newdata);
         unsigned int count = 0;
         for (unsigned int i = 0; i < ln->len; ++i) {
@@ -239,7 +239,7 @@ static void gap_move_to_line(struct buffer* buf, unsigned int toline)
     {
         struct line* ln        = buf_line(buf, toline);
         unsigned int newlength = ln->len + buf->gap.size;
-        char* newdata          = malloc(newlength * sizeof(char));
+        char* newdata          = (char*) malloc(newlength * sizeof(char));
         assert(newdata);
         memcpy(&newdata[buf->gap.size],
                ln->data,

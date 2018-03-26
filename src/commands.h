@@ -23,7 +23,6 @@ static const char* cmd_defs[] = {
 };
 
 
-
 union cmd_data {
     int i;        // Integer/count
     char* str;    // String
@@ -32,10 +31,10 @@ union cmd_data {
 
 
 struct command {
-    int valid;      // 0 if invalid
+    int valid;    // 0 if invalid
     enum cmd_type type;
     union cmd_data data;
-    const char* cmdstr; // original command string
+    const char* cmdstr;    // original command string
     char cmd[16];
     char args[128];
 };
@@ -45,5 +44,3 @@ struct command {
 struct command cmd_parse_string(const char* cmdstr);
 
 void cmd_pprint(const struct command cmd);
-
-

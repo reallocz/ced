@@ -16,18 +16,18 @@ include_directories(SRCDIR)
 add_compile_options(-g -Wall)
 
 add_executable(debug
-        ${SRCDIR}/log.c
-        ${SRCDIR}/common.c
-        ${SRCDIR}/fileutils.c
-        ${SRCDIR}/commands.c
-        ${SRCDIR}/buffer.c
-        ${SRCDIR}/buffer_view.c
-        ${SRCDIR}/window.c
-        ${SRCDIR}/input.c
-	${SRCDIR}/term.c
-	${SRCDIR}/draw.c
-        ${SRCDIR}/ced.c
-        ${SRCDIR}/main.c
+	${SRCDIR}/term.cc
+        ${SRCDIR}/ced.cc
+        ${SRCDIR}/main.cc
+        ${SRCDIR}/log.cc
+        ${SRCDIR}/common.cc
+        ${SRCDIR}/fileutils.cc
+        ${SRCDIR}/commands.cc
+        ${SRCDIR}/buffer.cc
+        ${SRCDIR}/buffer_view.cc
+        ${SRCDIR}/window.cc
+        ${SRCDIR}/input.cc
+	${SRCDIR}/draw.cc
 )
 
 target_link_libraries(debug ncursesw)

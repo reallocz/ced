@@ -53,13 +53,13 @@ void ced_init(struct cedopts opts)
     // Initialize globals
     G.quit = 0;
 
-    term_update();
+    Term::update();
 
     // Create context
-    struct context* ctx = malloc(sizeof(struct context));
+    struct context* ctx = new struct context;
     assert(ctx);
     ctx->mode   = MODE_NORMAL;
-    ctx->bounds = (struct rect) RECT(0, 0, term_cols(), term_rows());
+    ctx->bounds = (struct rect) RECT(0, 0, Term::cols, Term::rows);
     ctx->flags  = 0;
     SETFLAG(ctx->flags, Farea_update);
     G.context = ctx;
@@ -85,8 +85,8 @@ void ced_run()
     while (!G.quit) {
         // Check for window resize
         {
-            term_update();
-            struct rect newbounds = RECT(0, 0, term_cols(), term_rows());
+            Term::update();
+            struct rect newbounds = RECT(0, 0, Term::cols, Term::rows);
             G.context->bounds     = newbounds;
         }
 

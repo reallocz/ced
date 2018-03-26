@@ -13,7 +13,7 @@
 void onexit()
 {
     // Logs exit last
-    term_exit();
+    Term::exit();
     log_exit();
 }
 
@@ -27,7 +27,7 @@ int main()
     log_init();
 
     log_l("MAIN", "\n--------INIT BEGIN-------");
-    term_init();
+    Term::init();
     log_l("MAIN", "\n---------INIT END--------\n");
 
     struct cedopts opts;

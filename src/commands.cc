@@ -10,7 +10,9 @@
 struct command cmd_parse_string(const char* cmdstr)
 {
     assert(cmdstr);
-    struct command c = {.valid = 0, .cmdstr = cmdstr};
+    struct command c;
+    c.valid  = 0;
+    c.cmdstr = cmdstr;
 
     // Parse string into cmd and args
     {
@@ -50,7 +52,7 @@ struct command cmd_parse_string(const char* cmdstr)
         if (strcmp(c.cmd, cmd_defs[i]) == 0) {
             log_l(TAG, "Recognized command: %s", c.cmd);
             c.valid = 1;
-            c.type  = i;
+            //c.type  = i;
             break;
         }
     }
