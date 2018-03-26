@@ -24,7 +24,7 @@ add_executable(debug
         ${SRCDIR}/fileutils.cc
         ${SRCDIR}/commands.cc
         ${SRCDIR}/buffer.cc
-        ${SRCDIR}/buffer_view.cc
+        ${SRCDIR}/BufferView.cc
         ${SRCDIR}/window.cc
         ${SRCDIR}/input.cc
 	${SRCDIR}/draw.cc

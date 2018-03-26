@@ -1,11 +1,11 @@
 #pragma once
-#include "buffer_view.h"
+#include "BufferView.h"
 #include "common.h"
 #include "context.h"
 #include "window.h"
 
 
-void draw_bview(WINDOW* nwin, const struct buffer_view* bv,
+void draw_bview(WINDOW* nwin, const BufferView& bv,
                 const Context& context);
 
 void draw_margin(WINDOW* nwin, const Margin& mgn, struct rect area,

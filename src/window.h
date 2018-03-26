@@ -1,5 +1,5 @@
 #pragma once
-#include "buffer_view.h"
+#include "BufferView.h"
 #include "common.h"
 #include "context.h"
 #include <ncurses.h>
@@ -52,7 +52,7 @@ public:
     StatusLine sline;
     Margin margin;
     CmdLine cmdline;
-    struct buffer_view* bview;
+    BufferView* bview;
 
 public:
     Window();
@@ -60,9 +60,9 @@ public:
 
     void draw(const Context& context);
     void update(const Context& context);
-    void changeBufferView(struct buffer_view* bv);
+    void changeBufferView(BufferView* bv);
 
     inline WINDOW* Nwin() const { return nwin; };
-    inline struct buffer_view* Bview() { return bview; }
+    inline BufferView& Bview() { return *bview; }
 };
 

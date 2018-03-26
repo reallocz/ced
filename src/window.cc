@@ -28,7 +28,6 @@ Window::Window()
     nwin = newwin(0, 0, 0, 0);
     assert(nwin);
     keypad(nwin, TRUE);
-    bview = nullptr;
     log_l(TAG, "Window created:");
 }
 
@@ -42,7 +41,7 @@ void Window::destroy()
 
 
 
-void Window::changeBufferView(struct buffer_view* bv)
+void Window::changeBufferView(BufferView* bv)
 {
     assert(bv);
     bview = bv;
@@ -58,7 +57,7 @@ void Window::update(const Context& context)
 
     // Margin
     margin.width     = 3;
-    margin.start     = bv_start(bview);
+    margin.start     = bview->Start();
     margin.linecount = bview->buffer.linecount;
 
     // buffer
@@ -67,8 +66,8 @@ void Window::update(const Context& context)
     struct rect bvbounds = RECT(0, margin.width + 1,
                                 area.width - margin.width,
                                 area.height - STATUSLINE_HEIGHT - CMDLINE_HEIGHT);
-    bv_bounds_set(bview, bvbounds);
-    bv_update(bview);
+    bview->setBounds(bvbounds);
+    bview->update();
 }
 
 
@@ -90,13 +89,13 @@ void Window::draw(const Context& context)
     draw_cmdline(nwin, cmdline, areacmd, context);
 
     // Bufferview
-    draw_bview(nwin, bview, context);
+    draw_bview(nwin, *bview, context);
 
     // Draw cursor
     if (context.mode == Mode::Normal || context.mode == Mode::Insert) {
-        // Cursor in buffer_view
-        struct cursor c    = bv_relcur(bview);
-        struct rect areabv = bv_bounds(bview);
+        // Cursor in BufferView
+        struct cursor c    = bview->relcur();
+        struct rect areabv = bview->Bounds();
         wmove(nwin, areabv.y + c.line, areabv.x + c.col);
     } else if (context.mode == Mode::Command) {
         int x = strlen(cmdline.buffer) + 1;    // +1 for ':' prefix

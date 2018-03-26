@@ -32,8 +32,8 @@ int main()
 
     Ced::Opts opts{};
     opts.bcount    = 2;
-    opts.bviews[0] = bv_create(DOCUMENT, TEXTPATH "table.txt");
-    opts.bviews[1] = bv_create(DOCUMENT, TEXTPATH "kepler.txt");
+    opts.bviews[0] = BufferView(DOCUMENT, TEXTPATH "table.txt");
+    opts.bviews[1] = BufferView(DOCUMENT, TEXTPATH "kepler.txt");
 
     Ced ced(opts);
     ced.run();

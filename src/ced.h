@@ -1,6 +1,7 @@
 #pragma once
 #include "context.h"
 #include "input.h"
+#include "BufferView.h"
 
 /** ced.h
  * All the main editor logic lies here.
@@ -15,14 +16,14 @@ class Ced
     int quit;
     Context context{};
     Window win{};
-    struct buffer_view bviews[BVIEW_LIMIT]{};
+    BufferView bviews[BVIEW_LIMIT]{};
     unsigned int bcount{};
     unsigned int currentBview{};
 
 
 public:
     struct Opts {
-        struct buffer_view bviews[BVIEW_LIMIT];
+        BufferView bviews[BVIEW_LIMIT];
         unsigned int bcount;
     };
 
