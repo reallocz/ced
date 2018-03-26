@@ -7,7 +7,7 @@
 inpev inp_poll(Window& win)
 {
     inpev ev{};
-    int ch  = wgetch(win.nwin);
+    int ch  = wgetch(win.Nwin());
     ev.type = inp_classify(ch);
     ev.key  = ch;
     return ev;

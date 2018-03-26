@@ -83,19 +83,19 @@ void Ced::run()
 
 void Ced::insertCb(inpev ev)
 {
-    struct buffer* buf = &win.bview->buffer;
-    struct cursor cur  = win.bview->cur;
+    struct buffer* buf = &win.Bview()->buffer;
+    struct cursor cur  = win.Bview()->cur;
 
     if (ev.type == INP_ALPHA || ev.type == INP_NUM || ev.type == INP_SYMBOL || ev.key == k_space || ev.key == k_enter) {
         buf_addch(buf, ev.key, cur);
-        bv_cmov_fwd(win.bview, 1);
+        bv_cmov_fwd(win.Bview(), 1);
     }
 
     if (ev.type == INP_SPECIAL) {
         switch (ev.key) {
         case k_backspace:
             buf_delch(buf, cur);
-            bv_cmov_back(win.bview, 1);
+            bv_cmov_back(win.Bview(), 1);
             break;
         case k_esc:
             context.setMode(Mode::Normal);
@@ -118,24 +118,24 @@ void Ced::normalCb(inpev ev)
     } else if (ev.key == k_f1) {
         quit = 1;
     } else if (ev.key == k_f2) {
-        buf_save_to_disk(&win.bview->buffer, "doc.txt");
+        buf_save_to_disk(&win.Bview()->buffer, "doc.txt");
         // TODO(realloc): prompt for name
     } else if (ev.key == 'h') {
-        bv_cmov_back(win.bview, 1);
+        bv_cmov_back(win.Bview(), 1);
     } else if (ev.key == 'l') {
-        bv_cmov_fwd(win.bview, 1);
+        bv_cmov_fwd(win.Bview(), 1);
     } else if (ev.key == 'j') {
-        bv_cmov_lnext(win.bview, 1);
+        bv_cmov_lnext(win.Bview(), 1);
     } else if (ev.key == 'k') {
-        bv_cmov_lprev(win.bview, 1);
+        bv_cmov_lprev(win.Bview(), 1);
     } else if (ev.key == 'u') {
-        bv_scrollup(win.bview, 1);
+        bv_scrollup(win.Bview(), 1);
     } else if (ev.key == 'd') {
-        bv_scrolldown(win.bview, 1);
+        bv_scrolldown(win.Bview(), 1);
     } else if (ev.key == '$') {
-        bv_cmov_lend(win.bview);
+        bv_cmov_lend(win.Bview());
     } else if (ev.key == '0') {
-        bv_cmov_lstart(win.bview);
+        bv_cmov_lstart(win.Bview());
     } else if (ev.key == '1') {
         nextBview();
         win.changeBufferView(&bviews[currentBview]);
@@ -192,11 +192,11 @@ void Ced::execCommand(struct command cmd)
     if (cmd.type == CMD_BUFSAVE) {
         if (strlen(cmd.args) == 0) {
             // Save
-            buf_save_to_disk(&win.bview->buffer,
-                             win.bview->buffer.name);
+            buf_save_to_disk(&win.Bview()->buffer,
+                             win.Bview()->buffer.name);
         } else {
             // Save As arg
-            buf_save_to_disk(&win.bview->buffer,
+            buf_save_to_disk(&win.Bview()->buffer,
                              cmd.args);
             // TODO(realloc): add error checking
             // TODO(realloc): update buffer name to arg

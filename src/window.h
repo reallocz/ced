@@ -23,11 +23,13 @@
  *	|_______________|<- 2
  */
 
+
 struct StatusLine {
     const char* bufname;
     struct cursor cur;
     struct buffer_gap gap;
 };
+
 
 struct Margin {
     unsigned int width;
@@ -35,16 +37,18 @@ struct Margin {
     unsigned int linecount;
 };
 
+
 struct CmdLine {
     char buffer[CMDLINE_SIZE];
 };
 
 
 class Window {
-public:
+private:
     unsigned int id;
     WINDOW* nwin;
 
+public:
     StatusLine sline;
     Margin margin;
     CmdLine cmdline;
@@ -53,8 +57,12 @@ public:
 public:
     Window();
     void destroy();
+
     void draw(const Context& context);
     void update(const Context& context);
     void changeBufferView(struct buffer_view* bv);
+
+    inline WINDOW* Nwin() const { return nwin; };
+    inline struct buffer_view* Bview() { return bview; }
 };
 
