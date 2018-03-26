@@ -23,19 +23,19 @@
  *	|_______________|<- 2
  */
 
-struct statusline {
+struct StatusLine {
     const char* bufname;
     struct cursor cur;
     struct buffer_gap gap;
 };
 
-struct margin {
+struct Margin {
     unsigned int width;
     unsigned int start;    // First line number
     unsigned int linecount;
 };
 
-struct cmdline {
+struct CmdLine {
     char buffer[CMDLINE_SIZE];
 };
 
@@ -45,9 +45,9 @@ public:
     unsigned int id;
     WINDOW* nwin;
 
-    struct statusline sline;
-    struct margin margin;
-    struct cmdline cmdline;
+    StatusLine sline;
+    Margin margin;
+    CmdLine cmdline;
     struct buffer_view* bview;
 
 public:
