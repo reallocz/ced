@@ -40,19 +40,4 @@ struct rect {
     unsigned int width, height;
 };
 
-
-/** Editor modes */
-enum mode {
-    MODE_NORMAL,
-    MODE_INSERT,
-    MODE_COMMAND
-};
-
-/** Map for mode -> string */
-static const char* mode_str[] = {
-    "NORMAL",
-    "INSERT",
-    "COMMAND",
-};
-
 void printrect(const char* name, struct rect r);

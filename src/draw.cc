@@ -79,7 +79,7 @@ void draw_statusline(WINDOW* nwin, struct statusline sline, struct rect area, co
     char stsstring[area.width];
     sprintf(stsstring,
             "   %s | %s | CUR %d:%d | GAP: line: %d col: %d size: %d",
-            mode_str[context.mode], sline.bufname, sline.cur.line, sline.cur.col,
+            context.modestr, sline.bufname, sline.cur.line, sline.cur.col,
             sline.gap.line, sline.gap.col, sline.gap.size);
 
     init_pair(1, COLOR_BLACK, COLOR_WHITE);
@@ -96,7 +96,7 @@ void draw_cmdline(WINDOW* nwin, struct cmdline cline,
     wmove(nwin, area.y, 0);
     wclrtoeol(nwin);
 
-    if (context.mode != MODE_COMMAND) {
+    if (context.mode != Mode::Command) {
         return;
     }
     waddch(nwin, ':');

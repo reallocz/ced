@@ -99,12 +99,12 @@ void win_draw(const struct window* win, const Context& context)
     draw_bview(win->nwin, win->bview, context);
 
     // Draw cursor
-    if (context.mode == MODE_NORMAL || context.mode == MODE_INSERT) {
+    if (context.mode == Mode::Normal || context.mode == Mode::Insert) {
         // Cursor in buffer_view
         struct cursor c    = bv_relcur(win->bview);
         struct rect areabv = bv_bounds(win->bview);
         wmove(win->nwin, areabv.y + c.line, areabv.x + c.col);
-    } else if (context.mode == MODE_COMMAND) {
+    } else if (context.mode == Mode::Command) {
         int x = strlen(win->cmdline.buffer) + 1;    // +1 for ':' prefix
         wmove(win->nwin, areacmd.y, x);
     } else {
