@@ -35,6 +35,6 @@ int main()
     opts.bviews[0] = bv_create(DOCUMENT, TEXTPATH "table.txt");
     opts.bviews[1] = bv_create(DOCUMENT, TEXTPATH "kepler.txt");
 
-    Ced::init(opts);
-    Ced::run();
+    Ced ced(opts);
+    ced.run();
 }

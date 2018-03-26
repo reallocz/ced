@@ -4,16 +4,13 @@
 
 #define TAG "INPUT"
 
-void inp_poll(const char* name __attribute__((unused)), struct window* win,
-              void (*callback)(inpev))
+inpev inp_poll(struct window* win)
 {
-
     inpev ev;
     int ch  = wgetch(win->nwin);
     ev.type = inp_classify(ch);
     ev.key  = ch;
-
-    callback(ev);
+    return ev;
 }
 
 

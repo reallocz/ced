@@ -14,116 +14,94 @@
 
 #define TAG "CED"
 
-namespace Ced
+Ced::Ced(Opts opts)
 {
-static struct {
-    int quit;    // Return to main if 1
-    struct window* win;
-    struct context* context;
+    parseOpts(opts);
 
-    struct buffer_view bviews[BVIEW_LIMIT];
-    unsigned int bcount;
-} G;
+    quit = 0;
+    Term::update();
+
+    // Create context
+    context = new struct context;
+    assert(context);
+    context->mode   = MODE_NORMAL;
+    context->bounds = (struct rect) RECT(0, 0, Term::cols, Term::rows);
+    context->flags  = 0;
+    SETFLAG(context->flags, Farea_update);
+}
 
 
-/** Return 1 on parse error */
-static int ced_parseopts(Opts opts)
+Ced::~Ced()
+{
+}
+
+
+void Ced::parseOpts(Opts opts)
 {
     // Set up buffer_views
     if (opts.bcount == 0) {
         // Init scratch buffer
-        G.bcount    = 1;
-        G.bviews[0] = bv_create(SCRATCH, TEXTPATH "scratch.txt");
+        bcount    = 1;
+        bviews[0] = bv_create(SCRATCH, TEXTPATH "scratch.txt");
     } else {
         assert(opts.bviews);
-        G.bcount = opts.bcount;
-        for (int i = 0; i < G.bcount; ++i) {
-            G.bviews[i] = opts.bviews[i];
+        bcount = opts.bcount;
+        for (int i = 0; i < bcount; ++i) {
+            bviews[i] = opts.bviews[i];
         }
     }
-    return 0;
+
+    currentBview = 0;
 }
 
-void init(Opts opts)
+
+void Ced::run()
 {
-    if (ced_parseopts(opts) != 0) {
-        log_l(TAG, "Invalid opts. quitting");
-        // TODO more diag
-        return;
-    }
-
-    // Initialize globals
-    G.quit = 0;
-
-    Term::update();
-
-    // Create context
-    struct context* ctx = new struct context;
-    assert(ctx);
-    ctx->mode   = MODE_NORMAL;
-    ctx->bounds = (struct rect) RECT(0, 0, Term::cols, Term::rows);
-    ctx->flags  = 0;
-    SETFLAG(ctx->flags, Farea_update);
-    G.context = ctx;
-}
-
-static unsigned int currentbview = 0;
-static struct buffer_view* next_bview()
-{
-    currentbview++;
-    if (currentbview >= G.bcount) {
-        currentbview = 0;
-    }
-    return &G.bviews[currentbview];
-}
-
-void run()
-{
-
     // Create window and set buffer
-    G.win = win_create(&G.bviews[0]);
+    win = win_create(&bviews[0]);
 
     // Main loop
-    while (!G.quit) {
+    while (!quit) {
         // Check for window resize
         {
             Term::update();
             struct rect newbounds = RECT(0, 0, Term::cols, Term::rows);
-            G.context->bounds     = newbounds;
+            context->bounds       = newbounds;
         }
 
-        win_update(G.win, G.context);
-        win_draw(G.win, G.context);
+        win_update(win, context);
+        win_draw(win, context);
 
-        if (G.context->mode == MODE_NORMAL) {
-            inp_poll("NORMAL", G.win, normal_input_cb);
-        } else if (G.context->mode == MODE_INSERT) {
-            inp_poll("INSERT", G.win, insert_input_cb);
-        } else if (G.context->mode == MODE_COMMAND) {
-            inp_poll("INSERT", G.win, command_input_cb);
+        inpev ev = inp_poll(win);
+        if (context->mode == MODE_NORMAL) {
+            normalCb(ev);
+        } else if (context->mode == MODE_INSERT) {
+            insertCb(ev);
+        } else if (context->mode == MODE_COMMAND) {
+            commandCb(ev);
         }
     }
 }
 
 
-void insert_input_cb(inpev ev)
+void Ced::insertCb(inpev ev)
 {
-    struct buffer* buf = &G.win->bview->buffer;
-    struct cursor cur  = G.win->bview->cur;
+    struct buffer* buf = &win->bview->buffer;
+    struct cursor cur  = win->bview->cur;
 
     if (ev.type == INP_ALPHA || ev.type == INP_NUM || ev.type == INP_SYMBOL || ev.key == k_space || ev.key == k_enter) {
         buf_addch(buf, ev.key, cur);
-        bv_cmov_fwd(G.win->bview, 1);
+        bv_cmov_fwd(win->bview, 1);
     }
 
     if (ev.type == INP_SPECIAL) {
         switch (ev.key) {
         case k_backspace:
             buf_delch(buf, cur);
-            bv_cmov_back(G.win->bview, 1);
+            bv_cmov_back(win->bview, 1);
             break;
         case k_esc:
-            G.context->mode = MODE_NORMAL;
+            context->mode = MODE_NORMAL;
             break;
         default:
             break;
@@ -132,75 +110,82 @@ void insert_input_cb(inpev ev)
 }
 
 
-void normal_input_cb(inpev ev)
+void Ced::normalCb(inpev ev)
 {
-    /*struct buffer* buf = G.win->buffer;*/
+    /*struct buffer* buf = win->buffer;*/
 
     if (ev.key == 'i') {
         // Switch to insert mode
-        G.context->mode = MODE_INSERT;
+        context->mode = MODE_INSERT;
     } else if (ev.key == ':') {
         // Switch to comman mode
-        G.context->mode = MODE_COMMAND;
+        context->mode = MODE_COMMAND;
     } else if (ev.key == k_f1) {
-        G.quit = 1;
+        quit = 1;
     } else if (ev.key == k_f2) {
-        buf_save_to_disk(&G.win->bview->buffer, "doc.txt");
+        buf_save_to_disk(&win->bview->buffer, "doc.txt");
         // TODO(realloc): prompt for name
     } else if (ev.key == 'h') {
-        bv_cmov_back(G.win->bview, 1);
+        bv_cmov_back(win->bview, 1);
     } else if (ev.key == 'l') {
-        bv_cmov_fwd(G.win->bview, 1);
+        bv_cmov_fwd(win->bview, 1);
     } else if (ev.key == 'j') {
-        bv_cmov_lnext(G.win->bview, 1);
+        bv_cmov_lnext(win->bview, 1);
     } else if (ev.key == 'k') {
-        bv_cmov_lprev(G.win->bview, 1);
+        bv_cmov_lprev(win->bview, 1);
     } else if (ev.key == 'u') {
-        bv_scrollup(G.win->bview, 1);
+        bv_scrollup(win->bview, 1);
     } else if (ev.key == 'd') {
-        bv_scrolldown(G.win->bview, 1);
+        bv_scrolldown(win->bview, 1);
     } else if (ev.key == '$') {
-        bv_cmov_lend(G.win->bview);
+        bv_cmov_lend(win->bview);
     } else if (ev.key == '0') {
-        bv_cmov_lstart(G.win->bview);
+        bv_cmov_lstart(win->bview);
     } else if (ev.key == '1') {
-        win_setbview(G.win, next_bview());
+        nextBview();
+        win_setbview(win, &bviews[currentBview]);
     }
 }
 
-// Proto
-static void exec_command(struct command cmd);
 
-void command_input_cb(inpev ev)
+void Ced::commandCb(inpev ev)
 {
     static int i = 0;
     if (ev.key == k_esc) {
         // Switch to normal mode
-        G.context->mode = MODE_NORMAL;
+        context->mode = MODE_NORMAL;
     } else if (ev.key == k_enter) {
         // Execute command and clear cmdline buffer
-        exec_command(cmd_parse_string(G.win->cmdline.buffer));
+        execCommand(cmd_parse_string(win->cmdline.buffer));
         // Reset buffer
-        i                        = 0;
-        G.win->cmdline.buffer[i] = '\0';
-        G.context->mode          = MODE_NORMAL;
+        i                      = 0;
+        win->cmdline.buffer[i] = '\0';
+        context->mode          = MODE_NORMAL;
     } else if (ev.type == INP_ALPHA || ev.type == INP_NUM || ev.type == INP_SYMBOL || ev.key == k_space) {
-        G.win->cmdline.buffer[i++] = ev.key;
-        G.win->cmdline.buffer[i]   = '\0';
+        win->cmdline.buffer[i++] = ev.key;
+        win->cmdline.buffer[i]   = '\0';
     } else if (ev.key == k_backspace) {
         i--;
         if (i < 0) {
             i = 0;
         }
-        G.win->cmdline.buffer[i] = '\0';
+        win->cmdline.buffer[i] = '\0';
     } else {
         // Go back to MODE_NORMAL
-        G.context->mode = MODE_NORMAL;
+        context->mode = MODE_NORMAL;
     }
 }
 
 
-static void exec_command(struct command cmd)
+void Ced::nextBview()
+{
+    currentBview++;
+    if (currentBview >= bcount) {
+        currentBview = 0;
+    }
+}
+
+void Ced::execCommand(struct command cmd)
 {
     cmd_pprint(cmd);
     if (!cmd.valid) {
@@ -212,16 +197,15 @@ static void exec_command(struct command cmd)
     if (cmd.type == CMD_BUFSAVE) {
         if (strlen(cmd.args) == 0) {
             // Save
-            buf_save_to_disk(&G.win->bview->buffer,
-                             G.win->bview->buffer.name);
+            buf_save_to_disk(&win->bview->buffer,
+                             win->bview->buffer.name);
         } else {
             // Save As arg
-            buf_save_to_disk(&G.win->bview->buffer,
+            buf_save_to_disk(&win->bview->buffer,
                              cmd.args);
             // TODO add error checking
             // TODO update buffer name to arg
         }
         return;
     }
-}
 }

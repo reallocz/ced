@@ -24,8 +24,7 @@ typedef struct {
 /** Poll ncurses for input events.
  * The input event is passed on to the handler.
  */
-void inp_poll(const char* name, struct window* win,
-              void (*callback)(inpev));
+inpev inp_poll(struct window* win);
 
 /** Return the type of given int */
 enum inp_type inp_classify(int c);

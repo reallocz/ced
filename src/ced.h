@@ -8,24 +8,38 @@
  */
 #define BVIEW_LIMIT 8
 
-namespace Ced
-{
 
-struct Opts {
+class Ced
+{
+    int quit;
+    struct window* win;
+    struct context* context;
     struct buffer_view bviews[BVIEW_LIMIT];
     unsigned int bcount;
+    unsigned int currentBview;
+
+
+public:
+    struct Opts {
+        struct buffer_view bviews[BVIEW_LIMIT];
+        unsigned int bcount;
+    };
+
+
+private:
+    void parseOpts(Opts opts);
+    void nextBview();
+    void execCommand(struct command cmd);
+
+public:
+    Ced(Opts opts);
+    ~Ced();
+
+    void run();
+    /** Input callback for MODE_INSERT */
+    void insertCb(inpev ev);
+    /** Input callback for MODE_NORMAL */
+    void normalCb(inpev ev);
+    /** Input callback for MODE_COMMAND */
+    void commandCb(inpev ev);
 };
-
-void init(Opts opts);
-
-/** Initialize logic and run.  */
-void run();
-
-// Input callbacks
-/** Input callback for MODE_INSERT */
-void insert_input_cb(inpev ev);
-/** Input callback for MODE_NORMAL */
-void normal_input_cb(inpev ev);
-/** Input callback for MODE_COMMAND */
-void command_input_cb(inpev ev);
-}
