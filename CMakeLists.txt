@@ -13,7 +13,7 @@ set(SRCDIR "src")
 
 include_directories(SRCDIR)
 
-add_compile_options(-g -Wall)
+add_compile_options(-g -Wall -std=c++17)
 
 add_executable(debug
 	${SRCDIR}/term.cc
