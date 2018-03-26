@@ -41,7 +41,7 @@ void Ced::parseOpts(Opts opts)
         bcount    = 1;
         bviews[0] = bv_create(SCRATCH, TEXTPATH "scratch.txt");
     } else {
-        static_assert(opts.bviews );
+        static_assert(opts.bviews);
         bcount = opts.bcount;
         for (int i = 0; i < bcount; ++i) {
             bviews[i] = opts.bviews[i];
@@ -54,8 +54,8 @@ void Ced::parseOpts(Opts opts)
 
 void Ced::run()
 {
-    // Create window and set buffer
-    win = win_create(&bviews[0]);
+    // set buffer
+    win.changeBufferView(&bviews[0]);
 
     // Main loop
     while (!quit) {
@@ -66,8 +66,8 @@ void Ced::run()
             context.bounds        = newbounds;
         }
 
-        win_update(win, context);
-        win_draw(win, context);
+        win.update(context);
+        win.draw(context);
 
         inpev ev = inp_poll(win);
         if (context.mode == Mode::Normal) {
@@ -83,19 +83,19 @@ void Ced::run()
 
 void Ced::insertCb(inpev ev)
 {
-    struct buffer* buf = &win->bview->buffer;
-    struct cursor cur  = win->bview->cur;
+    struct buffer* buf = &win.bview->buffer;
+    struct cursor cur  = win.bview->cur;
 
     if (ev.type == INP_ALPHA || ev.type == INP_NUM || ev.type == INP_SYMBOL || ev.key == k_space || ev.key == k_enter) {
         buf_addch(buf, ev.key, cur);
-        bv_cmov_fwd(win->bview, 1);
+        bv_cmov_fwd(win.bview, 1);
     }
 
     if (ev.type == INP_SPECIAL) {
         switch (ev.key) {
         case k_backspace:
             buf_delch(buf, cur);
-            bv_cmov_back(win->bview, 1);
+            bv_cmov_back(win.bview, 1);
             break;
         case k_esc:
             context.setMode(Mode::Normal);
@@ -109,8 +109,6 @@ void Ced::insertCb(inpev ev)
 
 void Ced::normalCb(inpev ev)
 {
-    /*struct buffer* buf = win->buffer;*/
-
     if (ev.key == 'i') {
         // Switch to insert mode
         context.setMode(Mode::Insert);
@@ -120,27 +118,27 @@ void Ced::normalCb(inpev ev)
     } else if (ev.key == k_f1) {
         quit = 1;
     } else if (ev.key == k_f2) {
-        buf_save_to_disk(&win->bview->buffer, "doc.txt");
+        buf_save_to_disk(&win.bview->buffer, "doc.txt");
         // TODO(realloc): prompt for name
     } else if (ev.key == 'h') {
-        bv_cmov_back(win->bview, 1);
+        bv_cmov_back(win.bview, 1);
     } else if (ev.key == 'l') {
-        bv_cmov_fwd(win->bview, 1);
+        bv_cmov_fwd(win.bview, 1);
     } else if (ev.key == 'j') {
-        bv_cmov_lnext(win->bview, 1);
+        bv_cmov_lnext(win.bview, 1);
     } else if (ev.key == 'k') {
-        bv_cmov_lprev(win->bview, 1);
+        bv_cmov_lprev(win.bview, 1);
     } else if (ev.key == 'u') {
-        bv_scrollup(win->bview, 1);
+        bv_scrollup(win.bview, 1);
     } else if (ev.key == 'd') {
-        bv_scrolldown(win->bview, 1);
+        bv_scrolldown(win.bview, 1);
     } else if (ev.key == '$') {
-        bv_cmov_lend(win->bview);
+        bv_cmov_lend(win.bview);
     } else if (ev.key == '0') {
-        bv_cmov_lstart(win->bview);
+        bv_cmov_lstart(win.bview);
     } else if (ev.key == '1') {
         nextBview();
-        win_setbview(win, &bviews[currentBview]);
+        win.changeBufferView(&bviews[currentBview]);
     }
 }
 
@@ -153,20 +151,20 @@ void Ced::commandCb(inpev ev)
         context.setMode(Mode::Normal);
     } else if (ev.key == k_enter) {
         // Execute command and clear cmdline buffer
-        execCommand(cmd_parse_string(win->cmdline.buffer));
+        execCommand(cmd_parse_string(win.cmdline.buffer));
         // Reset buffer
         i                      = 0;
-        win->cmdline.buffer[i] = '\0';
+        win.cmdline.buffer[i] = '\0';
         context.setMode(Mode::Normal);
     } else if (ev.type == INP_ALPHA || ev.type == INP_NUM || ev.type == INP_SYMBOL || ev.key == k_space) {
-        win->cmdline.buffer[i++] = ev.key;
-        win->cmdline.buffer[i]   = '\0';
+        win.cmdline.buffer[i++] = ev.key;
+        win.cmdline.buffer[i]   = '\0';
     } else if (ev.key == k_backspace) {
         i--;
         if (i < 0) {
             i = 0;
         }
-        win->cmdline.buffer[i] = '\0';
+        win.cmdline.buffer[i] = '\0';
     } else {
         // Go back to Mode::Normal
         context.setMode(Mode::Normal);
@@ -194,11 +192,11 @@ void Ced::execCommand(struct command cmd)
     if (cmd.type == CMD_BUFSAVE) {
         if (strlen(cmd.args) == 0) {
             // Save
-            buf_save_to_disk(&win->bview->buffer,
-                             win->bview->buffer.name);
+            buf_save_to_disk(&win.bview->buffer,
+                             win.bview->buffer.name);
         } else {
             // Save As arg
-            buf_save_to_disk(&win->bview->buffer,
+            buf_save_to_disk(&win.bview->buffer,
                              cmd.args);
             // TODO(realloc): add error checking
             // TODO(realloc): update buffer name to arg

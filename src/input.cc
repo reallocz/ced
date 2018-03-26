@@ -4,10 +4,10 @@
 
 #define TAG "INPUT"
 
-inpev inp_poll(struct window* win)
+inpev inp_poll(Window& win)
 {
     inpev ev{};
-    int ch  = wgetch(win->nwin);
+    int ch  = wgetch(win.nwin);
     ev.type = inp_classify(ch);
     ev.key  = ch;
     return ev;

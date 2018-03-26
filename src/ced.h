@@ -14,7 +14,7 @@ class Ced
 {
     int quit;
     Context context{};
-    struct window* win{};
+    Window win{};
     struct buffer_view bviews[BVIEW_LIMIT]{};
     unsigned int bcount{};
     unsigned int currentBview{};

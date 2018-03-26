@@ -39,7 +39,9 @@ struct cmdline {
     char buffer[CMDLINE_SIZE];
 };
 
-struct window {
+
+class Window {
+public:
     unsigned int id;
     WINDOW* nwin;
 
@@ -47,22 +49,12 @@ struct window {
     struct margin margin;
     struct cmdline cmdline;
     struct buffer_view* bview;
+
+public:
+    Window();
+    void destroy();
+    void draw(const Context& context);
+    void update(const Context& context);
+    void changeBufferView(struct buffer_view* bv);
 };
 
-
-/** Create a window */
-struct window* win_create(struct buffer_view* bview);
-
-/** destroys the window. doesn't alter attached buffer*/
-void win_destroy(struct window* win);
-
-/** attach a buffer_view to the window*/
-void win_setbview(struct window* win, struct buffer_view* bv);
-
-/** Update window margin, statusline etc */
-void win_update(struct window* win, const Context& context);
-
-/** Draw the window */
-void win_draw(const struct window* win, const Context& context);
-
-void win_pprint(struct window* win);
