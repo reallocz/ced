@@ -55,10 +55,4 @@ static const char* mode_str[] = {
     "COMMAND",
 };
 
-struct context {
-    enum mode mode;
-    struct rect bounds;
-    unsigned long flags;
-};
-
 void printrect(const char* name, struct rect r);

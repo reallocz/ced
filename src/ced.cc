@@ -22,12 +22,10 @@ Ced::Ced(Opts opts)
     Term::update();
 
     // Create context
-    context = new struct context;
-    assert(context);
-    context->mode   = MODE_NORMAL;
-    context->bounds = (struct rect) RECT(0, 0, Term::cols, Term::rows);
-    context->flags  = 0;
-    SETFLAG(context->flags, Farea_update);
+    context.mode   = MODE_NORMAL;
+    context.bounds = (struct rect) RECT(0, 0, Term::cols, Term::rows);
+    context.flags  = 0;
+    SETFLAG(context.flags, Farea_update);
 }
 
 
@@ -66,18 +64,18 @@ void Ced::run()
         {
             Term::update();
             struct rect newbounds = RECT(0, 0, Term::cols, Term::rows);
-            context->bounds       = newbounds;
+            context.bounds        = newbounds;
         }
 
         win_update(win, context);
         win_draw(win, context);
 
         inpev ev = inp_poll(win);
-        if (context->mode == MODE_NORMAL) {
+        if (context.mode == MODE_NORMAL) {
             normalCb(ev);
-        } else if (context->mode == MODE_INSERT) {
+        } else if (context.mode == MODE_INSERT) {
             insertCb(ev);
-        } else if (context->mode == MODE_COMMAND) {
+        } else if (context.mode == MODE_COMMAND) {
             commandCb(ev);
         }
     }
@@ -101,7 +99,7 @@ void Ced::insertCb(inpev ev)
             bv_cmov_back(win->bview, 1);
             break;
         case k_esc:
-            context->mode = MODE_NORMAL;
+            context.mode = MODE_NORMAL;
             break;
         default:
             break;
@@ -116,10 +114,10 @@ void Ced::normalCb(inpev ev)
 
     if (ev.key == 'i') {
         // Switch to insert mode
-        context->mode = MODE_INSERT;
+        context.mode = MODE_INSERT;
     } else if (ev.key == ':') {
         // Switch to comman mode
-        context->mode = MODE_COMMAND;
+        context.mode = MODE_COMMAND;
     } else if (ev.key == k_f1) {
         quit = 1;
     } else if (ev.key == k_f2) {
@@ -153,14 +151,14 @@ void Ced::commandCb(inpev ev)
     static int i = 0;
     if (ev.key == k_esc) {
         // Switch to normal mode
-        context->mode = MODE_NORMAL;
+        context.mode = MODE_NORMAL;
     } else if (ev.key == k_enter) {
         // Execute command and clear cmdline buffer
         execCommand(cmd_parse_string(win->cmdline.buffer));
         // Reset buffer
         i                      = 0;
         win->cmdline.buffer[i] = '\0';
-        context->mode          = MODE_NORMAL;
+        context.mode           = MODE_NORMAL;
     } else if (ev.type == INP_ALPHA || ev.type == INP_NUM || ev.type == INP_SYMBOL || ev.key == k_space) {
         win->cmdline.buffer[i++] = ev.key;
         win->cmdline.buffer[i]   = '\0';
@@ -172,7 +170,7 @@ void Ced::commandCb(inpev ev)
         win->cmdline.buffer[i] = '\0';
     } else {
         // Go back to MODE_NORMAL
-        context->mode = MODE_NORMAL;
+        context.mode = MODE_NORMAL;
     }
 }
 

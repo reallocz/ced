@@ -1,6 +1,7 @@
 #pragma once
 #include "buffer_view.h"
 #include "common.h"
+#include "context.h"
 #include <ncurses.h>
 
 #define CMDLINE_SIZE 256
@@ -59,9 +60,9 @@ void win_destroy(struct window* win);
 void win_setbview(struct window* win, struct buffer_view* bv);
 
 /** Update window margin, statusline etc */
-void win_update(struct window* win, struct context* context);
+void win_update(struct window* win, const Context& context);
 
 /** Draw the window */
-void win_draw(const struct window* win, const struct context* context);
+void win_draw(const struct window* win, const Context& context);
 
 void win_pprint(struct window* win);

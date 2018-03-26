@@ -54,7 +54,7 @@ void win_setbview(struct window* win, struct buffer_view* bv)
 }
 
 
-void win_update(struct window* win, struct context* context)
+void win_update(struct window* win, const Context& context)
 {
     struct buffer_view* bv = win->bview;
     // statusline
@@ -69,7 +69,7 @@ void win_update(struct window* win, struct context* context)
 
     // buffer
     // Update bview bounds
-    struct rect area     = context->bounds;
+    struct rect area     = context.bounds;
     struct rect bvbounds = RECT(0, win->margin.width + 1,
                                 area.width - win->margin.width,
                                 area.height - STATUSLINE_HEIGHT - CMDLINE_HEIGHT);
@@ -78,9 +78,9 @@ void win_update(struct window* win, struct context* context)
 }
 
 
-void win_draw(const struct window* win, const struct context* context)
+void win_draw(const struct window* win, const Context& context)
 {
-    struct rect area = context->bounds;
+    struct rect area = context.bounds;
     // Stl
     struct rect areastl = RECT(area.height - STATUSLINE_HEIGHT - CMDLINE_HEIGHT, 0,
                                area.width, STATUSLINE_HEIGHT);
@@ -99,12 +99,12 @@ void win_draw(const struct window* win, const struct context* context)
     draw_bview(win->nwin, win->bview, context);
 
     // Draw cursor
-    if (context->mode == MODE_NORMAL || context->mode == MODE_INSERT) {
+    if (context.mode == MODE_NORMAL || context.mode == MODE_INSERT) {
         // Cursor in buffer_view
         struct cursor c    = bv_relcur(win->bview);
         struct rect areabv = bv_bounds(win->bview);
         wmove(win->nwin, areabv.y + c.line, areabv.x + c.col);
-    } else if (context->mode == MODE_COMMAND) {
+    } else if (context.mode == MODE_COMMAND) {
         int x = strlen(win->cmdline.buffer) + 1;    // +1 for ':' prefix
         wmove(win->nwin, areacmd.y, x);
     } else {

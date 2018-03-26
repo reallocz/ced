@@ -1,4 +1,5 @@
 #pragma once
+#include "context.h"
 #include "input.h"
 
 /** ced.h
@@ -12,8 +13,8 @@
 class Ced
 {
     int quit;
+    Context context;
     struct window* win;
-    struct context* context;
     struct buffer_view bviews[BVIEW_LIMIT];
     unsigned int bcount;
     unsigned int currentBview;
