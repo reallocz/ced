@@ -30,11 +30,11 @@ int main()
     Term::init();
     log_l("MAIN", "\n---------INIT END--------\n");
 
-    struct cedopts opts;
+    Ced::Opts opts;
     opts.bcount    = 2;
     opts.bviews[0] = bv_create(DOCUMENT, TEXTPATH "table.txt");
     opts.bviews[1] = bv_create(DOCUMENT, TEXTPATH "kepler.txt");
 
-    ced_init(opts);
-    ced_run();
+    Ced::init(opts);
+    Ced::run();
 }

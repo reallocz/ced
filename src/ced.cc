@@ -14,6 +14,8 @@
 
 #define TAG "CED"
 
+namespace Ced
+{
 static struct {
     int quit;    // Return to main if 1
     struct window* win;
@@ -25,7 +27,7 @@ static struct {
 
 
 /** Return 1 on parse error */
-static int ced_parseopts(struct cedopts opts)
+static int ced_parseopts(Opts opts)
 {
     // Set up buffer_views
     if (opts.bcount == 0) {
@@ -42,7 +44,7 @@ static int ced_parseopts(struct cedopts opts)
     return 0;
 }
 
-void ced_init(struct cedopts opts)
+void init(Opts opts)
 {
     if (ced_parseopts(opts) != 0) {
         log_l(TAG, "Invalid opts. quitting");
@@ -75,7 +77,7 @@ static struct buffer_view* next_bview()
     return &G.bviews[currentbview];
 }
 
-void ced_run()
+void run()
 {
 
     // Create window and set buffer
@@ -94,17 +96,17 @@ void ced_run()
         win_draw(G.win, G.context);
 
         if (G.context->mode == MODE_NORMAL) {
-            inp_poll("NORMAL", G.win, ced_normal_input_cb);
+            inp_poll("NORMAL", G.win, normal_input_cb);
         } else if (G.context->mode == MODE_INSERT) {
-            inp_poll("INSERT", G.win, ced_insert_input_cb);
+            inp_poll("INSERT", G.win, insert_input_cb);
         } else if (G.context->mode == MODE_COMMAND) {
-            inp_poll("INSERT", G.win, ced_command_input_cb);
+            inp_poll("INSERT", G.win, command_input_cb);
         }
     }
 }
 
 
-void ced_insert_input_cb(inpev ev)
+void insert_input_cb(inpev ev)
 {
     struct buffer* buf = &G.win->bview->buffer;
     struct cursor cur  = G.win->bview->cur;
@@ -130,7 +132,7 @@ void ced_insert_input_cb(inpev ev)
 }
 
 
-void ced_normal_input_cb(inpev ev)
+void normal_input_cb(inpev ev)
 {
     /*struct buffer* buf = G.win->buffer;*/
 
@@ -169,7 +171,7 @@ void ced_normal_input_cb(inpev ev)
 // Proto
 static void exec_command(struct command cmd);
 
-void ced_command_input_cb(inpev ev)
+void command_input_cb(inpev ev)
 {
     static int i = 0;
     if (ev.key == k_esc) {
@@ -221,4 +223,5 @@ static void exec_command(struct command cmd)
         }
         return;
     }
+}
 }
