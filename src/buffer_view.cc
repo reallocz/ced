@@ -1,13 +1,13 @@
 #include "buffer_view.h"
 #include "log.h"
-#include <assert.h>
+#include <cassert>
 
 #define TAG "BVIEW"
 
 struct buffer_view bv_create(enum buffer_type type, const char* filename)
 {
     assert(filename);
-    struct buffer_view bv;
+    struct buffer_view bv{};
     bv.cur.line = 0;
     bv.cur.col  = 0;
 

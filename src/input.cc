@@ -1,12 +1,12 @@
 #include "input.h"
 #include "log.h"
-#include <assert.h>
+#include <cassert>
 
 #define TAG "INPUT"
 
 inpev inp_poll(struct window* win)
 {
-    inpev ev;
+    inpev ev{};
     int ch  = wgetch(win->nwin);
     ev.type = inp_classify(ch);
     ev.key  = ch;

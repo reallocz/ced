@@ -1,9 +1,9 @@
 #include "term.h"
 #include "log.h"
-#include <locale.h>
+#include <clocale>
 #include <ncurses.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 
 #define TAG "TERM"
 
@@ -39,4 +39,4 @@ void update()
 {
     getmaxyx(stdscr, rows, cols);
 }
-};
+}  // namespace Term

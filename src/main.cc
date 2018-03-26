@@ -2,11 +2,11 @@
 #include "common.h"
 #include "log.h"
 #include "term.h"
-#include <assert.h>
-#include <locale.h>
+#include <cassert>
+#include <clocale>
 #include <ncurses.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 #include <unistd.h>
 
 /** Cleanup submodules */
@@ -30,7 +30,7 @@ int main()
     Term::init();
     log_l("MAIN", "\n---------INIT END--------\n");
 
-    Ced::Opts opts;
+    Ced::Opts opts{};
     opts.bcount    = 2;
     opts.bviews[0] = bv_create(DOCUMENT, TEXTPATH "table.txt");
     opts.bviews[1] = bv_create(DOCUMENT, TEXTPATH "kepler.txt");

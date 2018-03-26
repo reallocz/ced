@@ -7,10 +7,10 @@
 #include "log.h"
 #include "term.h"
 #include "window.h"
-#include <assert.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cassert>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 
 #define TAG "CED"
 
@@ -30,8 +30,7 @@ Ced::Ced(Opts opts)
 
 
 Ced::~Ced()
-{
-}
+= default;
 
 
 void Ced::parseOpts(Opts opts)
@@ -42,7 +41,7 @@ void Ced::parseOpts(Opts opts)
         bcount    = 1;
         bviews[0] = bv_create(SCRATCH, TEXTPATH "scratch.txt");
     } else {
-        assert(opts.bviews);
+        static_assert(opts.bviews );
         bcount = opts.bcount;
         for (int i = 0; i < bcount; ++i) {
             bviews[i] = opts.bviews[i];
@@ -201,8 +200,8 @@ void Ced::execCommand(struct command cmd)
             // Save As arg
             buf_save_to_disk(&win->bview->buffer,
                              cmd.args);
-            // TODO add error checking
-            // TODO update buffer name to arg
+            // TODO(realloc): add error checking
+            // TODO(realloc): update buffer name to arg
         }
         return;
     }

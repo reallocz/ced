@@ -1,7 +1,7 @@
 #include "commands.h"
 #include "log.h"
-#include <assert.h>
-#include <string.h>
+#include <cassert>
+#include <cstring>
 
 
 #define TAG "CMD"
@@ -10,7 +10,7 @@
 struct command cmd_parse_string(const char* cmdstr)
 {
     assert(cmdstr);
-    struct command c;
+    struct command c{};
     c.valid  = 0;
     c.cmdstr = cmdstr;
 
@@ -48,8 +48,8 @@ struct command cmd_parse_string(const char* cmdstr)
 
 
     // Identify command
-    for (unsigned int i = 0; i < CMD_ENUMCOUNT; ++i) {
-        if (strcmp(c.cmd, cmd_defs[i]) == 0) {
+    for (auto & cmd_def : cmd_defs) {
+        if (strcmp(c.cmd, cmd_def) == 0) {
             log_l(TAG, "Recognized command: %s", c.cmd);
             c.valid = 1;
             //c.type  = i;

@@ -27,7 +27,7 @@ void draw_bview(WINDOW* nwin, const struct buffer_view* bv, const Context& conte
 
         unsigned int linenumber = firstline + i;
         struct line* ln         = buf_line(&bv->buffer, linenumber);
-        if (ln == NULL) {
+        if (ln == nullptr) {
             break;
         }    // No more lines in buffer
 

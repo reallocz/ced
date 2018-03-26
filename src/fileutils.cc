@@ -1,7 +1,7 @@
 #include "fileutils.h"
 #include "log.h"
-#include <assert.h>
-#include <errno.h>
+#include <cassert>
+#include <cerrno>
 #include <linux/limits.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -10,13 +10,13 @@
 
 struct file_stats fu_stats(const char* path)
 {
-    struct file_stats fs;
+    struct file_stats fs{};
     fs.exists = 0;
     fs.path   = path;
     fs.size   = 0;
     fs.type   = F_FILE;
 
-    struct stat s;
+    struct stat s{};
     int err = 0;
     char abspath[PATH_MAX];
     realpath(path, abspath);
@@ -62,7 +62,7 @@ unsigned int fu_read_file_lines(const char* path,
     // Count number of lines
     unsigned int linecount = 0;
     char ch;
-    while (1) {
+    while (true) {
         ch = fgetc(f);
         if (ch == '\n') {
             linecount++;
@@ -74,15 +74,15 @@ unsigned int fu_read_file_lines(const char* path,
     }
     rewind(f);
 
-    struct line* mlines = (struct line*) malloc(linecount * sizeof(struct line));
+    auto* mlines = static_cast<struct line*>(malloc(linecount * sizeof(struct line)));
     assert(mlines);
 
     unsigned int count = 0;
     // getline allocates buffer if tmpdata and tmplen == 0
     int linelen   = 0;
     size_t wtfits = 0;
-    char* tmpdata = NULL;
-    while (1) {
+    char* tmpdata = nullptr;
+    while (true) {
         linelen = getline(&tmpdata, &wtfits, f);
         if (linelen == -1) {
             break;
@@ -91,7 +91,7 @@ unsigned int fu_read_file_lines(const char* path,
         ln->len         = linelen;
         ln->data        = tmpdata;
         /*log_l(TAG, "line: size=%d", ln->len, ln->data);*/
-        tmpdata = 0;
+        tmpdata = nullptr;
         wtfits  = 0;
     }
     fclose(f);
@@ -110,7 +110,7 @@ void fu_abspath(const char* relpath, char* abspath)
 
 int fu_file_exists(const char* path)
 {
-    struct stat s;
+    struct stat s{};
     int err = 0;
     char abspath[PATH_MAX];
     realpath(path, abspath);
@@ -131,7 +131,7 @@ int fu_file_exists(const char* path)
 
 int fu_dir_exists(const char* path)
 {
-    struct stat s;
+    struct stat s{};
     int err = 0;
     err     = stat(path, &s);
 
@@ -152,7 +152,7 @@ int fu_dir_exists(const char* path)
 
 char* fu_cwd()
 {
-    return getcwd(NULL, PATH_MAX);
+    return getcwd(nullptr, PATH_MAX);
 }
 
 int fu_save_buffer(const struct buffer* buf, const char* path)

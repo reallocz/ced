@@ -1,12 +1,12 @@
 #include "window.h"
 #include "draw.h"
 #include "log.h"
-#include <assert.h>
-#include <locale.h>
+#include <cassert>
+#include <clocale>
 #include <ncurses.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 
 #define TAG "WINDOW"
 #define STATUSLINE_HEIGHT 1
@@ -21,7 +21,7 @@ static unsigned int generate_id()
 
 struct window* win_create(struct buffer_view* bview)
 {
-    struct window* w = (struct window*) malloc(sizeof(struct window));
+    auto* w = static_cast<struct window*>(malloc(sizeof(struct window)));
     assert(w);
 
     w->id = generate_id();

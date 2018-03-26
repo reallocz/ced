@@ -3,10 +3,10 @@
 #include "fileutils.h"
 #include "input_keys.h"
 #include "log.h"
-#include <assert.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cassert>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 
 #define BUFFER_GAPSIZE 4
 
@@ -21,7 +21,7 @@
 
 struct buffer* buf_create_empty(enum buffer_type type)
 {
-    struct buffer* buf = (struct buffer*) malloc(sizeof(struct buffer));
+    auto* buf = static_cast<struct buffer*>(malloc(sizeof(struct buffer)));
     assert(buf);
 
     buf->id   = generate_id();
@@ -35,13 +35,13 @@ struct buffer* buf_create_empty(enum buffer_type type)
 
     /** lines */
     buf->linecount = 1;    // Empty buffer has at least one line
-    buf->lines     = (struct line*) calloc(buf->linecount, sizeof(struct line));
+    buf->lines     = static_cast<struct line*>(calloc(buf->linecount, sizeof(struct line)));
     assert(buf->lines);
 
     // Set gap on the first line
     struct line* fln = buf_line(buf, 0);
     fln->len         = BUFFER_GAPSIZE;
-    fln->data        = (char*) calloc(fln->len, sizeof(char));
+    fln->data        = static_cast<char*>(calloc(fln->len, sizeof(char)));
     return buf;
 }
 
@@ -70,7 +70,7 @@ struct buffer buf_create_file(enum buffer_type type,
     buf.name = filename;
 
     /** lines */
-    buf.lines     = NULL;
+    buf.lines     = nullptr;
     buf.linecount = fu_read_file_lines(fstats.path, &buf.lines);
     assert(buf.lines);
 
@@ -95,7 +95,7 @@ void buf_destroy(struct buffer* buf)
     free(buf->lines);
     free(buf);
     log_l(TAG, "Buffer destroyed (id=%d)", id);
-    buf = NULL;
+    buf = nullptr;
 }
 
 
@@ -132,7 +132,7 @@ struct line* buf_line(const struct buffer* buf, unsigned int num)
 {
     if (num >= buf->linecount) {
         /*log_e(TAG, "Invalid line request: buf: %d (%d lines), request: %d", buf->id, buf->linecount, num);*/
-        return NULL;
+        return nullptr;
     }
     return &buf->lines[num];
 }
@@ -194,7 +194,7 @@ static void gap_add(struct buffer* buf)
     unsigned int newlinelen = ln->len + BUFFER_GAPSIZE;
     unsigned int newgapsize = gap->size + BUFFER_GAPSIZE;
 
-    char* newdata = (char*) calloc(newlinelen, sizeof(char));
+    auto* newdata = static_cast<char*>(calloc(newlinelen, sizeof(char)));
     assert(newdata);
 
     /* Copy memory to new data */
@@ -219,7 +219,7 @@ static void gap_move_to_line(struct buffer* buf, unsigned int toline)
     {
         struct line* ln         = buf_line(buf, buf->gap.line);
         unsigned int linelength = ln->len - buf->gap.size;
-        char* newdata           = (char*) malloc(linelength * sizeof(char));
+        auto* newdata           = static_cast<char*>(malloc(linelength * sizeof(char)));
         assert(newdata);
         unsigned int count = 0;
         for (unsigned int i = 0; i < ln->len; ++i) {
@@ -239,7 +239,7 @@ static void gap_move_to_line(struct buffer* buf, unsigned int toline)
     {
         struct line* ln        = buf_line(buf, toline);
         unsigned int newlength = ln->len + buf->gap.size;
-        char* newdata          = (char*) malloc(newlength * sizeof(char));
+        auto* newdata          = static_cast<char*>(malloc(newlength * sizeof(char)));
         assert(newdata);
         memcpy(&newdata[buf->gap.size],
                ln->data,
