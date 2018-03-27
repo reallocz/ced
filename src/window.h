@@ -27,7 +27,7 @@
 struct StatusLine {
     const char* bufname;
     struct cursor cur;
-    struct buffer_gap gap;
+    struct Buffer::Gap gap;
 };
 
 
@@ -43,7 +43,8 @@ struct CmdLine {
 };
 
 
-class Window {
+class Window
+{
 private:
     unsigned int id;
     WINDOW* nwin;
@@ -65,4 +66,3 @@ public:
     inline WINDOW* Nwin() const { return nwin; };
     inline BufferView& Bview() { return *bview; }
 };
-

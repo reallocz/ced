@@ -10,7 +10,8 @@
 struct command cmd_parse_string(const char* cmdstr)
 {
     assert(cmdstr);
-    struct command c{};
+    struct command c {
+    };
     c.valid  = 0;
     c.cmdstr = cmdstr;
 
@@ -48,7 +49,7 @@ struct command cmd_parse_string(const char* cmdstr)
 
 
     // Identify command
-    for (auto & cmd_def : cmd_defs) {
+    for (auto& cmd_def : cmd_defs) {
         if (strcmp(c.cmd, cmd_def) == 0) {
             log_l(TAG, "Recognized command: %s", c.cmd);
             c.valid = 1;

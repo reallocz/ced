@@ -1,7 +1,7 @@
 #pragma once
+#include "BufferView.h"
 #include "context.h"
 #include "input.h"
-#include "BufferView.h"
 
 /** ced.h
  * All the main editor logic lies here.

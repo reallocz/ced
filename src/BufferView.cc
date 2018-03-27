@@ -6,13 +6,13 @@
 
 BufferView::BufferView() {}
 
-BufferView::BufferView(enum buffer_type type, const char* filename)
+BufferView::BufferView(enum Buffer::Type type, const char* filename)
 {
     assert(filename);
     cur.line = 0;
     cur.col  = 0;
 
-    buffer = buf_create_file(type, filename);
+    buffer = Buffer(type, filename);
     start  = 0;
     bounds = (struct rect) RECT(0, 0, 0, 0);
 }
@@ -58,11 +58,11 @@ void BufferView::setCursor(struct cursor newcur)
 
 void BufferView::cmovFwd(unsigned int n)
 {
-    const struct line* ln    = buf_line(&buffer, cur.line);
+    Buffer::Line* ln = buffer.line(cur.line);
 
     unsigned int newcol = cur.col + n;
-    unsigned int maxcol = buf_line_hasgap(&buffer, cur.line)
-                              ? (ln->len - buffer.gap.size)
+    unsigned int maxcol = buffer.lineHasGap(cur.line)
+                              ? (ln->len - buffer.Gap().size)
                               : ln->len;
 
     if (newcol > maxcol) {
@@ -86,10 +86,10 @@ void BufferView::cmovBack(unsigned int n)
 void BufferView::cmovLnext(unsigned int n)
 {
     // Move to next line
-    if ((cur.line + n) < buffer.linecount) {
+    if ((cur.line + n) < buffer.lineCount()) {
         cur.line += n;
     } else {
-        cur.line = buffer.linecount - 1;
+        cur.line = buffer.lineCount() - 1;
     }
     cmovInline();
 }
@@ -115,9 +115,9 @@ void BufferView::cmovLstart()
 
 void BufferView::cmovLend()
 {
-    struct line* ln = buf_line(&buffer, cur.line);
-    if (buf_line_hasgap(&buffer, cur.line)) {
-        cur.col = ln->len - buffer.gap.size;
+    Buffer::Line* ln = buffer.line(cur.line);
+    if (buffer.lineHasGap(cur.line)) {
+        cur.col = ln->len - buffer.Gap().size;
     } else {
         cur.col = ln->len;
     }
@@ -126,7 +126,7 @@ void BufferView::cmovLend()
 
 void BufferView::cmovInline()
 {
-    struct line* ln = buf_line(&buffer, cur.line);
+    Buffer::Line* ln = buffer.line(cur.line);
     if (cur.col >= ln->len) {
         cmovLend();
     }
@@ -148,9 +148,9 @@ void BufferView::scrollDown(unsigned int n)
 {
     log_l(TAG, "SCROLLING DOWN!");
     unsigned int newstart = Start() + n;
-    if (!(newstart < buffer.linecount)) {
+    if (!(newstart < buffer.lineCount())) {
         // last line
-        newstart = buffer.linecount - 1;
+        newstart = buffer.lineCount() - 1;
     }
     start = newstart;
 }

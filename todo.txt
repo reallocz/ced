@@ -7,6 +7,8 @@ TODO:
 - cmdline wrapping
 - statusline sections
 - Self hostign
+- Convert structs to classes
+- Use const references rather than raw pointers
 
 
 - Add wide char support

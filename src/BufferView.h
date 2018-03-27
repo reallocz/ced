@@ -11,12 +11,12 @@ class BufferView
 public:
     unsigned int start;    // View starts from
     struct cursor cur;
-    struct buffer buffer;
+    Buffer buffer{Buffer::Type::Scratch};
     struct rect bounds;
 
 public:
     BufferView();
-    BufferView(enum buffer_type type, const char* filename);
+    BufferView(enum Buffer::Type type, const char* filename);
     void update();
 
     inline struct rect Bounds() const { return bounds; }

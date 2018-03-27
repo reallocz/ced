@@ -3,10 +3,10 @@
 #include "log.h"
 #include <cassert>
 #include <clocale>
-#include <ncurses.h>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <ncurses.h>
 
 #define TAG "WINDOW"
 #define STATUSLINE_HEIGHT 1
@@ -32,13 +32,11 @@ Window::Window()
 }
 
 
-
 void Window::destroy()
 {
     delwin(nwin);
     log_l(TAG, "Window destroyed: %d", id);
 }
-
 
 
 void Window::changeBufferView(BufferView* bv)
@@ -51,14 +49,14 @@ void Window::changeBufferView(BufferView* bv)
 void Window::update(const Context& context)
 {
     // statusline
-    sline.bufname = bview->buffer.name;
+    sline.bufname = bview->buffer.Name();
     sline.cur     = bview->cur;
-    sline.gap     = bview->buffer.gap;
+    sline.gap     = bview->buffer.Gap();
 
     // Margin
     margin.width     = 3;
     margin.start     = bview->Start();
-    margin.linecount = bview->buffer.linecount;
+    margin.linecount = bview->buffer.lineCount();
 
     // buffer
     // Update bview bounds
@@ -107,4 +105,3 @@ void Window::draw(const Context& context)
 
     wrefresh(nwin);
 }
-

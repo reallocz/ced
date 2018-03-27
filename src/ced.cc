@@ -29,8 +29,7 @@ Ced::Ced(Opts opts)
 }
 
 
-Ced::~Ced()
-= default;
+Ced::~Ced() = default;
 
 
 void Ced::parseOpts(Opts opts)
@@ -39,7 +38,7 @@ void Ced::parseOpts(Opts opts)
     if (opts.bcount == 0) {
         // Init scratch buffer
         bcount    = 1;
-        bviews[0] = BufferView(SCRATCH, TEXTPATH "scratch.txt");
+        bviews[0] = BufferView(Buffer::Type::Scratch, TEXTPATH "scratch.txt");
     } else {
         static_assert(opts.bviews);
         bcount = opts.bcount;
@@ -83,18 +82,18 @@ void Ced::run()
 
 void Ced::insertCb(inpev ev)
 {
-    struct buffer* buf = &win.Bview().buffer;
-    struct cursor cur  = win.Bview().cur;
+    Buffer* buf       = &win.Bview().buffer;
+    struct cursor cur = win.Bview().cur;
 
     if (ev.type == INP_ALPHA || ev.type == INP_NUM || ev.type == INP_SYMBOL || ev.key == k_space || ev.key == k_enter) {
-        buf_addch(buf, ev.key, cur);
+        buf->addCh(ev.key, cur);
         win.Bview().cmovFwd(1);
     }
 
     if (ev.type == INP_SPECIAL) {
         switch (ev.key) {
         case k_backspace:
-            buf_delch(buf, cur);
+            buf->delCh(cur);
             win.Bview().cmovBack(1);
             break;
         case k_esc:
@@ -118,7 +117,7 @@ void Ced::normalCb(inpev ev)
     } else if (ev.key == k_f1) {
         quit = 1;
     } else if (ev.key == k_f2) {
-        buf_save_to_disk(&win.Bview().buffer, "doc.txt");
+        win.Bview().buffer.saveToDisk("doc.txt");
         // TODO(realloc): prompt for name
     } else if (ev.key == 'h') {
         win.Bview().cmovBack(1);
@@ -153,7 +152,7 @@ void Ced::commandCb(inpev ev)
         // Execute command and clear cmdline buffer
         execCommand(cmd_parse_string(win.cmdline.buffer));
         // Reset buffer
-        i                      = 0;
+        i                     = 0;
         win.cmdline.buffer[i] = '\0';
         context.setMode(Mode::Normal);
     } else if (ev.type == INP_ALPHA || ev.type == INP_NUM || ev.type == INP_SYMBOL || ev.key == k_space) {
@@ -192,12 +191,10 @@ void Ced::execCommand(struct command cmd)
     if (cmd.type == CMD_BUFSAVE) {
         if (strlen(cmd.args) == 0) {
             // Save
-            buf_save_to_disk(&win.Bview().buffer,
-                             win.Bview().buffer.name);
+            win.Bview().buffer.saveToDisk(win.Bview().buffer.Name());
         } else {
             // Save As arg
-            buf_save_to_disk(&win.Bview().buffer,
-                             cmd.args);
+            win.Bview().buffer.saveToDisk(cmd.args);
             // TODO(realloc): add error checking
             // TODO(realloc): update buffer name to arg
         }

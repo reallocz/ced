@@ -10,13 +10,15 @@
 
 struct file_stats fu_stats(const char* path)
 {
-    struct file_stats fs{};
+    struct file_stats fs {
+    };
     fs.exists = 0;
     fs.path   = path;
     fs.size   = 0;
     fs.type   = F_FILE;
 
-    struct stat s{};
+    struct stat s {
+    };
     int err = 0;
     char abspath[PATH_MAX];
     realpath(path, abspath);
@@ -51,7 +53,7 @@ struct file_stats fu_stats(const char* path)
 
 
 unsigned int fu_read_file_lines(const char* path,
-                                struct line** lines)
+                                Buffer::Line** lines)
 {
     FILE* f = fopen(path, "r");
     assert(f);
@@ -74,7 +76,7 @@ unsigned int fu_read_file_lines(const char* path,
     }
     rewind(f);
 
-    auto* mlines = static_cast<struct line*>(malloc(linecount * sizeof(struct line)));
+    auto* mlines = static_cast<Buffer::Line*>(malloc(linecount * sizeof(Buffer::Line)));
     assert(mlines);
 
     unsigned int count = 0;
@@ -87,9 +89,9 @@ unsigned int fu_read_file_lines(const char* path,
         if (linelen == -1) {
             break;
         }
-        struct line* ln = &mlines[count++];    // First line
-        ln->len         = linelen;
-        ln->data        = tmpdata;
+        Buffer::Line* ln = &mlines[count++];    // First line
+        ln->len          = linelen;
+        ln->data         = tmpdata;
         /*log_l(TAG, "line: size=%d", ln->len, ln->data);*/
         tmpdata = nullptr;
         wtfits  = 0;
@@ -110,7 +112,8 @@ void fu_abspath(const char* relpath, char* abspath)
 
 int fu_file_exists(const char* path)
 {
-    struct stat s{};
+    struct stat s {
+    };
     int err = 0;
     char abspath[PATH_MAX];
     realpath(path, abspath);
@@ -131,7 +134,8 @@ int fu_file_exists(const char* path)
 
 int fu_dir_exists(const char* path)
 {
-    struct stat s{};
+    struct stat s {
+    };
     int err = 0;
     err     = stat(path, &s);
 
@@ -155,20 +159,20 @@ char* fu_cwd()
     return getcwd(nullptr, PATH_MAX);
 }
 
-int fu_save_buffer(const struct buffer* buf, const char* path)
+int fu_save_buffer(Buffer* buf, const char* path)
 {
     log_l(TAG, "Saving buffer...");
     FILE* f = fopen(path, "w");
     assert(f);
     unsigned int wbytes = 0;
     unsigned int lcount = 0;
-    for (unsigned int lnum = 0; lnum < buf->linecount; ++lnum) {
-        struct line* ln = buf_line(buf, lnum);
+    for (unsigned int lnum = 0; lnum < buf->lineCount(); ++lnum) {
+        Buffer::Line* ln = buf->line(lnum);
         lcount++;
         for (unsigned int i = 0; i < ln->len; ++i) {
-            if (buf->gap.line == lnum) {
+            if (buf->lineHasGap(lnum)) {
                 // Line with the gap
-                if (!buf_ingap(buf, i)) {
+                if (!buf->inGap(i)) {
                     fputc(ln->data[i], f);
                     wbytes++;
                 }

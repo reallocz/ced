@@ -10,43 +10,34 @@
 
 #define BUFFER_GAPSIZE 4
 
-/** Evals to 1 if i is inside buffer gap */
-#define INGAP(buf, i) \
-    (((i) >= (buf)->gap.col && (i) < (buf)->gap.col + (buf)->gap.size))
-
 #define CURVALID(buf, cur) \
     ((cur).line < (buf)->linecount)
 
 #define TAG "BUFFER"
 
-struct buffer* buf_create_empty(enum buffer_type type)
+Buffer::Buffer(enum Buffer::Type type)
 {
-    auto* buf = static_cast<struct buffer*>(malloc(sizeof(struct buffer)));
-    assert(buf);
-
-    buf->id   = generate_id();
-    buf->type = type;    // TODO(realloc): type specific setup
-    buf->name = "[NEWBUF]";
+    id         = generate_id();
+    this->type = type;    // TODO(realloc): type specific setup
+    name       = "[NEWBUF]";
 
     /** gap */
-    buf->gap.line = 0;
-    buf->gap.col  = 0;
-    buf->gap.size = BUFFER_GAPSIZE;
+    gap.line = 0;
+    gap.col  = 0;
+    gap.size = BUFFER_GAPSIZE;
 
     /** lines */
-    buf->linecount = 1;    // Empty buffer has at least one line
-    buf->lines     = static_cast<struct line*>(calloc(buf->linecount, sizeof(struct line)));
-    assert(buf->lines);
+    linecount = 1;    // Empty buffer has at least one line
+    lines     = static_cast<Line*>(calloc(linecount, sizeof(Line)));
+    assert(lines);
 
     // Set gap on the first line
-    struct line* fln = buf_line(buf, 0);
-    fln->len         = BUFFER_GAPSIZE;
-    fln->data        = static_cast<char*>(calloc(fln->len, sizeof(char)));
-    return buf;
+    Line* fln = line(0);
+    fln->len  = BUFFER_GAPSIZE;
+    fln->data = static_cast<char*>(calloc(fln->len, sizeof(char)));
 }
 
-struct buffer buf_create_file(enum buffer_type type,
-                              const char* filename)
+Buffer::Buffer(enum Buffer::Type type, const char* filename)
 {
     struct file_stats fstats = fu_stats(filename);
     if (!(fstats.exists == 1 && F_FILE == fstats.type)) {
@@ -63,39 +54,31 @@ struct buffer buf_create_file(enum buffer_type type,
         }
     }
 
-    struct buffer buf = {0};
-
-    buf.id   = generate_id();
-    buf.type = type;
-    buf.name = filename;
+    id         = generate_id();
+    this->type = type;
+    name       = filename;
 
     /** lines */
-    buf.lines     = nullptr;
-    buf.linecount = fu_read_file_lines(fstats.path, &buf.lines);
-    assert(buf.lines);
+    lines     = nullptr;
+    linecount = fu_read_file_lines(fstats.path, &lines);
+    assert(lines);
 
     /** gap */
-    buf.gap.line = 0;
-    buf.gap.col  = 0;
-    buf.gap.size = 0;    // Gap starts at 0
-    gap_add(&buf);
-    buf_printline(&buf, 0);
-
-    return buf;
+    gap.line = 0;
+    gap.col  = 0;
+    gap.size = 0;    // Gap starts at 0
+    addGap();
+    pprintLine(0);
 }
 
 
-void buf_destroy(struct buffer* buf)
+void Buffer::destroy()
 {
-    unsigned int id = buf->id;
-    for (unsigned int i = 0; i < buf->linecount; ++i) {
-        struct line* ln = &buf->lines[i];
-        free(ln->data);
+    for (unsigned int i = 0; i < linecount; ++i) {
+        free(lines[i].data);
     }
-    free(buf->lines);
-    free(buf);
+    free(lines);
     log_l(TAG, "Buffer destroyed (id=%d)", id);
-    buf = nullptr;
 }
 
 
@@ -103,127 +86,162 @@ void buf_destroy(struct buffer* buf)
  * It may also require a gap resize(increase). The order of the two
  * operations is not fixed right now but I don't think it really
  * makes a difference */
-void buf_addch(struct buffer* buf, char ch, struct cursor cur)
+void Buffer::addCh(char ch, const struct cursor& cur)
 {
-    gap_move(buf, cur);
-    gap_resize_optional(buf);
+    moveGap(cur);
+    addGapOptional();
 
-    struct line* ln        = buf_line(buf, cur.line);
-    ln->data[buf->gap.col] = ch;
+    Line* ln          = line(cur.line);
+    ln->data[gap.col] = ch;
     // shrink gap
-    buf->gap.col++;
-    buf->gap.size--;
+    gap.col++;
+    gap.size--;
 }
 
 /** Deleting a character in the buffer has the same constraints as
  * the add operation - apart from the buffer resizing */
-void buf_delch(struct buffer* buf, struct cursor cur)
+void Buffer::delCh(const struct cursor& cur)
 {
     if (cur.col < 1) {
         return;
     }
-    gap_move(buf, cur);
-    buf->gap.col--;
-    buf->gap.size++;
+    moveGap(cur);
+    gap.col--;
+    gap.size++;
 }
 
 /** Returns pointer to line in buffer. NULL if 'num' is out of bounds*/
-struct line* buf_line(const struct buffer* buf, unsigned int num)
+Buffer::Line* Buffer::line(unsigned int num)
 {
-    if (num >= buf->linecount) {
+    if (num >= linecount) {
         /*log_e(TAG, "Invalid line request: buf: %d (%d lines), request: %d", buf->id, buf->linecount, num);*/
         return nullptr;
     }
-    return &buf->lines[num];
+    return &lines[num];
 }
 
-
-unsigned int buf_line_count(const struct buffer* buf)
+const Buffer::Line* Buffer::line(unsigned int num) const
 {
-    return buf->linecount;
+    if (num >= linecount) {
+        /*log_e(TAG, "Invalid line request: buf: %d (%d lines), request: %d", buf->id, buf->linecount, num);*/
+        return nullptr;
+    }
+    return &lines[num];
 }
 
-int buf_line_hasgap(const struct buffer* buf, unsigned int line)
+
+unsigned int Buffer::lineCount() const
 {
-    return buf->gap.line == line;
+    return linecount;
 }
 
 
-int buf_save_to_disk(const struct buffer* buf, const char* path)
+bool Buffer::lineHasGap(unsigned int line) const
 {
-    return fu_save_buffer(buf, path);
+    return gap.line == line;
 }
 
-int buf_ingap(const struct buffer* b, unsigned int i)
+
+bool Buffer::inGap(unsigned int i) const
 {
-    return INGAP(b, i);
+    return i >= gap.col && i < gap.col + gap.size;
 }
 
 
-void buf_pprint(const struct buffer* b)
+bool Buffer::saveToDisk(const char* path)
+{
+    //return fu_save_buffer(buf, path);
+    return false;
+}
+
+
+void Buffer::pprint() const
 {
     log_l(TAG, "Buffer{id=%d, gap.pos=%d, gap.size = %d"
                ", lncount=%d}",
-          b->id, b->gap.col, b->gap.size, b->linecount);
+          id, gap.col, gap.size, linecount);
 }
 
 
-void buf_pprint_lines(const struct buffer* buf)
+void Buffer::pprintLines() const
 {
     log_l(TAG, " -- line metadata --");
-    for (unsigned int i = 0; i < buf->linecount; ++i) {
-        const struct line* ln = buf_line(buf, i);
-        log_l(TAG, "no: %d, len: %d", i, ln->len);
+    for (unsigned int i = 0; i < linecount; ++i) {
+        log_l(TAG, "no: %d, len: %d", i, lines[i].len);
     }
     log_l(TAG, " --/ line metadata --");
 }
 
-/** buffer_internal.h **/
 
-static unsigned int generate_id()
+void Buffer::pprintLine(unsigned int i) const
 {
-    static unsigned int ids = 0;
-    return ids++;
+    assert(i < linecount);
+    int hasgap = i == gap.line ? 1 : 0;
+    Line* ln   = &lines[i];
+    log_l("LINE", "no: %d, len: %d, has_gap: %d",
+          i, ln->len, hasgap);
+    for (unsigned int i = 0; i < ln->len; ++i) {
+        if (inGap(i)) {
+            log_lc("-");
+        } else {
+            log_lc("%c", ln->data[i]);
+        }
+    }
+    log_lc("\n");
 }
 
-static void gap_add(struct buffer* buf)
+bool Buffer::addGap()
 {
-    struct line* ln        = buf_line(buf, buf->gap.line);
-    struct buffer_gap* gap = &buf->gap;
+    Line* ln = line(gap.line);
 
     unsigned int newlinelen = ln->len + BUFFER_GAPSIZE;
-    unsigned int newgapsize = gap->size + BUFFER_GAPSIZE;
+    unsigned int newgapsize = gap.size + BUFFER_GAPSIZE;
 
     auto* newdata = static_cast<char*>(calloc(newlinelen, sizeof(char)));
     assert(newdata);
 
     /* Copy memory to new data */
     // from start to gap
-    memcpy(newdata, ln->data, gap->col * sizeof(char));
+    memcpy(newdata, ln->data, gap.col * sizeof(char));
     // from end of gap to end of buffer
-    memcpy(&newdata[gap->col + newgapsize],
-           &ln->data[gap->col + gap->size],
-           ln->len - (gap->col + gap->size));
+    memcpy(&newdata[gap.col + newgapsize],
+           &ln->data[gap.col + gap.size],
+           ln->len - (gap.col + gap.size));
     // free old buffer
     free(ln->data);
-    ln->data  = newdata;
-    ln->len   = newlinelen;
-    gap->size = newgapsize;
+    ln->data = newdata;
+    ln->len  = newlinelen;
+    gap.size = newgapsize;
+
+    return true;
 }
 
-/* NOTE: toline must NOT be same as gap.line! */
-static void gap_move_to_line(struct buffer* buf, unsigned int toline)
+
+bool Buffer::addGapOptional()
 {
-    assert(buf->gap.line != toline);
+    if (gap.size < 1) {
+        unsigned int oldgap = gap.size;
+        addGap();
+        log_l(TAG, "Gap resized %d -> %d", oldgap, gap.size);
+        return true;
+    }
+    return false;
+}
+
+
+/* NOTE: toline must NOT be same as gap.line! */
+bool Buffer::moveGapToLine(unsigned int toline)
+{
+    assert(gap.line != toline);
     // Delete current gap
     {
-        struct line* ln         = buf_line(buf, buf->gap.line);
-        unsigned int linelength = ln->len - buf->gap.size;
+        Line* ln                = line(gap.line);
+        unsigned int linelength = ln->len - gap.size;
         auto* newdata           = static_cast<char*>(malloc(linelength * sizeof(char)));
         assert(newdata);
         unsigned int count = 0;
         for (unsigned int i = 0; i < ln->len; ++i) {
-            if (!INGAP(buf, i)) {
+            if (!inGap(i)) {
                 newdata[count] = ln->data[i];
                 count++;
             }
@@ -237,11 +255,11 @@ static void gap_move_to_line(struct buffer* buf, unsigned int toline)
     }
     // Create gap on toline
     {
-        struct line* ln        = buf_line(buf, toline);
-        unsigned int newlength = ln->len + buf->gap.size;
+        Line* ln               = line(toline);
+        unsigned int newlength = ln->len + gap.size;
         auto* newdata          = static_cast<char*>(malloc(newlength * sizeof(char)));
         assert(newdata);
-        memcpy(&newdata[buf->gap.size],
+        memcpy(&newdata[gap.size],
                ln->data,
                ln->len);
         free(ln->data);
@@ -251,75 +269,52 @@ static void gap_move_to_line(struct buffer* buf, unsigned int toline)
         ln->data = newdata;
     }
     // Update gap location (NOT SIZE!!)
-    buf->gap.line = toline;
-    buf->gap.col  = 0;
+    gap.line = toline;
+    gap.col  = 0;
+    return true;
 }
 
 /** move gap to cursor */
-static void gap_move(struct buffer* buf, struct cursor cur)
+bool Buffer::moveGap(const struct cursor& cur)
 {
-    assert(buf);
-    assert(CURVALID(buf, cur));
+    assert(cur.line < linecount);
 
     // Ensure that the gap is on the same line as that of the cursor
-    if (buf->gap.line != cur.line) {
-        gap_move_to_line(buf, cur.line);
+    if (gap.line != cur.line) {
+        moveGapToLine(cur.line);
     }
     // Now, the cursor and the gap are on the same line
 
-    struct line* ln     = buf_line(buf, cur.line);
+    Line* ln            = line(cur.line);
     unsigned int offset = 0;
-    int diff            = cur.col - buf->gap.col;
+    int diff            = cur.col - gap.col;
 
     if (diff > 0) {
         // Cursor is ahead of the gap
         offset = diff;
         for (unsigned int i = 0; i < offset; ++i) {
-            ln->data[buf->gap.col] =
-                ln->data[buf->gap.col + buf->gap.size];
-            buf->gap.col++;
+            ln->data[gap.col] =
+                ln->data[gap.col + gap.size];
+            gap.col++;
         }
         log_l(TAG, "%s: diff=%d, offset=%d", __func__, diff, offset);
     } else if (diff < 0) {
         // Cursor is behind the gap
         offset = -1 * diff;
         for (unsigned int i = 0; i < offset; ++i) {
-            ln->data[buf->gap.col + buf->gap.size - 1] = ln->data[buf->gap.col - 1];
-            buf->gap.col--;
+            ln->data[gap.col + gap.size - 1] = ln->data[gap.col - 1];
+            gap.col--;
         }
         log_l(TAG, "%s: diff=%d offset=%d", __func__, diff, offset);
     } else {
         // gap is in sync do nothing.
     }
-    return;
+    return true;
 }
 
 
-static int gap_resize_optional(struct buffer* buf)
+static unsigned int generate_id()
 {
-    if (buf->gap.size < 1) {
-        unsigned int oldgap = buf->gap.size;
-        gap_add(buf);
-        log_l(TAG, "Gap resized %d -> %d", oldgap, buf->gap.size);
-        return 1;
-    }
-    return 0;
-}
-
-
-void buf_printline(const struct buffer* buf, unsigned int i)
-{
-    assert(i < buf->linecount);
-    int hasgap            = i == buf->gap.line ? 1 : 0;
-    const struct line* ln = buf_line(buf, i);
-    log_l("LINE", "no: %d, len: %d, has_gap: %d",
-          i, ln->len, hasgap);
-    for (unsigned int i = 0; i < ln->len; ++i) {
-        if (INGAP(buf, i)) {
-            log_lc("-");
-        } else {
-            log_lc("%c", ln->data[i]);
-        }
-    }
-    log_lc("\n");
+    static unsigned int ids = 0;
+    return ids++;
 }

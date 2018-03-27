@@ -4,9 +4,9 @@
 #include "term.h"
 #include <cassert>
 #include <clocale>
-#include <ncurses.h>
 #include <cstdio>
 #include <cstdlib>
+#include <ncurses.h>
 #include <unistd.h>
 
 /** Cleanup submodules */
@@ -32,8 +32,8 @@ int main()
 
     Ced::Opts opts{};
     opts.bcount    = 2;
-    opts.bviews[0] = BufferView(DOCUMENT, TEXTPATH "table.txt");
-    opts.bviews[1] = BufferView(DOCUMENT, TEXTPATH "kepler.txt");
+    opts.bviews[0] = BufferView(Buffer::Type::Document, TEXTPATH "table.txt");
+    opts.bviews[1] = BufferView(Buffer::Type::Document, TEXTPATH "kepler.txt");
 
     Ced ced(opts);
     ced.run();
