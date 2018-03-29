@@ -51,7 +51,6 @@ void Window::update(const Context& context)
     // statusline
     sline.bufname = bview->buffer.Name();
     sline.cur     = bview->cur;
-    sline.gap     = bview->buffer.Gap();
 
     // Margin
     margin.width     = 3;

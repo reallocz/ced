@@ -27,7 +27,6 @@
 struct StatusLine {
     const char* bufname;
     struct cursor cur;
-    struct Buffer::Gap gap;
 };
 
 

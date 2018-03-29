@@ -23,7 +23,7 @@ struct file_stats {
 /** Read's file contents into lines and returns number of lines
  * read */
 unsigned int fu_read_file_lines(const char* path,
-                                Buffer::Line** lines);
+                                Line** lines);
 
 struct file_stats fu_stats(const char* path);
 

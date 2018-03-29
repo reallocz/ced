@@ -9,6 +9,8 @@ TODO:
 - Self hostign
 - Convert structs to classes
 - Use const references rather than raw pointers
+- Use new instead of malloc/calloc
+- Add default constructors etc
 
 
 - Add wide char support

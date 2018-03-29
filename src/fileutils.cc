@@ -52,8 +52,7 @@ struct file_stats fu_stats(const char* path)
 }
 
 
-unsigned int fu_read_file_lines(const char* path,
-                                Buffer::Line** lines)
+unsigned int fu_read_file_lines(const char* path, Line** lines)
 {
     FILE* f = fopen(path, "r");
     assert(f);
@@ -76,7 +75,7 @@ unsigned int fu_read_file_lines(const char* path,
     }
     rewind(f);
 
-    auto* mlines = static_cast<Buffer::Line*>(malloc(linecount * sizeof(Buffer::Line)));
+    Line* mlines = new Line[linecount];
     assert(mlines);
 
     unsigned int count = 0;
@@ -89,10 +88,8 @@ unsigned int fu_read_file_lines(const char* path,
         if (linelen == -1) {
             break;
         }
-        Buffer::Line* ln = &mlines[count++];    // First line
-        ln->len          = linelen;
-        ln->data         = tmpdata;
-        /*log_l(TAG, "line: size=%d", ln->len, ln->data);*/
+        Line ln(linelen, tmpdata);
+        mlines[count++] = ln;
         tmpdata = nullptr;
         wtfits  = 0;
     }
@@ -161,29 +158,29 @@ char* fu_cwd()
 
 int fu_save_buffer(Buffer* buf, const char* path)
 {
-    log_l(TAG, "Saving buffer...");
-    FILE* f = fopen(path, "w");
-    assert(f);
-    unsigned int wbytes = 0;
-    unsigned int lcount = 0;
-    for (unsigned int lnum = 0; lnum < buf->lineCount(); ++lnum) {
-        Buffer::Line* ln = buf->line(lnum);
-        lcount++;
-        for (unsigned int i = 0; i < ln->len; ++i) {
-            if (buf->lineHasGap(lnum)) {
-                // Line with the gap
-                if (!buf->inGap(i)) {
-                    fputc(ln->data[i], f);
-                    wbytes++;
-                }
-            } else {
-                // Lines without the gap
-                fputc(ln->data[i], f);
-                wbytes++;
-            }
-        }
-    }
-    log_l(TAG, "Buffer saved (%d lines, %d bytes): %s", lcount, wbytes, path);
-    fclose(f);
+    //log_l(TAG, "Saving buffer...");
+    //FILE* f = fopen(path, "w");
+    //assert(f);
+    //unsigned int wbytes = 0;
+    //unsigned int lcount = 0;
+    //for (unsigned int lnum = 0; lnum < buf->lineCount(); ++lnum) {
+        //const Buffer::Line& ln = buf->line(lnum);
+        //lcount++;
+        //for (unsigned int i = 0; i < ln.Len(); ++i) {
+            //if (buf->lineHasGap(lnum)) {
+                //// Line with the gap
+                //if (!buf->inGap(i)) {
+                    //fputc(ln[i], f);
+                    //wbytes++;
+                //}
+            //} else {
+                //// Lines without the gap
+                //fputc(ln[i], f);
+                //wbytes++;
+            //}
+        //}
+    //}
+    //log_l(TAG, "Buffer saved (%d lines, %d bytes): %s", lcount, wbytes, path);
+    //fclose(f);
     return 0;
 }

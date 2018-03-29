@@ -24,23 +24,18 @@ void draw_bview(WINDOW* nwin, const BufferView& bv, const Context& context __att
     unsigned int linesdrawn = 0;
     unsigned int firstline  = bv.Start();
     for (unsigned int i = 0; i < area.height; ++i) {
-
-        unsigned int linenumber = firstline + i;
-        const Buffer::Line* ln  = bv.buffer.line(linenumber);
-        if (ln == nullptr) {
+        if (i >= bv.buffer.lineCount()) {
             break;
-        }    // No more lines in buffer
+        }
+        unsigned int linenumber = firstline + i;
+        const Line& ln  = bv.buffer.line(linenumber);
+
+        if(linenumber > bv.buffer.lineCount()) { break; }
 
         linesdrawn++;
-        if (bv.buffer.lineHasGap(linenumber)) {
-            for (unsigned int j = 0; j < ln->len; ++j) {
-                if (!bv.buffer.inGap(j)) {
-                    mvwaddch(nwin, area.y, area.x++, ln->data[j]);
-                }
-            }
-        } else {
-            for (unsigned int j = 0; j < ln->len; ++j) {
-                mvwaddch(nwin, area.y, area.x++, ln->data[j]);
+        for (unsigned int j = 0; j < ln.Len(); ++j) {
+            if(!ln.inGap(j)) {
+                mvwaddch(nwin, area.y, area.x++, ln[j]);
             }
         }
         area.y++;
@@ -78,9 +73,9 @@ void draw_statusline(WINDOW* nwin, const StatusLine& sline, struct rect area, co
     // statusline string
     char stsstring[area.width];
     sprintf(stsstring,
-            "   %s | %s | CUR %d:%d | GAP: line: %d col: %d size: %d",
-            context.modestr, sline.bufname, sline.cur.line, sline.cur.col,
-            sline.gap.line, sline.gap.col, sline.gap.size);
+            "   %s | %s | CUR %d:%d | ",
+            context.modestr, sline.bufname, sline.cur.line,
+            sline.cur.col);
 
     init_pair(1, COLOR_BLACK, COLOR_WHITE);
     wattron(nwin, COLOR_PAIR(1));

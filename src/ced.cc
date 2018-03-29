@@ -82,27 +82,27 @@ void Ced::run()
 
 void Ced::insertCb(inpev ev)
 {
-    Buffer* buf       = &win.Bview().buffer;
-    struct cursor cur = win.Bview().cur;
+    //Buffer* buf       = &win.Bview().buffer;
+    //struct cursor cur = win.Bview().cur;
 
-    if (ev.type == INP_ALPHA || ev.type == INP_NUM || ev.type == INP_SYMBOL || ev.key == k_space || ev.key == k_enter) {
-        buf->addCh(ev.key, cur);
-        win.Bview().cmovFwd(1);
-    }
+    //if (ev.type == INP_ALPHA || ev.type == INP_NUM || ev.type == INP_SYMBOL || ev.key == k_space || ev.key == k_enter) {
+        //buf->addCh(ev.key, cur);
+        //win.Bview().cmovFwd(1);
+    //}
 
-    if (ev.type == INP_SPECIAL) {
-        switch (ev.key) {
-        case k_backspace:
-            buf->delCh(cur);
-            win.Bview().cmovBack(1);
-            break;
-        case k_esc:
-            context.setMode(Mode::Normal);
-            break;
-        default:
-            break;
-        }
-    }
+    //if (ev.type == INP_SPECIAL) {
+        //switch (ev.key) {
+        //case k_backspace:
+            //buf->delCh(cur);
+            //win.Bview().cmovBack(1);
+            //break;
+        //case k_esc:
+            //context.setMode(Mode::Normal);
+            //break;
+        //default:
+            //break;
+        //}
+    //}
 }
 
 
@@ -117,7 +117,7 @@ void Ced::normalCb(inpev ev)
     } else if (ev.key == k_f1) {
         quit = 1;
     } else if (ev.key == k_f2) {
-        win.Bview().buffer.saveToDisk("doc.txt");
+        //win.Bview().buffer.saveToDisk("doc.txt");
         // TODO(realloc): prompt for name
     } else if (ev.key == 'h') {
         win.Bview().cmovBack(1);

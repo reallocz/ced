@@ -58,18 +58,18 @@ void BufferView::setCursor(struct cursor newcur)
 
 void BufferView::cmovFwd(unsigned int n)
 {
-    Buffer::Line* ln = buffer.line(cur.line);
+    //Line& ln = buffer.line(cur.line);
 
-    unsigned int newcol = cur.col + n;
-    unsigned int maxcol = buffer.lineHasGap(cur.line)
-                              ? (ln->len - buffer.Gap().size)
-                              : ln->len;
+    //unsigned int newcol = cur.col + n;
+    //unsigned int maxcol = buffer.lineHasGap(cur.line)
+                              //? (ln.len - buffer.Gap().size)
+                              //: ln->len;
 
-    if (newcol > maxcol) {
-        cmovLend();
-    } else {
-        cur.col = newcol;
-    }
+    //if (newcol > maxcol) {
+        //cmovLend();
+    //} else {
+        //cur.col = newcol;
+    //}
 }
 
 
@@ -115,21 +115,21 @@ void BufferView::cmovLstart()
 
 void BufferView::cmovLend()
 {
-    Buffer::Line* ln = buffer.line(cur.line);
-    if (buffer.lineHasGap(cur.line)) {
-        cur.col = ln->len - buffer.Gap().size;
-    } else {
-        cur.col = ln->len;
-    }
+    //Line& ln = buffer.line(cur.line);
+    //if (buffer.lineHasGap(cur.line)) {
+        //cur.col = ln->len - buffer.Gap().size;
+    //} else {
+        //cur.col = ln->len;
+    //}
 }
 
 
 void BufferView::cmovInline()
 {
-    Buffer::Line* ln = buffer.line(cur.line);
-    if (cur.col >= ln->len) {
-        cmovLend();
-    }
+    //Buffer::Line* ln = buffer.line(cur.line);
+    //if (cur.col >= ln->len) {
+        //cmovLend();
+    //}
 }
 
 
