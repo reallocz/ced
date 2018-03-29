@@ -23,7 +23,6 @@ add_executable(debug
 	${SRCDIR}/draw.cc
         ${SRCDIR}/main.cc
         ${SRCDIR}/log.cc
-        ${SRCDIR}/common.cc
         ${SRCDIR}/commands.cc
         ${SRCDIR}/window.cc
         ${SRCDIR}/input.cc

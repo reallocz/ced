@@ -14,30 +14,30 @@ BufferView::BufferView(enum Buffer::Type type, const char* filename)
 
     buffer = Buffer(type, filename);
     start  = 0;
-    bounds = (struct rect) RECT(0, 0, 0, 0);
+    bounds = (Rect) RECT(0, 0, 0, 0);
 }
 
 void BufferView::update()
 {
     // Keep cursor on the screen
-    struct rect bvarea     = Bounds();
+    Rect bvarea     = Bounds();
     unsigned int firstline = Start();
 
     if (cur.line < firstline) {
-        struct cursor newcur = Cursor();
+        Cursor newcur = Cursor();
         newcur.line          = firstline;
         setCursor(newcur);
     }
 
     if (cur.line > firstline + bvarea.height - 1) {
-        struct cursor newcur = Cursor();
+        Cursor newcur = Cursor();
         newcur.line          = firstline + bvarea.height - 1;
         setCursor(newcur);
     }
 }
 
 
-void BufferView::setBounds(struct rect newbounds)
+void BufferView::setBounds(Rect newbounds)
 {
     log_l(TAG, "bounds set: {%d, %d, %d, %d} -> {%d, %d, %d, %d}",
           bounds.y, bounds.x, bounds.width, bounds.height,
@@ -47,7 +47,7 @@ void BufferView::setBounds(struct rect newbounds)
 
 /** Cursor **/
 
-void BufferView::setCursor(struct cursor newcur)
+void BufferView::setCursor(Cursor newcur)
 {
     log_l(TAG, "Setting cursor: line: %d -> %d, col: %d -> %d",
           cur.line, newcur.line, cur.col, newcur.col);
@@ -156,9 +156,9 @@ void BufferView::scrollDown(unsigned int n)
 }
 
 
-struct cursor BufferView::relcur() const
+Cursor BufferView::relcur() const
 {
-    struct cursor c = {
+    Cursor c = {
         .line = cur.line - start,
         .col  = cur.col};
     return c;

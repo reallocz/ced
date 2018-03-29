@@ -43,7 +43,7 @@ bool Line::inGap(unsigned int i) const
 }
 
 
-void Line::addCh(char ch, const struct cursor& cur)
+void Line::addCh(char ch, const Cursor& cur)
 {
     moveGap(cur);
     addGapOptional();
@@ -53,7 +53,7 @@ void Line::addCh(char ch, const struct cursor& cur)
 }
 
 
-void Line::delCh(const struct cursor& cur)
+void Line::delCh(const Cursor& cur)
 {
     if (cur.col < 1) {
         return;
@@ -111,7 +111,7 @@ bool Line::addGapOptional()
 }
 
 
-bool Line::moveGap(const struct cursor& cur)
+bool Line::moveGap(const Cursor& cur)
 {
     if (cur.col == gapcol) {
         return false;

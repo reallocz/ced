@@ -8,11 +8,11 @@
 void draw_bview(WINDOW* nwin, const BufferView& bv,
                 const Context& context);
 
-void draw_margin(WINDOW* nwin, const Margin& mgn, struct rect area,
+void draw_margin(WINDOW* nwin, const Margin& mgn, Rect area,
                  const Context& context);
 
 void draw_statusline(WINDOW* nwin, const StatusLine& sline,
-                     struct rect area, const Context& context);
+                     Rect area, const Context& context);
 
 void draw_cmdline(WINDOW* nwin, const CmdLine& cline,
-                  struct rect area, const Context& context);
+                  Rect area, const Context& context);

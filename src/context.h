@@ -11,7 +11,7 @@ struct Context {
     unsigned long flags;
     enum Mode mode;
     const char* modestr;
-    struct rect bounds;
+    Rect bounds;
 
     void setMode(enum Mode mode);
 };

@@ -9,14 +9,12 @@ TODO:
 - Self hostign
 - Convert structs to classes
 - Use const references rather than raw pointers
-- Use new instead of malloc/calloc
 - Add default constructors etc
-
-
 - Add wide char support
 - Impl a scripting language!
 
 DONE:
+- Use new instead of malloc/calloc
 - Fix curmove_next and prev line
 - Move area to their buffer_view
 - Specify startup options (ced file1 file2.c)

@@ -23,7 +23,7 @@ Ced::Ced(Opts opts)
 
     // Create context
     context.setMode(Mode::Normal);
-    context.bounds = (struct rect) RECT(0, 0, Term::cols, Term::rows);
+    context.bounds = (Rect) RECT(0, 0, Term::cols, Term::rows);
     context.flags  = 0;
     SETFLAG(context.flags, Farea_update);
 }
@@ -61,7 +61,7 @@ void Ced::run()
         // Check for window resize
         {
             Term::update();
-            struct rect newbounds = RECT(0, 0, Term::cols, Term::rows);
+            Rect newbounds = RECT(0, 0, Term::cols, Term::rows);
             context.bounds        = newbounds;
         }
 
@@ -83,7 +83,7 @@ void Ced::run()
 void Ced::insertCb(inpev ev)
 {
     //Buffer* buf       = &win.Bview().buffer;
-    //struct cursor cur = win.Bview().cur;
+    //Cursor cur = win.Bview().cur;
 
     //if (ev.type == INP_ALPHA || ev.type == INP_NUM || ev.type == INP_SYMBOL || ev.key == k_space || ev.key == k_enter) {
         //buf->addCh(ev.key, cur);

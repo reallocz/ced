@@ -23,11 +23,11 @@ public:
     void pprint() const;
     unsigned int Id() { return id; }
 
-    void addCh(char ch, const struct cursor& cur);
-    void delCh(const struct cursor& cur);
+    void addCh(char ch, const Cursor& cur);
+    void delCh(const Cursor& cur);
 
     bool addGap();
     bool addGapOptional();
-    bool moveGap(const struct cursor& cur);
+    bool moveGap(const Cursor& cur);
 };
 

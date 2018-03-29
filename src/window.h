@@ -26,7 +26,7 @@
 
 struct StatusLine {
     const char* bufname;
-    struct cursor cur;
+    Cursor cur;
 };
 
 

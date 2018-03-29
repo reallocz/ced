@@ -59,8 +59,8 @@ void Window::update(const Context& context)
 
     // buffer
     // Update bview bounds
-    struct rect area     = context.bounds;
-    struct rect bvbounds = RECT(0, margin.width + 1,
+    Rect area     = context.bounds;
+    Rect bvbounds = RECT(0, margin.width + 1,
                                 area.width - margin.width,
                                 area.height - STATUSLINE_HEIGHT - CMDLINE_HEIGHT);
     bview->setBounds(bvbounds);
@@ -70,18 +70,18 @@ void Window::update(const Context& context)
 
 void Window::draw(const Context& context)
 {
-    struct rect area = context.bounds;
+    Rect area = context.bounds;
     // Stl
-    struct rect areastl = RECT(area.height - STATUSLINE_HEIGHT - CMDLINE_HEIGHT, 0,
+    Rect areastl = RECT(area.height - STATUSLINE_HEIGHT - CMDLINE_HEIGHT, 0,
                                area.width, STATUSLINE_HEIGHT);
     draw_statusline(nwin, sline, areastl, context);
 
     // Margin
-    struct rect areamgn = RECT(0, 0, margin.width, area.height - STATUSLINE_HEIGHT - CMDLINE_HEIGHT);
+    Rect areamgn = RECT(0, 0, margin.width, area.height - STATUSLINE_HEIGHT - CMDLINE_HEIGHT);
     draw_margin(nwin, margin, areamgn, context);
 
     // Cmdline
-    struct rect areacmd = RECT(area.height - CMDLINE_HEIGHT, 0,
+    Rect areacmd = RECT(area.height - CMDLINE_HEIGHT, 0,
                                area.width, CMDLINE_HEIGHT);
     draw_cmdline(nwin, cmdline, areacmd, context);
 
@@ -91,8 +91,8 @@ void Window::draw(const Context& context)
     // Draw cursor
     if (context.mode == Mode::Normal || context.mode == Mode::Insert) {
         // Cursor in BufferView
-        struct cursor c    = bview->relcur();
-        struct rect areabv = bview->Bounds();
+        Cursor c    = bview->relcur();
+        Rect areabv = bview->Bounds();
         wmove(nwin, areabv.y + c.line, areabv.x + c.col);
     } else if (context.mode == Mode::Command) {
         int x = strlen(cmdline.buffer) + 1;    // +1 for ':' prefix

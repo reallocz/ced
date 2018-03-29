@@ -28,16 +28,19 @@ enum flags {
 };
 
 /** Cursor.h */
-struct cursor {
+struct Cursor {
     unsigned int line;
     unsigned int col;
 };
 
 
 /** struct rect represents area of the screen*/
-struct rect {
+struct Rect {
     unsigned int y, x;    // Top left corner
     unsigned int width, height;
-};
 
-void printrect(const char* name, struct rect r);
+    void print()
+    {
+        log_l("COMMON", "Rect {y: %d, x: %d, w: %d, h: %d}", y, x, width, height);
+    }
+};

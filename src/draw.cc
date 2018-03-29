@@ -17,7 +17,7 @@ void draw_bview(WINDOW* nwin, const BufferView& bv, const Context& context __att
     log_l(TAG, "Drawing buffer %d (%d lines)...",
           bv.buffer.Id(), bv.buffer.lineCount());
 
-    struct rect area = bv.Bounds();
+    Rect area = bv.Bounds();
     unsigned int ox  = area.x;
     unsigned int oy  = area.y;
 
@@ -46,7 +46,7 @@ void draw_bview(WINDOW* nwin, const BufferView& bv, const Context& context __att
 }
 
 
-void draw_margin(WINDOW* nwin, const Margin& mgn, struct rect area, const Context& context __attribute__((unused)))
+void draw_margin(WINDOW* nwin, const Margin& mgn, Rect area, const Context& context __attribute__((unused)))
 {
     wattron(nwin, A_BOLD);
 
@@ -68,7 +68,7 @@ void draw_margin(WINDOW* nwin, const Margin& mgn, struct rect area, const Contex
 }
 
 
-void draw_statusline(WINDOW* nwin, const StatusLine& sline, struct rect area, const Context& context)
+void draw_statusline(WINDOW* nwin, const StatusLine& sline, Rect area, const Context& context)
 {
     // statusline string
     char stsstring[area.width];
@@ -86,7 +86,7 @@ void draw_statusline(WINDOW* nwin, const StatusLine& sline, struct rect area, co
 }
 
 void draw_cmdline(WINDOW* nwin, const CmdLine& cline,
-                  struct rect area, const Context& context)
+                  Rect area, const Context& context)
 {
     wmove(nwin, area.y, 0);
     wclrtoeol(nwin);

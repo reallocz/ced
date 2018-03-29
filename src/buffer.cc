@@ -12,7 +12,8 @@
 
 #define TAG "BUFFER"
 
-static unsigned int generate_id() {
+static unsigned int generate_id()
+{
     static unsigned int id = 0;
     return id++;
 }
@@ -26,7 +27,7 @@ Buffer::Buffer(enum Buffer::Type type)
 
     /** lines */
     linecount = 1;    // Empty buffer has at least one line
-    lines     = static_cast<Line*>(calloc(linecount, sizeof(Line)));
+    lines     = new Line[linecount];
     assert(lines);
 }
 
@@ -88,7 +89,6 @@ unsigned int Buffer::lineCount() const
 }
 
 
-
 bool Buffer::saveToDisk(const char* path)
 {
     //return fu_save_buffer(buf, path);
@@ -99,8 +99,8 @@ bool Buffer::saveToDisk(const char* path)
 void Buffer::pprint() const
 {
     //log_l(TAG, "Buffer{id=%d, gap.pos=%d, gap.size = %d"
-               //", lncount=%d}",
-          //id, gap.col, gap.size, linecount);
+    //", lncount=%d}",
+    //id, gap.col, gap.size, linecount);
 }
 
 
@@ -112,4 +112,3 @@ void Buffer::pprintLines() const
     }
     log_l(TAG, " --/ line metadata --");
 }
-

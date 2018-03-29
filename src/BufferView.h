@@ -10,20 +10,20 @@ class BufferView
 {
 public:
     unsigned int start;    // View starts from
-    struct cursor cur;
+    Cursor cur;
     Buffer buffer{Buffer::Type::Scratch};
-    struct rect bounds;
+    Rect bounds;
 
 public:
     BufferView();
     BufferView(enum Buffer::Type type, const char* filename);
     void update();
 
-    inline struct rect Bounds() const { return bounds; }
-    void setBounds(struct rect newbounds);
+    inline Rect Bounds() const { return bounds; }
+    void setBounds(Rect newbounds);
 
-    inline struct cursor Cursor() const { return cur; };
-    void setCursor(struct cursor newcur);
+    inline Cursor getCursor() const { return cur; };
+    void setCursor(Cursor newcur);
 
     void cmovFwd(unsigned int n);
     void cmovBack(unsigned int n);
@@ -39,5 +39,5 @@ public:
     void scrollDown(unsigned int n);
 
     inline unsigned int Start() const { return start; }
-    struct cursor relcur() const;
+    Cursor relcur() const;
 };
