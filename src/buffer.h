@@ -1,7 +1,7 @@
 #pragma once
 #include "common.h"
 #include <cstdlib>
-#include "Line.h"
+#include "line.h"
 
 
 /** buffer.h
@@ -40,7 +40,8 @@ public:
     const Line& line(unsigned int num) const;
 
     unsigned int lineCount() const;
-    bool saveToDisk(const char* path);
+    bool saveToDisk();
+    bool saveToDiskAs(const char* path);
 
     void pprint() const;
     void pprintLines() const;

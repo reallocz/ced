@@ -1,4 +1,4 @@
-#include "BufferView.h"
+#include "bufferview.h"
 #include "log.h"
 #include <cassert>
 
@@ -20,8 +20,8 @@ BufferView::BufferView(enum Buffer::Type type, const char* filename)
 void BufferView::update()
 {
     // Keep cursor on the screen
-    Rect bvarea     = Bounds();
-    unsigned int firstline = Start();
+    Rect bvarea     = getBounds();
+    unsigned int firstline = getStart();
 
     if (cur.line < firstline) {
         Cursor newcur = Cursor();
@@ -136,7 +136,7 @@ void BufferView::cmovInline()
 void BufferView::scrollUp(unsigned int n)
 {
     log_l(TAG, "SCROLLING UP!");
-    if (n > Start()) {
+    if (n > getStart()) {
         start = 0;
     } else {
         start -= n;
@@ -147,7 +147,7 @@ void BufferView::scrollUp(unsigned int n)
 void BufferView::scrollDown(unsigned int n)
 {
     log_l(TAG, "SCROLLING DOWN!");
-    unsigned int newstart = Start() + n;
+    unsigned int newstart = getStart() + n;
     if (!(newstart < buffer.lineCount())) {
         // last line
         newstart = buffer.lineCount() - 1;

@@ -16,9 +16,9 @@ include_directories(SRCDIR)
 add_compile_options(-g -Wall -std=c++17)
 
 add_executable(debug
-        ${SRCDIR}/Line.cc
+        ${SRCDIR}/line.cc
         ${SRCDIR}/buffer.cc
-        ${SRCDIR}/BufferView.cc
+        ${SRCDIR}/bufferview.cc
         ${SRCDIR}/ced.cc
 	${SRCDIR}/draw.cc
         ${SRCDIR}/main.cc

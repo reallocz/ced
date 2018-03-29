@@ -49,13 +49,13 @@ void Window::changeBufferView(BufferView* bv)
 void Window::update(const Context& context)
 {
     // statusline
-    sline.bufname = bview->buffer.Name();
-    sline.cur     = bview->cur;
+    sline.bufname = bview->getBuffer().Name();
+    sline.cur     = bview->getCursor();
 
     // Margin
     margin.width     = 3;
-    margin.start     = bview->Start();
-    margin.linecount = bview->buffer.lineCount();
+    margin.start     = bview->getStart();
+    margin.linecount = bview->getBuffer().lineCount();
 
     // buffer
     // Update bview bounds
@@ -92,7 +92,7 @@ void Window::draw(const Context& context)
     if (context.mode == Mode::Normal || context.mode == Mode::Insert) {
         // Cursor in BufferView
         Cursor c    = bview->relcur();
-        Rect areabv = bview->Bounds();
+        Rect areabv = bview->getBounds();
         wmove(nwin, areabv.y + c.line, areabv.x + c.col);
     } else if (context.mode == Mode::Command) {
         int x = strlen(cmdline.buffer) + 1;    // +1 for ':' prefix

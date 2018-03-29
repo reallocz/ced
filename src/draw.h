@@ -1,5 +1,5 @@
 #pragma once
-#include "BufferView.h"
+#include "bufferview.h"
 #include "common.h"
 #include "context.h"
 #include "window.h"

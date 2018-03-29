@@ -14,27 +14,30 @@
 
 void draw_bview(WINDOW* nwin, const BufferView& bv, const Context& context __attribute__((unused)))
 {
-    log_l(TAG, "Drawing buffer %d (%d lines)...",
-          bv.buffer.Id(), bv.buffer.lineCount());
+    const Buffer& buffer = bv.getBuffer();
 
-    Rect area = bv.Bounds();
-    unsigned int ox  = area.x;
-    unsigned int oy  = area.y;
+    log_l(TAG, "Drawing buffer %d (%d lines)...",
+          buffer.Id(), buffer.lineCount());
+
+    Rect area       = bv.getBounds();
+    unsigned int ox = area.x;
+    unsigned int oy = area.y;
 
     unsigned int linesdrawn = 0;
-    unsigned int firstline  = bv.Start();
+    unsigned int firstline  = bv.getStart();
     for (unsigned int i = 0; i < area.height; ++i) {
-        if (i >= bv.buffer.lineCount()) {
+        unsigned int linenumber = firstline + i;
+
+        if (linenumber >= buffer.lineCount()) {
             break;
         }
-        unsigned int linenumber = firstline + i;
-        const Line& ln  = bv.buffer.line(linenumber);
 
-        if(linenumber > bv.buffer.lineCount()) { break; }
+        const Line& ln = buffer.line(linenumber);
+
 
         linesdrawn++;
         for (unsigned int j = 0; j < ln.Len(); ++j) {
-            if(!ln.inGap(j)) {
+            if (!ln.inGap(j)) {
                 mvwaddch(nwin, area.y, area.x++, ln[j]);
             }
         }

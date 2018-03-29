@@ -189,12 +189,13 @@ void Ced::execCommand(struct command cmd)
 
 
     if (cmd.type == CMD_BUFSAVE) {
+        Buffer& buffer = win.Bview().getBuffer();
         if (strlen(cmd.args) == 0) {
             // Save
-            win.Bview().buffer.saveToDisk(win.Bview().buffer.Name());
+            buffer.saveToDisk();
         } else {
             // Save As arg
-            win.Bview().buffer.saveToDisk(cmd.args);
+            buffer.saveToDiskAs(cmd.args);
             // TODO(realloc): add error checking
             // TODO(realloc): update buffer name to arg
         }

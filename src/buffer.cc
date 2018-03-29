@@ -89,7 +89,12 @@ unsigned int Buffer::lineCount() const
 }
 
 
-bool Buffer::saveToDisk(const char* path)
+bool Buffer::saveToDisk()
+{
+    return false;
+}
+
+bool Buffer::saveToDiskAs(const char* path)
 {
     //return fu_save_buffer(buf, path);
     return false;
