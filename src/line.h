@@ -15,6 +15,8 @@ public:
     Line(unsigned int len, char* data);
 
     unsigned int Len() const { return len; }
+    unsigned int trueLen() const { return len - gaplen; }
+
     const char operator[](std::size_t index) const;
     char& operator[](std::size_t index);
 

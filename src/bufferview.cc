@@ -58,18 +58,16 @@ void BufferView::setCursor(Cursor newcur)
 
 void BufferView::cmovFwd(unsigned int n)
 {
-    //Line& ln = buffer.line(cur.line);
+    const Line& ln = buffer.line(cur.line);
 
-    //unsigned int newcol = cur.col + n;
-    //unsigned int maxcol = buffer.lineHasGap(cur.line)
-                              //? (ln.len - buffer.Gap().size)
-                              //: ln->len;
+    unsigned int newcol = cur.col + n;
+    unsigned int maxcol = ln.trueLen();
 
-    //if (newcol > maxcol) {
-        //cmovLend();
-    //} else {
-        //cur.col = newcol;
-    //}
+    if (newcol > maxcol) {
+        cmovLend();
+    } else {
+        cur.col = newcol;
+    }
 }
 
 
@@ -115,21 +113,17 @@ void BufferView::cmovLstart()
 
 void BufferView::cmovLend()
 {
-    //Line& ln = buffer.line(cur.line);
-    //if (buffer.lineHasGap(cur.line)) {
-        //cur.col = ln->len - buffer.Gap().size;
-    //} else {
-        //cur.col = ln->len;
-    //}
+    const Line& ln = buffer.line(cur.line);
+    cur.col = ln.trueLen();
 }
 
 
 void BufferView::cmovInline()
 {
-    //Buffer::Line* ln = buffer.line(cur.line);
-    //if (cur.col >= ln->len) {
-        //cmovLend();
-    //}
+    const Line& ln = buffer.line(cur.line);
+    if (cur.col >= ln.trueLen()) {
+        cmovLend();
+    }
 }
 
 
