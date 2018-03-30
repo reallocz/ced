@@ -28,6 +28,7 @@ public:
     void addCh(char ch, const Cursor& cur);
     void delCh(const Cursor& cur);
 
+private:
     bool addGap();
     bool addGapOptional();
     bool moveGap(const Cursor& cur);

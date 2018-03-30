@@ -88,7 +88,7 @@ void draw_statusline(WINDOW* nwin, const StatusLine& sline, Rect area, const Con
     wattroff(nwin, COLOR_PAIR(1));
 }
 
-void draw_cmdline(WINDOW* nwin, const CmdLine& cline,
+void draw_cmdline(WINDOW* nwin, const CommandLine& cline,
                   Rect area, const Context& context)
 {
     wmove(nwin, area.y, 0);
@@ -98,5 +98,5 @@ void draw_cmdline(WINDOW* nwin, const CmdLine& cline,
         return;
     }
     waddch(nwin, ':');
-    waddstr(nwin, cline.buffer);
+    waddstr(nwin, cline.data());
 }

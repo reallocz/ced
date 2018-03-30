@@ -2,6 +2,7 @@
 #include "bufferview.h"
 #include "context.h"
 #include "input.h"
+#include "commands.h"
 
 /** ced.h
  * All the main editor logic lies here.
@@ -31,7 +32,7 @@ public:
 private:
     void parseOpts(Opts opts);
     void nextBview();
-    void execCommand(struct command cmd);
+    void execCommand(const Command& cmd);
 
 public:
     Ced(Opts opts);

@@ -2,6 +2,7 @@
 #include "bufferview.h"
 #include "common.h"
 #include "context.h"
+#include "commandline.h"
 #include <ncurses.h>
 
 #define CMDLINE_SIZE 256
@@ -36,12 +37,6 @@ struct Margin {
     unsigned int linecount;
 };
 
-
-struct CmdLine {
-    char buffer[CMDLINE_SIZE];
-};
-
-
 class Window
 {
 private:
@@ -51,7 +46,7 @@ private:
 public:
     StatusLine sline;
     Margin margin;
-    CmdLine cmdline;
+    CommandLine cline;
     BufferView* bview;
 
 public:

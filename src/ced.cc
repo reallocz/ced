@@ -144,28 +144,26 @@ void Ced::normalCb(inpev ev)
 
 void Ced::commandCb(inpev ev)
 {
-    static int i = 0;
     if (ev.key == k_esc) {
         // Switch to normal mode
         context.setMode(Mode::Normal);
     } else if (ev.key == k_enter) {
         // Execute command and clear cmdline buffer
-        execCommand(cmd_parse_string(win.cmdline.buffer));
-        // Reset buffer
-        i                     = 0;
-        win.cmdline.buffer[i] = '\0';
+        Command cmd = win.cline.parse();
+        cmd.pprint();
+        if (!cmd.valid) {
+            log_e(TAG, "Unknown command: %s", win.cline.data());
+        } else {
+            execCommand(cmd);
+        }
+        // Reset cmdline
+        win.cline.clear();
         context.setMode(Mode::Normal);
     } else if (ev.type == INP_ALPHA || ev.type == INP_NUM || ev.type == INP_SYMBOL || ev.key == k_space) {
-        win.cmdline.buffer[i++] = ev.key;
-        win.cmdline.buffer[i]   = '\0';
+        win.cline.addCh(ev.key);
     } else if (ev.key == k_backspace) {
-        i--;
-        if (i < 0) {
-            i = 0;
-        }
-        win.cmdline.buffer[i] = '\0';
+        win.cline.delCh();
     } else {
-        // Go back to Mode::Normal
         context.setMode(Mode::Normal);
     }
 }
@@ -179,16 +177,9 @@ void Ced::nextBview()
     }
 }
 
-void Ced::execCommand(struct command cmd)
+void Ced::execCommand(const Command& cmd)
 {
-    cmd_pprint(cmd);
-    if (!cmd.valid) {
-        log_e(TAG, "Unknown command: %s", cmd.cmdstr);
-        return;
-    }
-
-
-    if (cmd.type == CMD_BUFSAVE) {
+    if (cmd.type == Command::Type::Bufsave) {
         Buffer& buffer = win.Bview().getBuffer();
         if (strlen(cmd.args) == 0) {
             // Save

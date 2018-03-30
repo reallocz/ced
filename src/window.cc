@@ -83,7 +83,7 @@ void Window::draw(const Context& context)
     // Cmdline
     Rect areacmd = RECT(area.height - CMDLINE_HEIGHT, 0,
                                area.width, CMDLINE_HEIGHT);
-    draw_cmdline(nwin, cmdline, areacmd, context);
+    draw_cmdline(nwin, cline, areacmd, context);
 
     // Bufferview
     draw_bview(nwin, *bview, context);
@@ -95,7 +95,8 @@ void Window::draw(const Context& context)
         Rect areabv = bview->getBounds();
         wmove(nwin, areabv.y + c.line, areabv.x + c.col);
     } else if (context.mode == Mode::Command) {
-        int x = strlen(cmdline.buffer) + 1;    // +1 for ':' prefix
+        int x = cline.getCursor() + 1;
+        //int x = strlen(cmdline.buffer) + 1;    // +1 for ':' prefix
         wmove(nwin, areacmd.y, x);
     } else {
         // ERROR

@@ -28,6 +28,7 @@ add_executable(debug
         ${SRCDIR}/input.cc
         ${SRCDIR}/fileutils.cc
 	${SRCDIR}/term.cc
+	${SRCDIR}/commandline.cc
 )
 
 target_link_libraries(debug ncursesw)

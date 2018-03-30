@@ -3,66 +3,89 @@
 #include <cassert>
 #include <cstring>
 
-
 #define TAG "CMD"
 
+/** String repr of command type */
+static const char* StringMap[] = {
+    "BUFSAVE",
+    "BUFOPEN",
+};
 
-struct command cmd_parse_string(const char* cmdstr)
+
+/** Command definitions corresponding to cmd type */
+static const char* Defs[] = {
+    "w",    // BUFSAVE
+    "e",    // BUFOPEN
+};
+
+Command::Command()
+    : valid(false), type(Type::Unknown)
+{
+    for (unsigned int i = 0; i < 16; ++i) {
+        cmd[i] = '\0';
+    }
+    for (unsigned int i = 0; i < 128; ++i) {
+        args[i] = '\0';
+    }
+}
+
+Command::Command(const char* cmdstr)
+    : Command()
 {
     assert(cmdstr);
-    struct command c {
-    };
-    c.valid  = 0;
-    c.cmdstr = cmdstr;
-
-    // Parse string into cmd and args
-    {
-        unsigned int len = strlen(cmdstr);
-        unsigned int i   = 0;
-        // cmd
-        for (i = 0; i < len; ++i) {
-            c.cmd[i] = cmdstr[i];
-            if (cmdstr[i] == ' ') {
-                c.cmd[i] = '\0';
-                break;
-            }
-        }
-
-        // Skip space
-        unsigned int space = 0;    // Whitespace b/w cmd and arg
-        unsigned int k;
-        for (k = i; k < len; ++k) {
-            if (cmdstr[k] != ' ') {
-                break;
-            } else {
-                space++;
-            }
-        }
-
-        // args
-        unsigned int j;
-        for (j = 0; k < len; ++k, ++j) {
-            c.args[j] = cmdstr[k];
-        }
-        c.args[j + 1] = '\0';
-    }
-
-
-    // Identify command
-    for (auto& cmd_def : cmd_defs) {
-        if (strcmp(c.cmd, cmd_def) == 0) {
-            log_l(TAG, "Recognized command: %s", c.cmd);
-            c.valid = 1;
-            //c.type  = i;
-            break;
-        }
-    }
-    return c;
+    parseArgs(cmdstr);
+    idType();
 }
 
 
-void cmd_pprint(const struct command cmd)
+void Command::parseArgs(const char* cmdstr)
+{
+    unsigned int len = strlen(cmdstr);
+    unsigned int i   = 0;
+    // cmd
+    for (i = 0; i < len; ++i) {
+        cmd[i] = cmdstr[i];
+        if (cmdstr[i] == ' ') {
+            cmd[i] = '\0';
+            break;
+        }
+    }
+
+    // Skip space
+    unsigned int space = 0;    // Whitespace b/w cmd and arg
+    unsigned int k;
+    for (k = i; k < len; ++k) {
+        if (cmdstr[k] != ' ') {
+            break;
+        } else {
+            space++;
+        }
+    }
+
+    // args
+    unsigned int j;
+    for (j = 0; k < len; ++k, ++j) {
+        args[j] = cmdstr[k];
+    }
+    args[j + 1] = '\0';
+}
+
+void Command::idType()
+{
+    int count = 0;
+    for (auto& def : Defs) {
+        if (strcmp(cmd, def) == 0) {
+            log_l(TAG, "Recognized command: %s", cmd);
+            valid = true;
+            type  = (Type) count;
+            break;
+        }
+        count++;
+    }
+}
+
+void Command::pprint() const
 {
     log_l(TAG, "Command {valid: %d, cmd: %s, args: %s}",
-          cmd.valid, cmd.cmd, cmd.args);
+          valid, cmd, args);
 }

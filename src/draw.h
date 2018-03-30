@@ -14,5 +14,5 @@ void draw_margin(WINDOW* nwin, const Margin& mgn, Rect area,
 void draw_statusline(WINDOW* nwin, const StatusLine& sline,
                      Rect area, const Context& context);
 
-void draw_cmdline(WINDOW* nwin, const CmdLine& cline,
+void draw_cmdline(WINDOW* nwin, const CommandLine& cline,
                   Rect area, const Context& context);
