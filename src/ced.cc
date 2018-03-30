@@ -82,32 +82,33 @@ void Ced::run()
 
 void Ced::insertCb(inpev ev)
 {
-    //Buffer* buf       = &win.Bview().buffer;
-    //Cursor cur = win.Bview().cur;
+    Buffer& buffer = win.Bview().getBuffer();
+    Cursor cur = win.Bview().getCursor();
 
-    //if (ev.type == INP_ALPHA || ev.type == INP_NUM || ev.type == INP_SYMBOL || ev.key == k_space || ev.key == k_enter) {
-        //buf->addCh(ev.key, cur);
-        //win.Bview().cmovFwd(1);
-    //}
+    if (ev.type == INP_ALPHA || ev.type == INP_NUM || ev.type == INP_SYMBOL || ev.key == k_space || ev.key == k_enter) {
+        buffer.line(cur.line).addCh(ev.key, cur);
+        win.Bview().cmovFwd(1);
+    }
 
-    //if (ev.type == INP_SPECIAL) {
-        //switch (ev.key) {
-        //case k_backspace:
-            //buf->delCh(cur);
-            //win.Bview().cmovBack(1);
-            //break;
-        //case k_esc:
-            //context.setMode(Mode::Normal);
-            //break;
-        //default:
-            //break;
-        //}
-    //}
+    if (ev.type == INP_SPECIAL) {
+        switch (ev.key) {
+        case k_backspace:
+            buffer.line(cur.line).delCh(cur);
+            win.Bview().cmovBack(1);
+            break;
+        case k_esc:
+            context.setMode(Mode::Normal);
+            break;
+        default:
+            break;
+        }
+    }
 }
 
 
 void Ced::normalCb(inpev ev)
 {
+    BufferView& bview = win.Bview();
     if (ev.key == 'i') {
         // Switch to insert mode
         context.setMode(Mode::Insert);
@@ -117,24 +118,23 @@ void Ced::normalCb(inpev ev)
     } else if (ev.key == k_f1) {
         quit = 1;
     } else if (ev.key == k_f2) {
-        //win.Bview().buffer.saveToDisk("doc.txt");
-        // TODO(realloc): prompt for name
+        bview.getBuffer().saveToDiskAs("doc.txt");
     } else if (ev.key == 'h') {
-        win.Bview().cmovBack(1);
+        bview.cmovBack(1);
     } else if (ev.key == 'l') {
-        win.Bview().cmovFwd(1);
+        bview.cmovFwd(1);
     } else if (ev.key == 'j') {
-        win.Bview().cmovLnext(1);
+        bview.cmovLnext(1);
     } else if (ev.key == 'k') {
-        win.Bview().cmovLprev(1);
+        bview.cmovLprev(1);
     } else if (ev.key == 'u') {
-        win.Bview().scrollUp(1);
+        bview.scrollUp(1);
     } else if (ev.key == 'd') {
-        win.Bview().scrollDown(1);
+        bview.scrollDown(1);
     } else if (ev.key == '$') {
-        win.Bview().cmovLend();
+        bview.cmovLend();
     } else if (ev.key == '0') {
-        win.Bview().cmovLstart();
+        bview.cmovLstart();
     } else if (ev.key == '1') {
         nextBview();
         win.changeBufferView(&bviews[currentBview]);
