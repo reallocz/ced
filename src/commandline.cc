@@ -18,7 +18,7 @@ void CommandLine::addCh(char ch)
 void CommandLine::delCh()
 {
     cur--;
-    if (cur < 0) {
+    if (cur < 1) {
         cur = 0;
     }
     buffer[cur] = '\0';
