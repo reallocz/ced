@@ -1,6 +1,5 @@
 #include "ced.h"
 #include "buffer.h"
-#include "commands.h"
 #include "common.h"
 #include "input.h"
 #include "input_keys.h"

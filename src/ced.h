@@ -2,7 +2,6 @@
 #include "bufferview.h"
 #include "context.h"
 #include "input.h"
-#include "commands.h"
 
 /** ced.h
  * All the main editor logic lies here.
