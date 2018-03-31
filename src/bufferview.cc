@@ -99,7 +99,10 @@ void BufferView::cmovLprev(unsigned int n)
 {
     // Move to prev line
     if (n > cur.line) {
-        cmovLstart();
+        cur.line = 0;
+    } else if (cur.line - n < getStart()) {
+        // TODO remove this condition when scroll on curmove's added
+        cur.line = getStart();
     } else {
         cur.line -= n;
     }
