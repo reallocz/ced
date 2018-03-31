@@ -6,6 +6,7 @@
 #include "log.h"
 #include "term.h"
 #include "window.h"
+#include "fileutils.h"
 #include <cassert>
 #include <cstdio>
 #include <cstdlib>
@@ -117,7 +118,7 @@ void Ced::normalCb(inpev ev)
     } else if (ev.key == k_f1) {
         quit = 1;
     } else if (ev.key == k_f2) {
-        bview.getBuffer().saveToDiskAs("doc.txt");
+        FileUtil::saveBuffer(win.Bview().getBuffer(), "doc.txt");
     } else if (ev.key == 'h') {
         bview.cmovBack(1);
     } else if (ev.key == 'l') {
@@ -182,10 +183,10 @@ void Ced::execCommand(const Command& cmd)
         Buffer& buffer = win.Bview().getBuffer();
         if (strlen(cmd.args) == 0) {
             // Save
-            buffer.saveToDisk();
+            FileUtil::saveBuffer(buffer, buffer.getName());
         } else {
             // Save As arg
-            buffer.saveToDiskAs(cmd.args);
+            FileUtil::saveBuffer(buffer, cmd.args);
             // TODO(realloc): add error checking
             // TODO(realloc): update buffer name to arg
         }

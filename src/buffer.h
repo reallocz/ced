@@ -42,13 +42,11 @@ public:
     const Line& line(unsigned int num) const;
 
     unsigned int lineCount() const;
-    bool saveToDisk();
-    bool saveToDiskAs(const char* path);
 
     void pprint() const;
     void pprintLines() const;
 
-    inline const char* Name() const { return name; }
+    inline const char* getName() const { return name; }
     inline unsigned int Id() const { return id; }
 
 private:

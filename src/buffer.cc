@@ -101,18 +101,6 @@ unsigned int Buffer::lineCount() const
 }
 
 
-bool Buffer::saveToDisk()
-{
-    return false;
-}
-
-bool Buffer::saveToDiskAs(const char*  /*path*/)
-{
-    //return fu_save_buffer(buf, path);
-    return false;
-}
-
-
 void Buffer::pprint() const
 {
     //log_l(TAG, "Buffer{id=%d, gap.pos=%d, gap.size = %d"

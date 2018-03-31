@@ -49,7 +49,7 @@ void Window::changeBufferView(BufferView* bv)
 void Window::update(const Context& context)
 {
     // statusline
-    sline.bufname = bview->getBuffer().Name();
+    sline.bufname = bview->getBuffer().getName();
     sline.cur     = bview->getCursor();
 
     // Margin
