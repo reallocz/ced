@@ -139,32 +139,28 @@ Buffer loadBuffer(const char* path)
 }
 
 
-int saveBuffer(Buffer&  /*buf*/, const char*  /*path*/)
+int saveBuffer(Buffer& buf, const char* path)
 {
-    //log_l(TAG, "Saving buffer...");
-    //FILE* f = fopen(path, "w");
-    //assert(f);
-    //unsigned int wbytes = 0;
-    //unsigned int lcount = 0;
-    //for (unsigned int lnum = 0; lnum < buf->lineCount(); ++lnum) {
-    //const Buffer::Line& ln = buf->line(lnum);
-    //lcount++;
-    //for (unsigned int i = 0; i < ln.Len(); ++i) {
-    //if (buf->lineHasGap(lnum)) {
-    //// Line with the gap
-    //if (!buf->inGap(i)) {
-    //fputc(ln[i], f);
-    //wbytes++;
-    //}
-    //} else {
-    //// Lines without the gap
-    //fputc(ln[i], f);
-    //wbytes++;
-    //}
-    //}
-    //}
-    //log_l(TAG, "Buffer saved (%d lines, %d bytes): %s", lcount, wbytes, path);
-    //fclose(f);
+    log_l(TAG, "Saving buffer...");
+    FILE* f = fopen(path, "w");
+    assert(f);
+    unsigned int wbytes = 0; // Bytes written
+    unsigned int wlines = 0; // Lines return
+    for (unsigned int lnum = 0; lnum < buf.lineCount(); ++lnum) {
+        unsigned int checkbytes = 0;
+        const Line& ln = buf.line(lnum);
+        for (unsigned int i = 0; i < ln.Len(); ++i) {
+            if (!ln.inGap(i)) {
+                fputc(ln[i], f);
+                wbytes++;
+                checkbytes++;
+            }
+        }
+        assert(checkbytes == ln.trueLen());
+        wlines++;
+    }
+    log_l(TAG, "Buffer saved (%d lines, %d bytes): %s", wlines, wbytes, path);
+    fclose(f);
     return 0;
 }
 } // namespace FileUtil
