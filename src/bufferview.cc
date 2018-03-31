@@ -1,4 +1,5 @@
 #include "bufferview.h"
+#include "fileutils.h"
 #include "log.h"
 #include <cassert>
 
@@ -12,7 +13,8 @@ BufferView::BufferView(enum Buffer::Type type, const char* filename)
     cur.line = 0;
     cur.col  = 0;
 
-    buffer = Buffer(type, filename);
+    // TODO error handling
+    buffer = FileUtil::loadBuffer(filename);
     start  = 0;
     bounds = (Rect) RECT(0, 0, 0, 0);
 }
@@ -20,18 +22,18 @@ BufferView::BufferView(enum Buffer::Type type, const char* filename)
 void BufferView::update()
 {
     // Keep cursor on the screen
-    Rect bvarea     = getBounds();
+    Rect bvarea            = getBounds();
     unsigned int firstline = getStart();
 
     if (cur.line < firstline) {
         Cursor newcur = Cursor();
-        newcur.line          = firstline;
+        newcur.line   = firstline;
         setCursor(newcur);
     }
 
     if (cur.line > firstline + bvarea.height - 1) {
         Cursor newcur = Cursor();
-        newcur.line          = firstline + bvarea.height - 1;
+        newcur.line   = firstline + bvarea.height - 1;
         setCursor(newcur);
     }
 }
@@ -114,7 +116,7 @@ void BufferView::cmovLstart()
 void BufferView::cmovLend()
 {
     const Line& ln = buffer.line(cur.line);
-    cur.col = ln.trueLen();
+    cur.col        = ln.trueLen();
 }
 
 

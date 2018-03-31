@@ -5,7 +5,7 @@
 #include <cassert>
 #include <cstdio>
 #include <cstdlib>
-#include <cstring>
+#include <string.h>
 
 #define CURVALID(buf, cur) \
     ((cur).line < (buf)->linecount)
@@ -31,31 +31,43 @@ Buffer::Buffer(enum Buffer::Type type)
     assert(lines);
 }
 
-Buffer::Buffer(enum Buffer::Type type, const char* filename)
+
+//Buffer::Buffer(enum Buffer::Type type, const char* filename)
+//{
+    //FileUtil::Stats stats;
+    //FileUtil::getStats(filename, stats);
+    //if (!(stats.exists == true && F_FILE == stats.type)) {
+        //if (stats.type == F_DIR) {
+            //log_fatal(TAG, "%s: cannot open:%s. (Its a directory)",
+                      //__func__, filename);
+        //} else {
+            //log_fatal(TAG, "%s: couldn't open:%s. exiting.",
+                      //__func__, filename);
+            //[>// Return a new empty buffer;<]
+            //[>struct buffer* buf = buf_create_empty(type);<]
+            //[>buf->name = filename;<]
+            //[>return buf;<]
+        //}
+    //}
+
+    //id         = generate_id();
+    //this->type = type;
+    //name       = filename;
+
+    //[>* lines <]
+    //lines     = nullptr;
+    //linecount = fu_read_file_lines(fstats.path, &lines);
+    //assert(lines);
+//}
+
+
+Buffer::Buffer(enum Type type, const char* name, Line* lines,
+               unsigned int linecount)
+    : Buffer(type)
 {
-    struct file_stats fstats = fu_stats(filename);
-    if (!(fstats.exists == 1 && F_FILE == fstats.type)) {
-        if (fstats.type == F_DIR) {
-            log_fatal(TAG, "%s: cannot open:%s. (Its a directory)",
-                      __func__, filename);
-        } else {
-            log_fatal(TAG, "%s: couldn't open:%s. exiting.",
-                      __func__, filename);
-            /*// Return a new empty buffer;*/
-            /*struct buffer* buf = buf_create_empty(type);*/
-            /*buf->name = filename;*/
-            /*return buf;*/
-        }
-    }
-
-    id         = generate_id();
-    this->type = type;
-    name       = filename;
-
-    /** lines */
-    lines     = nullptr;
-    linecount = fu_read_file_lines(fstats.path, &lines);
-    assert(lines);
+    this->name = name;
+    this->lines = lines;
+    this->linecount = linecount;
 }
 
 

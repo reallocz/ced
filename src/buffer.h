@@ -1,7 +1,7 @@
 #pragma once
 #include "common.h"
-#include <cstdlib>
 #include "line.h"
+#include <cstdlib>
 
 
 /** buffer.h
@@ -32,7 +32,9 @@ private:
     // Member functions
 public:
     Buffer(enum Type type);
-    Buffer(enum Type type, const char* filename);
+    //Buffer(enum Type type, const char* filename);
+    Buffer(enum Type type, const char* name, Line* lines,
+           unsigned int linecount);
 
     void destroy();
 
