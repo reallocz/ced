@@ -5,18 +5,19 @@
 
 #define TAG "BVIEW"
 
-BufferView::BufferView() {}
+BufferView::BufferView()
+{
+    start = 0;
+    cur = {0, 0};
+    bounds = RECT(0, 0, 0, 0);
+}
 
 BufferView::BufferView(enum Buffer::Type type, const char* filename)
+    : BufferView()
 {
     assert(filename);
-    cur.line = 0;
-    cur.col  = 0;
-
     // TODO error handling
     buffer = FileUtil::loadBuffer(filename);
-    start  = 0;
-    bounds = (Rect) RECT(0, 0, 0, 0);
 }
 
 void BufferView::update()
