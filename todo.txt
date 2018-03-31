@@ -1,19 +1,19 @@
 TODO: 
-- Prompt for path while saving file
 - Scroll buffer when cursor reaches the edge
 - Add relative line number
-- Clean up fileutils
 - Line wrapping
 - cmdline wrapping
 - statusline sections
 - Self hostign
 - Convert structs to classes
-- Use const references rather than raw pointers
-- Add default constructors etc
 - Add wide char support
 - Impl a scripting language!
 
 DONE:
+- Prompt for path while saving file
+- Clean up fileutils
+- Use const references rather than raw pointers
+- Add default constructors etc
 - Use new instead of malloc/calloc
 - Fix curmove_next and prev line
 - Move area to their buffer_view

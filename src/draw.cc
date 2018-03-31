@@ -49,9 +49,10 @@ void draw_bview(WINDOW* nwin, const BufferView& bv, const Context& context __att
 }
 
 
-void draw_margin(WINDOW* nwin, const Margin& mgn, Rect area, const Context& context __attribute__((unused)))
+void draw_margin(WINDOW* nwin, const Margin& mgn, Rect area,
+                 const Cursor& cursor,
+                 const Context& context __attribute__((unused)))
 {
-    wattron(nwin, A_BOLD);
 
     int txtpadding = 1;
     // line number to string
@@ -65,9 +66,18 @@ void draw_margin(WINDOW* nwin, const Margin& mgn, Rect area, const Context& cont
         } else {
             sprintf(lnstr, "%3c", '~');
         }
-        waddstr(nwin, lnstr);
+
+        // Highlight current line number
+        if(cursor.line == lnnumber) {
+            wattron(nwin, A_BOLD);
+            waddstr(nwin, lnstr);
+            wattroff(nwin, A_BOLD);
+        } else {
+            waddstr(nwin, lnstr);
+        }
     }
-    wattroff(nwin, A_BOLD);
+
+
 }
 
 

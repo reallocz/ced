@@ -78,7 +78,7 @@ void Window::draw(const Context& context)
 
     // Margin
     Rect areamgn = RECT(0, 0, margin.width, area.height - STATUSLINE_HEIGHT - CMDLINE_HEIGHT);
-    draw_margin(nwin, margin, areamgn, context);
+    draw_margin(nwin, margin, areamgn, bview->getCursor(), context);
 
     // Cmdline
     Rect areacmd = RECT(area.height - CMDLINE_HEIGHT, 0,
