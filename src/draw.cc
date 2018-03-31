@@ -55,20 +55,35 @@ void draw_margin(WINDOW* nwin, const Margin& mgn, Rect area,
 {
 
     int txtpadding = 1;
-    // line number to string
-    char lnstr[mgn.width + txtpadding];
+    char lnstr[mgn.width + txtpadding];    // line number to string
+
     for (unsigned int i = 0; i < area.height; ++i) {
+        // Clear line
         wmove(nwin, i, 0);
         wclrtoeol(nwin);
+
         unsigned int lnnumber = mgn.start + i;
+
         if (lnnumber < mgn.linecount) {
-            sprintf(lnstr, "%3d", lnnumber + 1);    // 1 indexed
+            int finalValue; // 1 indexed calculated ln number
+
+            if (mgn.relative && cursor.line != lnnumber) {
+                // Relative number
+                int relnum = cursor.line - lnnumber;
+                finalValue = std::abs(relnum);
+            } else {
+                // Regular number
+                finalValue = lnnumber + 1;
+            }
+
+            sprintf(lnstr, "%3d", finalValue);
         } else {
+            // Beyond End of buffer
             sprintf(lnstr, "%3c", '~');
         }
 
         // Highlight current line number
-        if(cursor.line == lnnumber) {
+        if (cursor.line == lnnumber) {
             wattron(nwin, A_BOLD);
             waddstr(nwin, lnstr);
             wattroff(nwin, A_BOLD);
@@ -76,8 +91,6 @@ void draw_margin(WINDOW* nwin, const Margin& mgn, Rect area,
             waddstr(nwin, lnstr);
         }
     }
-
-
 }
 
 

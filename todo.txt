@@ -1,6 +1,5 @@
 TODO: 
 - Scroll buffer when cursor reaches the edge
-- Add relative line number
 - Line wrapping
 - cmdline wrapping
 - statusline sections
@@ -10,6 +9,7 @@ TODO:
 - Impl a scripting language!
 
 DONE:
+- Add relative line number
 - Prompt for path while saving file
 - Clean up fileutils
 - Use const references rather than raw pointers

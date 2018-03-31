@@ -138,6 +138,9 @@ void Ced::normalCb(inpev ev)
     } else if (ev.key == '1') {
         nextBview();
         win.changeBufferView(&bviews[currentBview]);
+    } else if (ev.key == 'r') {
+        // Toggle relative line numbers
+        win.margin.relative = !win.margin.relative;
     }
 }
 

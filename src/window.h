@@ -35,6 +35,7 @@ struct Margin {
     unsigned int width;
     unsigned int start;    // First line number
     unsigned int linecount;
+    bool relative{false}; // Relative line number
 };
 
 class Window
