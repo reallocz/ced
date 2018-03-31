@@ -8,15 +8,50 @@
 
 #define TAG "FUTILS"
 
-struct file_stats fu_stats(const char* path)
+namespace FileUtil
 {
-    struct file_stats fs {
-    };
-    fs.exists = 0;
-    fs.path   = path;
-    fs.size   = 0;
-    fs.type   = F_FILE;
 
+// Standard empty constructor
+Stats::Stats()
+{
+    type    = Type::Other;
+    path    = nullptr;
+    abspath = nullptr;
+    size    = 0;
+    exists  = false;
+}
+
+
+Stats::~Stats()
+{
+    if (path != nullptr)
+        delete[] path;
+    if (abspath != nullptr)
+        delete[] abspath;
+}
+
+
+void Stats::pprint() const
+{
+    const char* typestr;
+    switch (type) {
+    case Type::File:
+        typestr = "file";
+        break;
+    case Type::Dir:
+        typestr = "dir";
+        break;
+    case Type::Other:
+        typestr = "other";
+        break;
+    }
+    log_l(TAG, "Stats{path: %s, apath: %s, fsize: %d, type: %s",
+          path, abspath, size, typestr);
+}
+
+
+int getStats(const char* path, Stats& stats)
+{
     struct stat s {
     };
     int err = 0;
@@ -29,31 +64,32 @@ struct file_stats fu_stats(const char* path)
         } else {
             log_e(TAG, "Unknown error reading stat()");
         }
-        return fs;
+        return 1;
     } else {
-        fs.path    = path;
-        fs.abspath = abspath;
-        fs.size    = s.st_size;
-        fs.exists  = 1;
+        stats.path    = path;
+        stats.abspath = abspath;
+        stats.size    = s.st_size;
+        stats.exists  = true;
 
         // set type specific stuff (man 7 inode)
         if (S_ISREG(s.st_mode)) {    // S_IFREG = regular file
-            fs.type = F_FILE;
+            stats.type = Type::File;
         } else if (S_ISDIR(s.st_mode)) {
-            fs.type = F_DIR;
+            stats.type = Type::Dir;
         } else {
-            fs.type = F_UNKNOWN;
+            stats.type = Type::Other;
         }
-        log_l(TAG, "%s: path: %s, apath: %s, fsize: %d, type: %s",
-              __func__, fs.path, fs.abspath, fs.size,
-              fs.type == F_FILE ? "file" : "dir");
-        return fs;
+        stats.pprint();
+        return 0;
     }
 }
 
 
-unsigned int fu_read_file_lines(const char* path, Line** lines)
+Buffer loadBuffer(const char* path)
 {
+    // TODO Check if the file is indeed a file
+    // TODO Load empty buffer if doesnt exist
+
     FILE* f = fopen(path, "r");
     assert(f);
     fseek(f, 0, SEEK_END);
@@ -75,8 +111,8 @@ unsigned int fu_read_file_lines(const char* path, Line** lines)
     }
     rewind(f);
 
-    Line* mlines = new Line[linecount];
-    assert(mlines);
+    Line* lines = new Line[linecount];
+    assert(lines);
 
     unsigned int count = 0;
     // getline allocates buffer if tmpdata and tmplen == 0
@@ -89,74 +125,19 @@ unsigned int fu_read_file_lines(const char* path, Line** lines)
             break;
         }
         Line ln(linelen, tmpdata);
-        mlines[count++] = ln;
-        tmpdata = nullptr;
-        wtfits  = 0;
+        lines[count++] = ln;
+        tmpdata        = nullptr;
+        wtfits         = 0;
     }
     fclose(f);
     log_l(TAG, "%d lines read (%d bytes)", linecount, size);
     assert(count == linecount);
 
-    *lines = mlines;
-    return linecount;
+    return Buffer(Buffer::Type::Document, path, lines, linecount);
 }
 
 
-void fu_abspath(const char* relpath, char* abspath)
-{
-    realpath(relpath, abspath);
-}
-
-int fu_file_exists(const char* path)
-{
-    struct stat s {
-    };
-    int err = 0;
-    char abspath[PATH_MAX];
-    realpath(path, abspath);
-    err = stat(abspath, &s);
-
-    if (err) {
-        /* Either it doesn't exist or we lack the permissions.
-         * Either way we failed */
-        return 0;
-    }
-    // man 7 inode
-    if ((s.st_mode & S_IFMT) == S_IFREG) {    // S_IFREG = regular file
-        return 1;
-    } else {
-        return 0;
-    }
-}
-
-int fu_dir_exists(const char* path)
-{
-    struct stat s {
-    };
-    int err = 0;
-    err     = stat(path, &s);
-
-    char abspath[PATH_MAX];
-    realpath(path, abspath);
-    if (err) {
-        // Either it doesn't exist or we lack the permissions. Either way
-        // we failed
-        return 0;
-    }
-    // man 7 inode
-    if ((s.st_mode & S_IFMT) == S_IFDIR) {    // S_IFDIR = directory
-        return 1;
-    } else {
-        return 0;
-    }
-}
-
-char* fu_cwd()
-{
-    return getcwd(nullptr, PATH_MAX);
-}
-
-int fu_save_buffer(Buffer* buf, const char* path)
+int saveBuffer(Buffer& buf, const char* path)
 {
     //log_l(TAG, "Saving buffer...");
     //FILE* f = fopen(path, "w");
@@ -164,23 +145,24 @@ int fu_save_buffer(Buffer* buf, const char* path)
     //unsigned int wbytes = 0;
     //unsigned int lcount = 0;
     //for (unsigned int lnum = 0; lnum < buf->lineCount(); ++lnum) {
-        //const Buffer::Line& ln = buf->line(lnum);
-        //lcount++;
-        //for (unsigned int i = 0; i < ln.Len(); ++i) {
-            //if (buf->lineHasGap(lnum)) {
-                //// Line with the gap
-                //if (!buf->inGap(i)) {
-                    //fputc(ln[i], f);
-                    //wbytes++;
-                //}
-            //} else {
-                //// Lines without the gap
-                //fputc(ln[i], f);
-                //wbytes++;
-            //}
-        //}
+    //const Buffer::Line& ln = buf->line(lnum);
+    //lcount++;
+    //for (unsigned int i = 0; i < ln.Len(); ++i) {
+    //if (buf->lineHasGap(lnum)) {
+    //// Line with the gap
+    //if (!buf->inGap(i)) {
+    //fputc(ln[i], f);
+    //wbytes++;
+    //}
+    //} else {
+    //// Lines without the gap
+    //fputc(ln[i], f);
+    //wbytes++;
+    //}
+    //}
     //}
     //log_l(TAG, "Buffer saved (%d lines, %d bytes): %s", lcount, wbytes, path);
     //fclose(f);
     return 0;
+}
 }
