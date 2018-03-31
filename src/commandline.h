@@ -5,7 +5,7 @@
 
 class CommandLine
 {
-    char buffer[CMDBUFCAP];
+    char buffer[CMDBUFCAP]{};
     unsigned int cur;
 public:
     CommandLine();

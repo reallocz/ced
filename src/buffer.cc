@@ -5,7 +5,7 @@
 #include <cassert>
 #include <cstdio>
 #include <cstdlib>
-#include <string.h>
+#include <cstring>
 
 #define CURVALID(buf, cur) \
     ((cur).line < (buf)->linecount)
@@ -18,7 +18,7 @@ static unsigned int generate_id()
     return id++;
 }
 
-// TODO empty buffer
+// TODO(realloc): empty buffer
 Buffer::Buffer(enum Buffer::Type type)
 {
     id         = generate_id();
@@ -106,7 +106,7 @@ bool Buffer::saveToDisk()
     return false;
 }
 
-bool Buffer::saveToDiskAs(const char* path)
+bool Buffer::saveToDiskAs(const char*  /*path*/)
 {
     //return fu_save_buffer(buf, path);
     return false;

@@ -12,8 +12,8 @@ struct Command {
     // Members
     bool valid;        // 0 if invalid
     enum Type type;    // Use only if valid
-    char cmd[16];
-    char args[128];
+    char cmd[16]{};
+    char args[128]{};
 
     Command();
     Command(const char* cmdstr);

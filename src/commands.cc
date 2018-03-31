@@ -21,11 +21,11 @@ static const char* Defs[] = {
 Command::Command()
     : valid(false), type(Type::Unknown)
 {
-    for (unsigned int i = 0; i < 16; ++i) {
-        cmd[i] = '\0';
+    for (char & i : cmd) {
+        i = '\0';
     }
-    for (unsigned int i = 0; i < 128; ++i) {
-        args[i] = '\0';
+    for (char & arg : args) {
+        arg = '\0';
     }
 }
 
@@ -77,7 +77,7 @@ void Command::idType()
         if (strcmp(cmd, def) == 0) {
             log_l(TAG, "Recognized command: %s", cmd);
             valid = true;
-            type  = (Type) count;
+            type  = static_cast<Type>(count);
             break;
         }
         count++;

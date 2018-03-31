@@ -24,10 +24,12 @@ Stats::Stats()
 
 Stats::~Stats()
 {
-    if (path != nullptr)
+    if (path != nullptr) {
         delete[] path;
-    if (abspath != nullptr)
+}
+    if (abspath != nullptr) {
         delete[] abspath;
+}
 }
 
 
@@ -87,8 +89,8 @@ int getStats(const char* path, Stats& stats)
 
 Buffer loadBuffer(const char* path)
 {
-    // TODO Check if the file is indeed a file
-    // TODO Load empty buffer if doesnt exist
+    // TODO(realloc): Check if the file is indeed a file
+    // TODO(realloc): Load empty buffer if doesnt exist
 
     FILE* f = fopen(path, "r");
     assert(f);
@@ -111,7 +113,7 @@ Buffer loadBuffer(const char* path)
     }
     rewind(f);
 
-    Line* lines = new Line[linecount];
+    auto* lines = new Line[linecount];
     assert(lines);
 
     unsigned int count = 0;
@@ -137,7 +139,7 @@ Buffer loadBuffer(const char* path)
 }
 
 
-int saveBuffer(Buffer& buf, const char* path)
+int saveBuffer(Buffer&  /*buf*/, const char*  /*path*/)
 {
     //log_l(TAG, "Saving buffer...");
     //FILE* f = fopen(path, "w");
@@ -165,4 +167,4 @@ int saveBuffer(Buffer& buf, const char* path)
     //fclose(f);
     return 0;
 }
-}
+} // namespace FileUtil

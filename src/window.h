@@ -44,10 +44,10 @@ private:
     WINDOW* nwin;
 
 public:
-    StatusLine sline;
-    Margin margin;
+    StatusLine sline{};
+    Margin margin{};
     CommandLine cline;
-    BufferView* bview;
+    BufferView* bview{};
 
 public:
     Window();

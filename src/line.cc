@@ -68,7 +68,7 @@ bool Line::addGap()
 {
     unsigned int newlinelen = Len() + GAPSIZE;
     unsigned int newgaplen  = gaplen + GAPSIZE;
-    char* newdata           = new char[newlinelen];
+    auto* newdata           = new char[newlinelen];
     assert(newdata);
 
     /* Copy memory to new data */
