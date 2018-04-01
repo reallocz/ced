@@ -1,5 +1,5 @@
-TODO: 
-- Scroll buffer when cursor reaches the edge
+#TODO 
+General: 
 - Line wrapping
 - cmdline wrapping
 - statusline sections
@@ -7,6 +7,15 @@ TODO:
 - Convert structs to classes
 - Add wide char support
 - Impl a scripting language!
+- Undo
+
+Buffer: 
+- Scroll buffer when cursor reaches the edge
+
+Line:
+- Clear line
+- Add line
+- Delete line
 
 DONE:
 - Add relative line number
