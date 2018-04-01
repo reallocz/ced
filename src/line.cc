@@ -24,22 +24,16 @@ Line::Line(unsigned int len, char* data)
 }
 
 
+bool Line::inGap(unsigned int i) const
+{
+    return (i >= gapcol) && (i < gapcol + gaplen);
+}
+
+
 const char Line::operator[](std::size_t index) const
 {
     assert(index < len);
     return data[index];
-}
-
-char& Line::operator[](std::size_t index)
-{
-    assert(index < len);
-    return data[index];
-}
-
-
-bool Line::inGap(unsigned int i) const
-{
-    return (i >= gapcol) && (i < gapcol + gaplen);
 }
 
 
@@ -64,6 +58,13 @@ void Line::delCh(const Cursor& cur)
 }
 
 
+void Line::clear()
+{
+    gapcol = 0;
+    gaplen = len;
+}
+
+
 bool Line::addGap()
 {
     unsigned int newlinelen = Len() + GAPSIZE;
@@ -71,9 +72,6 @@ bool Line::addGap()
     auto* newdata           = new char[newlinelen];
     assert(newdata);
 
-    /* Copy memory to new data */
-    // from start to gap
-    //memcpy(newdata, data, gapcol * sizeof(char));
     for (unsigned int i = 0; i < gapcol; ++i) {
         newdata[i] = data[i];
     }
@@ -84,9 +82,6 @@ bool Line::addGap()
     for (unsigned int i = 0; i < aftergaplen; ++i) {
         newdata[gapcol + newgaplen + i] = data[aftergap + i];
     }
-    //memcpy(&newdata[gapcol + newgaplen],
-    //&data[gapcol + gaplen],
-    //Len() - (gapcol + gaplen));
 
     // free old buffer
     delete[] data;
@@ -141,3 +136,4 @@ bool Line::moveGap(const Cursor& cur)
     }
     return true;
 }
+

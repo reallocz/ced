@@ -14,21 +14,24 @@ public:
     Line();
     Line(unsigned int len, char* data);
 
+    // Length
     unsigned int Len() const { return len; }
     unsigned int trueLen() const { return len - gaplen; }
+    unsigned int Id() { return id; }
 
-    const char operator[](std::size_t index) const;
-    char& operator[](std::size_t index);
-
+    // Return true if i is inside the gap
     bool inGap(unsigned int i) const;
 
-    void pprint() const;
-    unsigned int Id() { return id; }
+    // Operators
+    const char operator[](std::size_t index) const;
 
     void addCh(char ch, const Cursor& cur);
     void delCh(const Cursor& cur);
+    void clear();
 
+    void pprint() const;
 private:
+    // Gap
     bool addGap();
     bool addGapOptional();
     bool moveGap(const Cursor& cur);
