@@ -82,19 +82,19 @@ void Ced::run()
 
 void Ced::insertCb(inpev ev)
 {
-    Buffer& buffer = win.Bview().getBuffer();
-    Cursor cur = win.Bview().getCursor();
+    BufferView& bview = win.Bview();
+    const Cursor& cur = bview.getCursor();
 
     if (ev.type == INP_ALPHA || ev.type == INP_NUM || ev.type == INP_SYMBOL || ev.key == k_space || ev.key == k_enter) {
-        buffer.line(cur.line).addCh(ev.key, cur);
-        win.Bview().cmovFwd(1);
+        bview.currentLine().addCh(ev.key, cur);
+        bview.cmovFwd(1);
     }
 
     if (ev.type == INP_SPECIAL) {
         switch (ev.key) {
         case k_backspace:
-            buffer.line(cur.line).delCh(cur);
-            win.Bview().cmovBack(1);
+            bview.currentLine().delCh(cur);
+            bview.cmovBack(1);
             break;
         case k_esc:
             context.setMode(Mode::Normal);
