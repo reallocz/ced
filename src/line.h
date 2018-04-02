@@ -17,7 +17,9 @@ public:
     // Length
     unsigned int Len() const { return len; }
     unsigned int trueLen() const { return len - gaplen; }
-    unsigned int Id() { return id; }
+    unsigned int Id() const { return id; }
+    unsigned int gapCol() const { return gapcol; }
+    unsigned int gapLen() const { return gaplen; }
 
     // Return true if i is inside the gap
     bool inGap(unsigned int i) const;

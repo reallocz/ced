@@ -51,6 +51,8 @@ void Window::update(const Context& context)
     // statusline
     sline.bufname = bview->getBuffer().getName();
     sline.cur     = bview->getCursor();
+    sline.gaplen  = bview->currentLine().gapLen();
+    sline.gapcol  = bview->currentLine().gapCol();
 
     // Margin
     margin.width     = 3;

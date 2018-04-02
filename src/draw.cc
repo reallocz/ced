@@ -99,9 +99,9 @@ void draw_statusline(WINDOW* nwin, const StatusLine& sline, Rect area, const Con
     // statusline string
     char stsstring[area.width];
     sprintf(stsstring,
-            "   %s | %s | CUR %d:%d | ",
+            "   %s | %s | CUR %d:%d | Gap: col: %d, len: %d |",
             context.modestr, sline.bufname, sline.cur.line,
-            sline.cur.col);
+            sline.cur.col, sline.gapcol, sline.gaplen);
 
     init_pair(1, COLOR_BLACK, COLOR_WHITE);
     wattron(nwin, COLOR_PAIR(1));

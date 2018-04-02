@@ -28,6 +28,8 @@
 struct StatusLine {
     const char* bufname;
     Cursor cur;
+    unsigned int gaplen;
+    unsigned int gapcol;
 };
 
 
