@@ -37,8 +37,9 @@ void Ced::parseOpts(Opts opts)
     // Set up BufferViews
     if (opts.bcount == 0) {
         // Init scratch buffer
-        bcount    = 1;
-        bviews[0] = BufferView(Buffer::Type::Scratch, TEXTPATH "scratch.txt");
+        bcount = 1;
+        bviews[0] =
+            BufferView(Buffer::Type::Scratch, TEXTPATH "scratch.txt");
     } else {
         static_assert(opts.bviews);
         bcount = opts.bcount;
@@ -85,8 +86,8 @@ void Ced::insertCb(inpev ev)
     BufferView& bview = win.Bview();
     const Cursor& cur = bview.getCursor();
 
-    if (ev.type == InputType::Alpha || ev.type == InputType::Num || ev.type == InputType::Symbol
-            || ev.key == k_space) {
+    if (ev.type == InputType::Alpha || ev.type == InputType::Num ||
+        ev.type == InputType::Symbol || ev.key == k_space) {
         bview.currentLine().addCh(ev.key, cur);
         bview.cmovFwd(1);
     } else if (ev.key == k_enter) {
@@ -97,11 +98,8 @@ void Ced::insertCb(inpev ev)
             bview.currentLine().delCh(cur);
             bview.cmovBack(1);
             break;
-        case k_esc:
-            context.setMode(Mode::Normal);
-            break;
-        default:
-            break;
+        case k_esc: context.setMode(Mode::Normal); break;
+        default: break;
         }
     }
 }
@@ -144,7 +142,7 @@ void Ced::normalCb(inpev ev)
         win.margin.relative = !win.margin.relative;
     } else if (ev.key == 'D') {
         bview.currentLine().deleteGap();
-        //bview.currentLine().clear();
+        // bview.currentLine().clear();
     }
 }
 
@@ -166,7 +164,9 @@ void Ced::commandCb(inpev ev)
         // Reset cmdline
         win.cline.clear();
         context.setMode(Mode::Normal);
-    } else if (ev.type == InputType::Alpha || ev.type == InputType::Num || ev.type == InputType::Symbol || ev.key == k_space) {
+    } else if (ev.type == InputType::Alpha ||
+               ev.type == InputType::Num ||
+               ev.type == InputType::Symbol || ev.key == k_space) {
         win.cline.addCh(ev.key);
     } else if (ev.key == k_backspace) {
         win.cline.delCh();

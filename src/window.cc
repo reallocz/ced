@@ -61,10 +61,10 @@ void Window::update(const Context& context)
 
     // buffer
     // Update bview bounds
-    Rect area     = context.bounds;
-    Rect bvbounds = RECT(0, margin.width + 1,
-                                area.width - margin.width,
-                                area.height - STATUSLINE_HEIGHT - CMDLINE_HEIGHT);
+    Rect area = context.bounds;
+    Rect bvbounds =
+        RECT(0, margin.width + 1, area.width - margin.width,
+             area.height - STATUSLINE_HEIGHT - CMDLINE_HEIGHT);
     bview->setBounds(bvbounds);
     bview->update();
 }
@@ -74,31 +74,35 @@ void Window::draw(const Context& context)
 {
     Rect area = context.bounds;
     // Stl
-    Rect areastl = RECT(area.height - STATUSLINE_HEIGHT - CMDLINE_HEIGHT, 0,
-                               area.width, STATUSLINE_HEIGHT);
+    Rect areastl =
+        RECT(area.height - STATUSLINE_HEIGHT - CMDLINE_HEIGHT, 0,
+             area.width, STATUSLINE_HEIGHT);
     draw_statusline(nwin, sline, areastl, context);
 
     // Margin
-    Rect areamgn = RECT(0, 0, margin.width, area.height - STATUSLINE_HEIGHT - CMDLINE_HEIGHT);
+    Rect areamgn =
+        RECT(0, 0, margin.width,
+             area.height - STATUSLINE_HEIGHT - CMDLINE_HEIGHT);
     draw_margin(nwin, margin, areamgn, bview->getCursor(), context);
 
     // Cmdline
-    Rect areacmd = RECT(area.height - CMDLINE_HEIGHT, 0,
-                               area.width, CMDLINE_HEIGHT);
+    Rect areacmd = RECT(area.height - CMDLINE_HEIGHT, 0, area.width,
+                        CMDLINE_HEIGHT);
     draw_cmdline(nwin, cline, areacmd, context);
 
     // Bufferview
     draw_bview(nwin, *bview, context);
 
     // Draw cursor
-    if (context.mode == Mode::Normal || context.mode == Mode::Insert) {
+    if (context.mode == Mode::Normal ||
+        context.mode == Mode::Insert) {
         // Cursor in BufferView
         Cursor c    = bview->relcur();
         Rect areabv = bview->getBounds();
         wmove(nwin, areabv.y + c.line, areabv.x + c.col);
     } else if (context.mode == Mode::Command) {
         int x = cline.getCursor() + 1;
-        //int x = strlen(cmdline.buffer) + 1;    // +1 for ':' prefix
+        // int x = strlen(cmdline.buffer) + 1;    // +1 for ':' prefix
         wmove(nwin, areacmd.y, x);
     } else {
         // ERROR

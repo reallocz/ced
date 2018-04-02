@@ -6,11 +6,7 @@
 namespace FileUtil
 {
 
-enum class Type {
-    File,
-    Dir,
-    Other
-};
+enum class Type { File, Dir, Other };
 
 
 struct Stats {

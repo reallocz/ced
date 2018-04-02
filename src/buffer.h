@@ -32,7 +32,7 @@ private:
     // Member functions
 public:
     Buffer(enum Type type);
-    //Buffer(enum Type type, const char* filename);
+    // Buffer(enum Type type, const char* filename);
     Buffer(enum Type type, const char* name, Line* lines,
            size_t linecount);
 

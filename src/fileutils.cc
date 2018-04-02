@@ -26,10 +26,10 @@ Stats::~Stats()
 {
     if (path != nullptr) {
         delete[] path;
-}
+    }
     if (abspath != nullptr) {
         delete[] abspath;
-}
+    }
 }
 
 
@@ -37,18 +37,12 @@ void Stats::pprint() const
 {
     const char* typestr;
     switch (type) {
-    case Type::File:
-        typestr = "file";
-        break;
-    case Type::Dir:
-        typestr = "dir";
-        break;
-    case Type::Other:
-        typestr = "other";
-        break;
+    case Type::File: typestr = "file"; break;
+    case Type::Dir: typestr = "dir"; break;
+    case Type::Other: typestr = "other"; break;
     }
-    log_l(TAG, "Stats{path: %s, apath: %s, fsize: %d, type: %s",
-          path, abspath, size, typestr);
+    log_l(TAG, "Stats{path: %s, apath: %s, fsize: %d, type: %s", path,
+          abspath, size, typestr);
 }
 
 
@@ -124,7 +118,7 @@ Buffer loadBuffer(const char* path)
     while (true) {
         linelen = getline(&tmpdata, &wtfits, f);
         if (linelen == -1) {
-            delete[] tmpdata; // Recommended by getline
+            delete[] tmpdata;    // Recommended by getline
             break;
         }
 
@@ -132,19 +126,19 @@ Buffer loadBuffer(const char* path)
         char* finaldata = tmpdata;
 
         // Remove terminating '\0'
-        if(tmpdata[linelen] == '\0') {
+        if (tmpdata[linelen] == '\0') {
             finallen = linelen - 1;
 
             char* data = new char[finallen];
             assert(data);
-            for(size_t i = 0; i < finallen; ++i) {
+            for (size_t i = 0; i < finallen; ++i) {
                 data[i] = tmpdata[i];
             }
             delete[] tmpdata;
             finaldata = data;
         }
 
-        Line ln = Line(finallen, finaldata);
+        Line ln        = Line(finallen, finaldata);
         lines[count++] = ln;
         tmpdata        = nullptr;
         wtfits         = 0;
@@ -162,11 +156,11 @@ int saveBuffer(Buffer& buf, const char* path)
     log_l(TAG, "Saving buffer...");
     FILE* f = fopen(path, "w");
     assert(f);
-    size_t wbytes = 0; // Bytes written
-    size_t wlines = 0; // Lines return
+    size_t wbytes = 0;    // Bytes written
+    size_t wlines = 0;    // Lines return
     for (size_t lnum = 0; lnum < buf.lineCount(); ++lnum) {
         size_t checkbytes = 0;
-        const Line& ln = buf.getLine(lnum);
+        const Line& ln    = buf.getLine(lnum);
         for (size_t i = 0; i < ln.Len(); ++i) {
             if (!ln.inGap(i)) {
                 fputc(ln[i], f);
@@ -178,8 +172,9 @@ int saveBuffer(Buffer& buf, const char* path)
         assert(checkbytes == ln.trueLen());
         wlines++;
     }
-    log_l(TAG, "Buffer saved (%d lines, %d bytes): %s", wlines, wbytes, path);
+    log_l(TAG, "Buffer saved (%d lines, %d bytes): %s", wlines,
+          wbytes, path);
     fclose(f);
     return 0;
 }
-} // namespace FileUtil
+}    // namespace FileUtil

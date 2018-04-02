@@ -1,8 +1,8 @@
 #pragma once
 #include "bufferview.h"
+#include "commandline.h"
 #include "common.h"
 #include "context.h"
-#include "commandline.h"
 #include <ncurses.h>
 
 #define CMDLINE_SIZE 256
@@ -37,7 +37,7 @@ struct Margin {
     size_t width;
     size_t start;    // First line number
     size_t linecount;
-    bool relative{false}; // Relative line number
+    bool relative{false};    // Relative line number
 };
 
 class Window

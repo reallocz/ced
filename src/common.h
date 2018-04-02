@@ -1,6 +1,6 @@
 #pragma once
-#include <cstdlib>
 #include "log.h"
+#include <cstdlib>
 
 #define TEXTPATH "../text/"
 
@@ -11,18 +11,16 @@
     }
 
 /** Evals to 1 if two rects are identical */
-#define RECTSAME(A, B) \
-    (A.y == B.y && A.x == B.x && A.width == B.width && A.height == B.height)
+#define RECTSAME(A, B)                                 \
+    (A.y == B.y && A.x == B.x && A.width == B.width && \
+     A.height == B.height)
 
 /** Eval to 1 if 'f' is set in 'flags' */
-#define ISFLAGSET(flags, f) \
-    (flags & f) == f ? 1 : 0
+#define ISFLAGSET(flags, f) (flags & f) == f ? 1 : 0
 
-#define SETFLAG(flags, f) \
-    flags |= f
+#define SETFLAG(flags, f) flags |= f
 
-#define UNSETFLAG(flags, f) \
-    flags &= ~f
+#define UNSETFLAG(flags, f) flags &= ~f
 
 enum flags {
     Farea_update = 1 << 1,
@@ -42,6 +40,7 @@ struct Rect {
 
     void print()
     {
-        log_l("COMMON", "Rect {y: %d, x: %d, w: %d, h: %d}", y, x, width, height);
+        log_l("COMMON", "Rect {y: %d, x: %d, w: %d, h: %d}", y, x,
+              width, height);
     }
 };

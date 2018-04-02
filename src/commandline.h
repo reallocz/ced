@@ -35,6 +35,7 @@ class CommandLine
 {
     char buffer[CMDBUFCAP]{};
     unsigned int cur;
+
 public:
     CommandLine();
     void addCh(char ch);

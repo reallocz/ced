@@ -9,15 +9,17 @@
  *  1 - statusline
  *  2 - margin
  *  ... - cmdline, textarea etc
- * This is because drawing margin clear each line and drawing textarea does NOT!
+ * This is because drawing margin clear each line and drawing textarea
+ * does NOT!
  */
 
-void draw_bview(WINDOW* nwin, const BufferView& bv, const Context& context __attribute__((unused)))
+void draw_bview(WINDOW* nwin, const BufferView& bv,
+                const Context& context __attribute__((unused)))
 {
     const Buffer& buffer = bv.getBuffer();
 
-    //log_l(TAG, "Drawing buffer %d (%d lines)...",
-    //buffer.Id(), buffer.lineCount());
+    // log_l(TAG, "Drawing buffer %d (%d lines)...",
+    // buffer.Id(), buffer.lineCount());
 
     Rect area = bv.getBounds();
     size_t ox = area.x;
@@ -45,7 +47,7 @@ void draw_bview(WINDOW* nwin, const BufferView& bv, const Context& context __att
         area.x = ox;
     }
 
-    //log_l(TAG, "%d lines drawn", linesdrawn);
+    // log_l(TAG, "%d lines drawn", linesdrawn);
 }
 
 
@@ -94,14 +96,17 @@ void draw_margin(WINDOW* nwin, const Margin& mgn, Rect area,
 }
 
 
-void draw_statusline(WINDOW* nwin, const StatusLine& sline, Rect area, const Context& context)
+void draw_statusline(WINDOW* nwin, const StatusLine& sline, Rect area,
+                     const Context& context)
 {
     // statusline string
     char stsstring[area.width];
     sprintf(stsstring,
             "   %s | %s | CUR %d:%d | Gap: col: %d, len: %d |",
-            context.modestr, sline.bufname, static_cast<int>(sline.cur.line),
-            static_cast<int>(sline.cur.col), static_cast<int>(sline.gapcol),
+            context.modestr, sline.bufname,
+            static_cast<int>(sline.cur.line),
+            static_cast<int>(sline.cur.col),
+            static_cast<int>(sline.gapcol),
             static_cast<int>(sline.gaplen));
 
     init_pair(1, COLOR_BLACK, COLOR_WHITE);
@@ -112,8 +117,8 @@ void draw_statusline(WINDOW* nwin, const StatusLine& sline, Rect area, const Con
     wattroff(nwin, COLOR_PAIR(1));
 }
 
-void draw_cmdline(WINDOW* nwin, const CommandLine& cline,
-                  Rect area, const Context& context)
+void draw_cmdline(WINDOW* nwin, const CommandLine& cline, Rect area,
+                  const Context& context)
 {
     wmove(nwin, area.y, 0);
     wclrtoeol(nwin);

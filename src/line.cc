@@ -61,7 +61,7 @@ void Line::delCh(const Cursor& cur)
 void Line::clear()
 {
     gapcol = 0;
-    gaplen = len - 1; // Last char is a '\n'
+    gaplen = len - 1;    // Last char is a '\n'
 }
 
 
@@ -69,7 +69,7 @@ bool Line::addGap()
 {
     size_t newlinelen = Len() + GAPSIZE;
     size_t newgaplen  = gaplen + GAPSIZE;
-    auto* newdata           = new char[newlinelen];
+    auto* newdata     = new char[newlinelen];
     assert(newdata);
 
     for (size_t i = 0; i < gapcol; ++i) {
@@ -113,17 +113,17 @@ bool Line::deleteGap()
     assert(newdata);
 
     size_t j = 0;
-    for(size_t i = 0; i < Len(); ++i) {
-        if(!inGap(i)) {
+    for (size_t i = 0; i < Len(); ++i) {
+        if (!inGap(i)) {
             newdata[j++] = data[i];
         }
     }
     assert(j == newlen);
     delete[] data;
 
-    len = newlen;
+    len    = newlen;
     gaplen = 0;
-    data = newdata;
+    data   = newdata;
     return true;
 }
 
@@ -143,7 +143,7 @@ bool Line::moveGap(const size_t col)
     }
 
     size_t offset = 0;
-    int diff            = col - gapcol;
+    int diff      = col - gapcol;
 
     if (diff > 0) {
         // Cursor is ahead of the gap
@@ -169,9 +169,9 @@ bool Line::moveGap(const size_t col)
 
 void Line::pprint() const
 {
-    log_l(TAG, "Line{len: %d, gapcol: %d, gaplen: %d, data: ",
-            len, gapcol, gaplen);
-    for(size_t i = 0; i < len; ++i) {
+    log_l(TAG, "Line{len: %d, gapcol: %d, gaplen: %d, data: ", len,
+          gapcol, gaplen);
+    for (size_t i = 0; i < len; ++i) {
         log_lc("%c", data[i]);
     }
     log_lc("}\n");

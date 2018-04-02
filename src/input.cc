@@ -26,11 +26,14 @@ enum InputType inp_classify(int ch)
         return InputType::Num;
     }
 
-    if ((ch >= 33 && ch <= 47) || (ch >= 58 && ch <= 64) || (ch >= 91 && ch <= 96) || (ch >= 123 && ch <= 126)) {
+    if ((ch >= 33 && ch <= 47) || (ch >= 58 && ch <= 64) ||
+        (ch >= 91 && ch <= 96) || (ch >= 123 && ch <= 126)) {
         return InputType::Symbol;
     }
 
-    if (ch == k_esc || ch == k_enter || ch == k_tab || ch == k_space || ch == k_delete || ch == k_insert || ch == k_backspace) {
+    if (ch == k_esc || ch == k_enter || ch == k_tab ||
+        ch == k_space || ch == k_delete || ch == k_insert ||
+        ch == k_backspace) {
         return InputType::Special;
     }
 

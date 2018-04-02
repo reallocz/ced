@@ -7,8 +7,7 @@
 #include <cstdlib>
 #include <cstring>
 
-#define CURVALID(buf, cur) \
-    ((cur).line < (buf)->linecount)
+#define CURVALID(buf, cur) ((cur).line < (buf)->linecount)
 
 #define TAG "BUFFER"
 
@@ -36,8 +35,8 @@ Buffer::Buffer(enum Type type, const char* name, Line* lines,
                size_t linecount)
     : Buffer(type)
 {
-    this->name = name;
-    this->lines = lines;
+    this->name      = name;
+    this->lines     = lines;
     this->linecount = linecount;
 }
 
@@ -45,14 +44,15 @@ Buffer::Buffer(enum Type type, const char* name, Line* lines,
 void Buffer::destroy()
 {
     for (size_t i = 0; i < linecount; ++i) {
-        //free(lines[i].data); // TODO!!!
+        // free(lines[i].data); // TODO!!!
     }
     free(lines);
     log_l(TAG, "Buffer destroyed (id=%d)", id);
 }
 
 
-/** Returns pointer to line in buffer. NULL if 'num' is out of bounds*/
+/** Returns pointer to line in buffer. NULL if 'num' is out of
+ * bounds*/
 Line& Buffer::getLine(size_t num)
 {
     assert(num < linecount);
@@ -69,15 +69,15 @@ const Line& Buffer::getLine(size_t num) const
 
 bool Buffer::splitLine(const Cursor& cur)
 {
-    log_l(TAG, "Splitting line at cur: col:%d, line:%d", cur.col, cur.line);
+    log_l(TAG, "Splitting line at cur: col:%d, line:%d", cur.col,
+          cur.line);
     Line& ln = getLine(cur.line);
     ln.deleteGap();
 
     // create New line
     size_t newlen = ln.Len() - cur.col;
     char* newdata = new char[newlen];
-    for(size_t i = cur.col, j = 0; i < ln.trueLen(); ++i, ++j)
-    {
+    for (size_t i = cur.col, j = 0; i < ln.trueLen(); ++i, ++j) {
         newdata[j] = ln[i];
     }
 
@@ -90,23 +90,21 @@ bool Buffer::splitLine(const Cursor& cur)
     size_t newlinecount = linecount + 1;
     Line* newlinebuffer = new Line[newlinecount];
 
-    for(size_t i = 0; i <= cur.line; ++i) {
+    for (size_t i = 0; i <= cur.line; ++i) {
         newlinebuffer[i] = lines[i];
     }
     newlinebuffer[cur.line + 1] = newline;
-    for(size_t i = cur.line + 2; i < linecount + 1; ++i) {
+    for (size_t i = cur.line + 2; i < linecount + 1; ++i) {
         newlinebuffer[i] = lines[i - 1];
     }
     delete[] lines;
-    lines = newlinebuffer;
+    lines     = newlinebuffer;
     linecount = newlinecount;
     return true;
 }
 
 
-void Buffer::pprint() const
-{
-}
+void Buffer::pprint() const {}
 
 
 void Buffer::pprintLines() const

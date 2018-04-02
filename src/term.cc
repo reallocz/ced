@@ -23,8 +23,7 @@ int init()
     noecho();
     keypad(stdscr, TRUE);
     log_l(TAG, "Init success");
-    log_lc("stdscr { rows: %d, cols %d }\n",
-           rows, cols);
+    log_lc("stdscr { rows: %d, cols %d }\n", rows, cols);
     return 0;
 }
 
@@ -35,8 +34,5 @@ void exit()
 }
 
 
-void update()
-{
-    getmaxyx(stdscr, rows, cols);
-}
+void update() { getmaxyx(stdscr, rows, cols); }
 }    // namespace Term

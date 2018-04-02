@@ -1,6 +1,6 @@
 #pragma once
-#include <cstdlib>
 #include "common.h"
+#include <cstdlib>
 
 class Line
 {
@@ -8,7 +8,7 @@ class Line
     size_t gapcol;
     size_t gaplen;
     size_t len; /** length of line (includes gapsize) */
-    char* data;       /** line data */
+    char* data; /** line data */
 
 public:
     Line();
@@ -36,10 +36,10 @@ public:
     bool clearToEnd(size_t from);
 
     void pprint() const;
+
 private:
     // Gap
     bool addGap();
     bool addGapOptional();
     bool moveGap(const size_t col);
 };
-

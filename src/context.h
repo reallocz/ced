@@ -21,14 +21,8 @@ inline void Context::setMode(enum Mode mode)
 {
     this->mode = mode;
     switch (mode) {
-    case Mode::Normal:
-        modestr = "Normal";
-        break;
-    case Mode::Insert:
-        modestr = "Insert";
-        break;
-    case Mode::Command:
-        modestr = "Command";
-        break;
+    case Mode::Normal: modestr = "Normal"; break;
+    case Mode::Insert: modestr = "Insert"; break;
+    case Mode::Command: modestr = "Command"; break;
     }
 }

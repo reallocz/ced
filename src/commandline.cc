@@ -1,5 +1,5 @@
-#include "log.h"
 #include "commandline.h"
+#include "log.h"
 #include <cassert>
 #include <cstring>
 
@@ -21,12 +21,13 @@ static const char* Defs[] = {
 };
 
 Command::Command()
-    : valid(false), type(Type::Unknown)
+    : valid(false)
+    , type(Type::Unknown)
 {
-    for (char & i : cmd) {
+    for (char& i : cmd) {
         i = '\0';
     }
-    for (char & arg : args) {
+    for (char& arg : args) {
         arg = '\0';
     }
 }
@@ -88,8 +89,8 @@ void Command::idType()
 
 void Command::pprint() const
 {
-    log_l(TAG, "Command {valid: %d, cmd: %s, args: %s}",
-          valid, cmd, args);
+    log_l(TAG, "Command {valid: %d, cmd: %s, args: %s}", valid, cmd,
+          args);
 }
 
 
@@ -105,7 +106,7 @@ void CommandLine::addCh(char ch)
 {
     if (cur < CMDBUFCAP - 1) {
         buffer[cur++] = ch;
-        buffer[cur] = '\0';
+        buffer[cur]   = '\0';
     }
 }
 
@@ -121,12 +122,8 @@ void CommandLine::delCh()
 
 void CommandLine::clear()
 {
-    cur = 0;
+    cur         = 0;
     buffer[cur] = '\0';
 }
 
-Command CommandLine::parse()
-{
-    return Command(buffer);
-}
-
+Command CommandLine::parse() { return Command(buffer); }

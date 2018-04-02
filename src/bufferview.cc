@@ -7,8 +7,8 @@
 
 BufferView::BufferView()
 {
-    start = 0;
-    cur = {0, 0};
+    start  = 0;
+    cur    = {0, 0};
     bounds = RECT(0, 0, 0, 0);
 }
 
@@ -23,7 +23,7 @@ BufferView::BufferView(enum Buffer::Type type, const char* filename)
 void BufferView::update()
 {
     // Keep cursor on the screen
-    Rect bvarea            = getBounds();
+    Rect bvarea      = getBounds();
     size_t firstline = getStart();
 
     if (cur.line < firstline) {
@@ -42,9 +42,9 @@ void BufferView::update()
 
 void BufferView::setBounds(Rect newbounds)
 {
-    //log_l(TAG, "bounds set: {%d, %d, %d, %d} -> {%d, %d, %d, %d}",
-          //bounds.y, bounds.x, bounds.width, bounds.height,
-          //newbounds.y, newbounds.x, newbounds.width, newbounds.height);
+    // log_l(TAG, "bounds set: {%d, %d, %d, %d} -> {%d, %d, %d, %d}",
+    // bounds.y, bounds.x, bounds.width, bounds.height,
+    // newbounds.y, newbounds.x, newbounds.width, newbounds.height);
     bounds = newbounds;
 }
 
@@ -111,10 +111,7 @@ void BufferView::cmovLprev(size_t n)
 }
 
 
-void BufferView::cmovLstart()
-{
-    cur.col = 0;
-}
+void BufferView::cmovLstart() { cur.col = 0; }
 
 
 void BufferView::cmovLend()
@@ -158,8 +155,6 @@ void BufferView::scrollDown(size_t n)
 
 Cursor BufferView::relcur() const
 {
-    Cursor c = {
-        .line = cur.line - start,
-        .col  = cur.col};
+    Cursor c = {.line = cur.line - start, .col = cur.col};
     return c;
 }

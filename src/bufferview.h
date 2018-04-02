@@ -46,6 +46,9 @@ public:
     inline Buffer& getBuffer() { return buffer; };
     inline const Buffer& getBuffer() const { return buffer; }
 
-    const Line& currentLine() const { return buffer.getLine(cur.line); }
+    const Line& currentLine() const
+    {
+        return buffer.getLine(cur.line);
+    }
     Line& currentLine() { return buffer.getLine(cur.line); }
 };
