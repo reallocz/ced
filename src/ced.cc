@@ -1,12 +1,12 @@
 #include "ced.h"
 #include "buffer.h"
 #include "common.h"
+#include "fileutils.h"
 #include "input.h"
 #include "input_keys.h"
 #include "log.h"
 #include "term.h"
 #include "window.h"
-#include "fileutils.h"
 #include <cassert>
 #include <cstdio>
 #include <cstdlib>
@@ -62,7 +62,7 @@ void Ced::run()
         {
             Term::update();
             Rect newbounds = RECT(0, 0, Term::cols, Term::rows);
-            context.bounds        = newbounds;
+            context.bounds = newbounds;
         }
 
         win.update(context);
@@ -85,12 +85,13 @@ void Ced::insertCb(inpev ev)
     BufferView& bview = win.Bview();
     const Cursor& cur = bview.getCursor();
 
-    if (ev.type == INP_ALPHA || ev.type == INP_NUM || ev.type == INP_SYMBOL || ev.key == k_space) {
+    if (ev.type == InputType::Alpha || ev.type == InputType::Num || ev.type == InputType::Symbol
+            || ev.key == k_space) {
         bview.currentLine().addCh(ev.key, cur);
         bview.cmovFwd(1);
     } else if (ev.key == k_enter) {
         bview.getBuffer().splitLine(cur);
-    } else if (ev.type == INP_SPECIAL) {
+    } else if (ev.type == InputType::Special) {
         switch (ev.key) {
         case k_backspace:
             bview.currentLine().delCh(cur);
@@ -165,7 +166,7 @@ void Ced::commandCb(inpev ev)
         // Reset cmdline
         win.cline.clear();
         context.setMode(Mode::Normal);
-    } else if (ev.type == INP_ALPHA || ev.type == INP_NUM || ev.type == INP_SYMBOL || ev.key == k_space) {
+    } else if (ev.type == InputType::Alpha || ev.type == InputType::Num || ev.type == InputType::Symbol || ev.key == k_space) {
         win.cline.addCh(ev.key);
     } else if (ev.key == k_backspace) {
         win.cline.delCh();
