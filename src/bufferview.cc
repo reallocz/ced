@@ -42,9 +42,9 @@ void BufferView::update()
 
 void BufferView::setBounds(Rect newbounds)
 {
-    log_l(TAG, "bounds set: {%d, %d, %d, %d} -> {%d, %d, %d, %d}",
-          bounds.y, bounds.x, bounds.width, bounds.height,
-          newbounds.y, newbounds.x, newbounds.width, newbounds.height);
+    //log_l(TAG, "bounds set: {%d, %d, %d, %d} -> {%d, %d, %d, %d}",
+          //bounds.y, bounds.x, bounds.width, bounds.height,
+          //newbounds.y, newbounds.x, newbounds.width, newbounds.height);
     bounds = newbounds;
 }
 
@@ -61,7 +61,7 @@ void BufferView::setCursor(Cursor newcur)
 
 void BufferView::cmovFwd(unsigned int n)
 {
-    const Line& ln = buffer.line(cur.line);
+    const Line& ln = buffer.getLine(cur.line);
 
     unsigned int newcol = cur.col + n;
     unsigned int maxcol = ln.trueLen();
@@ -119,14 +119,14 @@ void BufferView::cmovLstart()
 
 void BufferView::cmovLend()
 {
-    const Line& ln = buffer.line(cur.line);
+    const Line& ln = buffer.getLine(cur.line);
     cur.col        = ln.trueLen();
 }
 
 
 void BufferView::cmovInline()
 {
-    const Line& ln = buffer.line(cur.line);
+    const Line& ln = buffer.getLine(cur.line);
     if (cur.col >= ln.trueLen()) {
         cmovLend();
     }

@@ -148,7 +148,7 @@ int saveBuffer(Buffer& buf, const char* path)
     unsigned int wlines = 0; // Lines return
     for (unsigned int lnum = 0; lnum < buf.lineCount(); ++lnum) {
         unsigned int checkbytes = 0;
-        const Line& ln = buf.line(lnum);
+        const Line& ln = buf.getLine(lnum);
         for (unsigned int i = 0; i < ln.Len(); ++i) {
             if (!ln.inGap(i)) {
                 fputc(ln[i], f);

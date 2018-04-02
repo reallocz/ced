@@ -16,8 +16,8 @@ void draw_bview(WINDOW* nwin, const BufferView& bv, const Context& context __att
 {
     const Buffer& buffer = bv.getBuffer();
 
-    log_l(TAG, "Drawing buffer %d (%d lines)...",
-          buffer.Id(), buffer.lineCount());
+    //log_l(TAG, "Drawing buffer %d (%d lines)...",
+          //buffer.Id(), buffer.lineCount());
 
     Rect area       = bv.getBounds();
     unsigned int ox = area.x;
@@ -32,7 +32,7 @@ void draw_bview(WINDOW* nwin, const BufferView& bv, const Context& context __att
             break;
         }
 
-        const Line& ln = buffer.line(linenumber);
+        const Line& ln = buffer.getLine(linenumber);
 
 
         linesdrawn++;
@@ -45,7 +45,7 @@ void draw_bview(WINDOW* nwin, const BufferView& bv, const Context& context __att
         area.x = ox;
     }
 
-    log_l(TAG, "%d lines drawn", linesdrawn);
+    //log_l(TAG, "%d lines drawn", linesdrawn);
 }
 
 
