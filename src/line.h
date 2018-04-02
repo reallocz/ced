@@ -32,10 +32,12 @@ public:
     void clear();
 
     void pprint() const;
+    bool deleteGap();
+    bool clearToEnd(unsigned int from);
 private:
     // Gap
     bool addGap();
     bool addGapOptional();
-    bool moveGap(const Cursor& cur);
+    bool moveGap(const unsigned int col);
 };
 

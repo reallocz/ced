@@ -85,12 +85,12 @@ void Ced::insertCb(inpev ev)
     BufferView& bview = win.Bview();
     const Cursor& cur = bview.getCursor();
 
-    if (ev.type == INP_ALPHA || ev.type == INP_NUM || ev.type == INP_SYMBOL || ev.key == k_space || ev.key == k_enter) {
+    if (ev.type == INP_ALPHA || ev.type == INP_NUM || ev.type == INP_SYMBOL || ev.key == k_space) {
         bview.currentLine().addCh(ev.key, cur);
         bview.cmovFwd(1);
-    }
-
-    if (ev.type == INP_SPECIAL) {
+    } else if (ev.key == k_enter) {
+        bview.getBuffer().splitLine(cur);
+    } else if (ev.type == INP_SPECIAL) {
         switch (ev.key) {
         case k_backspace:
             bview.currentLine().delCh(cur);
@@ -142,7 +142,8 @@ void Ced::normalCb(inpev ev)
         // Toggle relative line numbers
         win.margin.relative = !win.margin.relative;
     } else if (ev.key == 'D') {
-        bview.currentLine().clear();
+        bview.currentLine().deleteGap();
+        //bview.currentLine().clear();
     }
 }
 

@@ -38,16 +38,19 @@ public:
 
     void destroy();
 
-    Line& line(unsigned int num);
-    const Line& line(unsigned int num) const;
+    inline const char* getName() const { return name; }
+    inline unsigned int Id() const { return id; }
+    unsigned int lineCount() const { return linecount; };
 
-    unsigned int lineCount() const;
+    // Line
+    Line& getLine(unsigned int num);
+    const Line& getLine(unsigned int num) const;
+    /// Split line at cursor
+    bool splitLine(const Cursor& cur);
+
 
     void pprint() const;
     void pprintLines() const;
-
-    inline const char* getName() const { return name; }
-    inline unsigned int Id() const { return id; }
 
 private:
 };

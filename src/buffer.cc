@@ -32,35 +32,6 @@ Buffer::Buffer(enum Buffer::Type type)
 }
 
 
-//Buffer::Buffer(enum Buffer::Type type, const char* filename)
-//{
-    //FileUtil::Stats stats;
-    //FileUtil::getStats(filename, stats);
-    //if (!(stats.exists == true && F_FILE == stats.type)) {
-        //if (stats.type == F_DIR) {
-            //log_fatal(TAG, "%s: cannot open:%s. (Its a directory)",
-                      //__func__, filename);
-        //} else {
-            //log_fatal(TAG, "%s: couldn't open:%s. exiting.",
-                      //__func__, filename);
-            //[>// Return a new empty buffer;<]
-            //[>struct buffer* buf = buf_create_empty(type);<]
-            //[>buf->name = filename;<]
-            //[>return buf;<]
-        //}
-    //}
-
-    //id         = generate_id();
-    //this->type = type;
-    //name       = filename;
-
-    //[>* lines <]
-    //lines     = nullptr;
-    //linecount = fu_read_file_lines(fstats.path, &lines);
-    //assert(lines);
-//}
-
-
 Buffer::Buffer(enum Type type, const char* name, Line* lines,
                unsigned int linecount)
     : Buffer(type)
@@ -82,30 +53,59 @@ void Buffer::destroy()
 
 
 /** Returns pointer to line in buffer. NULL if 'num' is out of bounds*/
-Line& Buffer::line(unsigned int num)
-{
-    assert(num < linecount);
-    return lines[num];
-}
-
-const Line& Buffer::line(unsigned int num) const
+Line& Buffer::getLine(unsigned int num)
 {
     assert(num < linecount);
     return lines[num];
 }
 
 
-unsigned int Buffer::lineCount() const
+const Line& Buffer::getLine(unsigned int num) const
 {
-    return linecount;
+    assert(num < linecount);
+    return lines[num];
+}
+
+
+bool Buffer::splitLine(const Cursor& cur)
+{
+    log_l(TAG, "Splitting line at cur: col:%d, line:%d", cur.col, cur.line);
+    Line& ln = getLine(cur.line);
+    ln.deleteGap();
+
+    // create New line
+    unsigned int newlen = ln.Len() - cur.col;
+    char* newdata = new char[newlen];
+    for(unsigned int i = cur.col, j = 0; i < ln.trueLen(); ++i, ++j)
+    {
+        newdata[j] = ln[i];
+    }
+
+    // Clip old line
+    ln.clearToEnd(cur.col);
+    // Insert newline into lines
+    Line newline = Line(newlen, newdata);
+    newline.pprint();
+
+    unsigned int newlinecount = linecount + 1;
+    Line* newlinebuffer = new Line[newlinecount];
+
+    for(unsigned int i = 0; i <= cur.line; ++i) {
+        newlinebuffer[i] = lines[i];
+    }
+    newlinebuffer[cur.line + 1] = newline;
+    for(unsigned int i = cur.line + 2; i < linecount + 1; ++i) {
+        newlinebuffer[i] = lines[i - 1];
+    }
+    delete[] lines;
+    lines = newlinebuffer;
+    linecount = newlinecount;
+    return true;
 }
 
 
 void Buffer::pprint() const
 {
-    //log_l(TAG, "Buffer{id=%d, gap.pos=%d, gap.size = %d"
-    //", lncount=%d}",
-    //id, gap.col, gap.size, linecount);
 }
 
 

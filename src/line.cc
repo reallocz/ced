@@ -39,7 +39,7 @@ const char Line::operator[](std::size_t index) const
 
 void Line::addCh(char ch, const Cursor& cur)
 {
-    moveGap(cur);
+    moveGap(cur.col);
     addGapOptional();
     data[gapcol] = ch;
     gapcol++;
@@ -52,7 +52,7 @@ void Line::delCh(const Cursor& cur)
     if (cur.col < 1) {
         return;
     }
-    moveGap(cur);
+    moveGap(cur.col);
     gapcol--;
     gaplen++;
 }
@@ -61,7 +61,7 @@ void Line::delCh(const Cursor& cur)
 void Line::clear()
 {
     gapcol = 0;
-    gaplen = len;
+    gaplen = len - 1; // Last char is a '\n'
 }
 
 
@@ -106,14 +106,44 @@ bool Line::addGapOptional()
 }
 
 
-bool Line::moveGap(const Cursor& cur)
+bool Line::deleteGap()
 {
-    if (cur.col == gapcol) {
+    unsigned int newlen = trueLen();
+    auto* newdata = new char[newlen];
+    assert(newdata);
+
+    unsigned int j = 0;
+    for(unsigned int i = 0; i < Len(); ++i) {
+        if(!inGap(i)) {
+            newdata[j++] = data[i];
+        }
+    }
+    assert(j == newlen);
+    delete[] data;
+
+    len = newlen;
+    gaplen = 0;
+    data = newdata;
+    return true;
+}
+
+
+bool Line::clearToEnd(unsigned int from)
+{
+    moveGap(from);
+    gaplen = Len() - gapcol;
+    return true;
+}
+
+
+bool Line::moveGap(const unsigned int col)
+{
+    if (col == gapcol) {
         return false;
     }
 
     unsigned int offset = 0;
-    int diff            = cur.col - gapcol;
+    int diff            = col - gapcol;
 
     if (diff > 0) {
         // Cursor is ahead of the gap
@@ -137,3 +167,12 @@ bool Line::moveGap(const Cursor& cur)
     return true;
 }
 
+void Line::pprint() const
+{
+    log_l(TAG, "Line{len: %d, gapcol: %d, gaplen: %d, data: ",
+            len, gapcol, gaplen);
+    for(unsigned int i = 0; i < len; ++i) {
+        log_lc("%c", data[i]);
+    }
+    log_lc("}\n");
+}
