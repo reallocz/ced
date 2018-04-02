@@ -124,9 +124,27 @@ Buffer loadBuffer(const char* path)
     while (true) {
         linelen = getline(&tmpdata, &wtfits, f);
         if (linelen == -1) {
+            delete[] tmpdata; // Recommended by getline
             break;
         }
-        Line ln(linelen, tmpdata);
+
+        unsigned int finallen = linelen;
+        char* finaldata = tmpdata;
+
+        // Remove terminating '\0'
+        if(tmpdata[linelen] == '\0') {
+            finallen = linelen - 1;
+
+            char* data = new char[finallen];
+            assert(data);
+            for(unsigned int i = 0; i < finallen; ++i) {
+                data[i] = tmpdata[i];
+            }
+            delete[] tmpdata;
+            finaldata = data;
+        }
+
+        Line ln = Line(finallen, finaldata);
         lines[count++] = ln;
         tmpdata        = nullptr;
         wtfits         = 0;
@@ -156,6 +174,7 @@ int saveBuffer(Buffer& buf, const char* path)
                 checkbytes++;
             }
         }
+        fputc('\n', f);
         assert(checkbytes == ln.trueLen());
         wlines++;
     }
