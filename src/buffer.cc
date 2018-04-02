@@ -76,7 +76,7 @@ bool Buffer::splitLine(const Cursor& cur)
 
     // create New line
     size_t newlen = ln.Len() - cur.col;
-    char* newdata = new char[newlen];
+    auto* newdata = new char[newlen];
     for (size_t i = cur.col, j = 0; i < ln.trueLen(); ++i, ++j) {
         newdata[j] = ln[i];
     }
@@ -88,7 +88,7 @@ bool Buffer::splitLine(const Cursor& cur)
     newline.pprint();
 
     size_t newlinecount = linecount + 1;
-    Line* newlinebuffer = new Line[newlinecount];
+    auto* newlinebuffer = new Line[newlinecount];
 
     for (size_t i = 0; i <= cur.line; ++i) {
         newlinebuffer[i] = lines[i];

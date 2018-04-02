@@ -129,7 +129,7 @@ Buffer loadBuffer(const char* path)
         if (tmpdata[linelen] == '\0') {
             finallen = linelen - 1;
 
-            char* data = new char[finallen];
+            auto* data = new char[finallen];
             assert(data);
             for (size_t i = 0; i < finallen; ++i) {
                 data[i] = tmpdata[i];

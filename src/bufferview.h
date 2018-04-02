@@ -10,9 +10,9 @@ class BufferView
 {
 private:
     size_t start;    // View starts from
-    Cursor cur;
+    Cursor cur{};
     Buffer buffer{Buffer::Type::Scratch};
-    Rect bounds;
+    Rect bounds{};
 
 public:
     BufferView();

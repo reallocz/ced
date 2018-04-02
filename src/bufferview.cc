@@ -12,11 +12,11 @@ BufferView::BufferView()
     bounds = RECT(0, 0, 0, 0);
 }
 
-BufferView::BufferView(enum Buffer::Type type, const char* filename)
+BufferView::BufferView(enum Buffer::Type  /*type*/, const char* filename)
     : BufferView()
 {
     assert(filename);
-    // TODO error handling
+    // TODO(realloc): error handling
     buffer = FileUtil::loadBuffer(filename);
 }
 
@@ -102,7 +102,7 @@ void BufferView::cmovLprev(size_t n)
     if (n > cur.line) {
         cur.line = 0;
     } else if (cur.line - n < getStart()) {
-        // TODO remove this condition when scroll on curmove's added
+        // TODO(realloc): remove this condition when scroll on curmove's added
         cur.line = getStart();
     } else {
         cur.line -= n;
