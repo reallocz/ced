@@ -17,16 +17,16 @@ void draw_bview(WINDOW* nwin, const BufferView& bv, const Context& context __att
     const Buffer& buffer = bv.getBuffer();
 
     //log_l(TAG, "Drawing buffer %d (%d lines)...",
-          //buffer.Id(), buffer.lineCount());
+    //buffer.Id(), buffer.lineCount());
 
-    Rect area       = bv.getBounds();
-    unsigned int ox = area.x;
-    unsigned int oy = area.y;
+    Rect area = bv.getBounds();
+    size_t ox = area.x;
+    size_t oy = area.y;
 
-    unsigned int linesdrawn = 0;
-    unsigned int firstline  = bv.getStart();
-    for (unsigned int i = 0; i < area.height; ++i) {
-        unsigned int linenumber = firstline + i;
+    size_t linesdrawn = 0;
+    size_t firstline  = bv.getStart();
+    for (size_t i = 0; i < area.height; ++i) {
+        size_t linenumber = firstline + i;
 
         if (linenumber >= buffer.lineCount()) {
             break;
@@ -36,7 +36,7 @@ void draw_bview(WINDOW* nwin, const BufferView& bv, const Context& context __att
 
 
         linesdrawn++;
-        for (unsigned int j = 0; j < ln.Len(); ++j) {
+        for (size_t j = 0; j < ln.Len(); ++j) {
             if (!ln.inGap(j)) {
                 mvwaddch(nwin, area.y, area.x++, ln[j]);
             }
@@ -57,15 +57,15 @@ void draw_margin(WINDOW* nwin, const Margin& mgn, Rect area,
     int txtpadding = 1;
     char lnstr[mgn.width + txtpadding];    // line number to string
 
-    for (unsigned int i = 0; i < area.height; ++i) {
+    for (size_t i = 0; i < area.height; ++i) {
         // Clear line
         wmove(nwin, i, 0);
         wclrtoeol(nwin);
 
-        unsigned int lnnumber = mgn.start + i;
+        size_t lnnumber = mgn.start + i;
 
         if (lnnumber < mgn.linecount) {
-            int finalValue; // 1 indexed calculated ln number
+            int finalValue;    // 1 indexed calculated ln number
 
             if (mgn.relative && cursor.line != lnnumber) {
                 // Relative number
@@ -100,8 +100,9 @@ void draw_statusline(WINDOW* nwin, const StatusLine& sline, Rect area, const Con
     char stsstring[area.width];
     sprintf(stsstring,
             "   %s | %s | CUR %d:%d | Gap: col: %d, len: %d |",
-            context.modestr, sline.bufname, sline.cur.line,
-            sline.cur.col, sline.gapcol, sline.gaplen);
+            context.modestr, sline.bufname, static_cast<int>(sline.cur.line),
+            static_cast<int>(sline.cur.col), static_cast<int>(sline.gapcol),
+            static_cast<int>(sline.gaplen));
 
     init_pair(1, COLOR_BLACK, COLOR_WHITE);
     wattron(nwin, COLOR_PAIR(1));

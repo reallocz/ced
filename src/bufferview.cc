@@ -24,7 +24,7 @@ void BufferView::update()
 {
     // Keep cursor on the screen
     Rect bvarea            = getBounds();
-    unsigned int firstline = getStart();
+    size_t firstline = getStart();
 
     if (cur.line < firstline) {
         Cursor newcur = Cursor();
@@ -59,12 +59,12 @@ void BufferView::setCursor(Cursor newcur)
 }
 
 
-void BufferView::cmovFwd(unsigned int n)
+void BufferView::cmovFwd(size_t n)
 {
     const Line& ln = buffer.getLine(cur.line);
 
-    unsigned int newcol = cur.col + n;
-    unsigned int maxcol = ln.trueLen();
+    size_t newcol = cur.col + n;
+    size_t maxcol = ln.trueLen();
 
     if (newcol > maxcol) {
         cmovLend();
@@ -74,7 +74,7 @@ void BufferView::cmovFwd(unsigned int n)
 }
 
 
-void BufferView::cmovBack(unsigned int n)
+void BufferView::cmovBack(size_t n)
 {
     if (n > cur.col) {
         cur.col = 0;
@@ -84,7 +84,7 @@ void BufferView::cmovBack(unsigned int n)
 }
 
 
-void BufferView::cmovLnext(unsigned int n)
+void BufferView::cmovLnext(size_t n)
 {
     // Move to next line
     if ((cur.line + n) < buffer.lineCount()) {
@@ -96,7 +96,7 @@ void BufferView::cmovLnext(unsigned int n)
 }
 
 
-void BufferView::cmovLprev(unsigned int n)
+void BufferView::cmovLprev(size_t n)
 {
     // Move to prev line
     if (n > cur.line) {
@@ -133,7 +133,7 @@ void BufferView::cmovInline()
 }
 
 
-void BufferView::scrollUp(unsigned int n)
+void BufferView::scrollUp(size_t n)
 {
     log_l(TAG, "SCROLLING UP!");
     if (n > getStart()) {
@@ -144,10 +144,10 @@ void BufferView::scrollUp(unsigned int n)
 }
 
 
-void BufferView::scrollDown(unsigned int n)
+void BufferView::scrollDown(size_t n)
 {
     log_l(TAG, "SCROLLING DOWN!");
-    unsigned int newstart = getStart() + n;
+    size_t newstart = getStart() + n;
     if (!(newstart < buffer.lineCount())) {
         // last line
         newstart = buffer.lineCount() - 1;

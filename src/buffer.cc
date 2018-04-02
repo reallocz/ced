@@ -12,9 +12,9 @@
 
 #define TAG "BUFFER"
 
-static unsigned int generate_id()
+static size_t generate_id()
 {
-    static unsigned int id = 0;
+    static size_t id = 0;
     return id++;
 }
 
@@ -33,7 +33,7 @@ Buffer::Buffer(enum Buffer::Type type)
 
 
 Buffer::Buffer(enum Type type, const char* name, Line* lines,
-               unsigned int linecount)
+               size_t linecount)
     : Buffer(type)
 {
     this->name = name;
@@ -44,7 +44,7 @@ Buffer::Buffer(enum Type type, const char* name, Line* lines,
 
 void Buffer::destroy()
 {
-    for (unsigned int i = 0; i < linecount; ++i) {
+    for (size_t i = 0; i < linecount; ++i) {
         //free(lines[i].data); // TODO!!!
     }
     free(lines);
@@ -53,14 +53,14 @@ void Buffer::destroy()
 
 
 /** Returns pointer to line in buffer. NULL if 'num' is out of bounds*/
-Line& Buffer::getLine(unsigned int num)
+Line& Buffer::getLine(size_t num)
 {
     assert(num < linecount);
     return lines[num];
 }
 
 
-const Line& Buffer::getLine(unsigned int num) const
+const Line& Buffer::getLine(size_t num) const
 {
     assert(num < linecount);
     return lines[num];
@@ -74,9 +74,9 @@ bool Buffer::splitLine(const Cursor& cur)
     ln.deleteGap();
 
     // create New line
-    unsigned int newlen = ln.Len() - cur.col;
+    size_t newlen = ln.Len() - cur.col;
     char* newdata = new char[newlen];
-    for(unsigned int i = cur.col, j = 0; i < ln.trueLen(); ++i, ++j)
+    for(size_t i = cur.col, j = 0; i < ln.trueLen(); ++i, ++j)
     {
         newdata[j] = ln[i];
     }
@@ -87,14 +87,14 @@ bool Buffer::splitLine(const Cursor& cur)
     Line newline = Line(newlen, newdata);
     newline.pprint();
 
-    unsigned int newlinecount = linecount + 1;
+    size_t newlinecount = linecount + 1;
     Line* newlinebuffer = new Line[newlinecount];
 
-    for(unsigned int i = 0; i <= cur.line; ++i) {
+    for(size_t i = 0; i <= cur.line; ++i) {
         newlinebuffer[i] = lines[i];
     }
     newlinebuffer[cur.line + 1] = newline;
-    for(unsigned int i = cur.line + 2; i < linecount + 1; ++i) {
+    for(size_t i = cur.line + 2; i < linecount + 1; ++i) {
         newlinebuffer[i] = lines[i - 1];
     }
     delete[] lines;
@@ -112,7 +112,7 @@ void Buffer::pprint() const
 void Buffer::pprintLines() const
 {
     log_l(TAG, " -- line metadata --");
-    for (unsigned int i = 0; i < linecount; ++i) {
+    for (size_t i = 0; i < linecount; ++i) {
         log_l(TAG, "no: %d, len: %d", i, lines[i].Len());
     }
     log_l(TAG, " --/ line metadata --");

@@ -28,22 +28,22 @@
 struct StatusLine {
     const char* bufname;
     Cursor cur;
-    unsigned int gaplen;
-    unsigned int gapcol;
+    size_t gaplen;
+    size_t gapcol;
 };
 
 
 struct Margin {
-    unsigned int width;
-    unsigned int start;    // First line number
-    unsigned int linecount;
+    size_t width;
+    size_t start;    // First line number
+    size_t linecount;
     bool relative{false}; // Relative line number
 };
 
 class Window
 {
 private:
-    unsigned int id;
+    size_t id;
     WINDOW* nwin;
 
 public:

@@ -9,7 +9,7 @@
 class BufferView
 {
 private:
-    unsigned int start;    // View starts from
+    size_t start;    // View starts from
     Cursor cur;
     Buffer buffer{Buffer::Type::Scratch};
     Rect bounds;
@@ -19,23 +19,23 @@ public:
     BufferView(enum Buffer::Type type, const char* filename);
     void update();
 
-    void cmovFwd(unsigned int n);
-    void cmovBack(unsigned int n);
+    void cmovFwd(size_t n);
+    void cmovBack(size_t n);
 
-    void cmovLnext(unsigned int n);
-    void cmovLprev(unsigned int n);
+    void cmovLnext(size_t n);
+    void cmovLprev(size_t n);
     void cmovLstart();
     void cmovLend();
 
     void cmovInline();
 
-    void scrollUp(unsigned int n);
-    void scrollDown(unsigned int n);
+    void scrollUp(size_t n);
+    void scrollDown(size_t n);
 
     Cursor relcur() const;
 
     // Accessors
-    inline unsigned int getStart() const { return start; }
+    inline size_t getStart() const { return start; }
 
     inline Rect getBounds() const { return bounds; }
     void setBounds(Rect newbounds);

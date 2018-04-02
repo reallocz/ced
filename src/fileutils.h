@@ -17,7 +17,7 @@ struct Stats {
     enum Type type;
     const char* path;
     const char* abspath;
-    unsigned int size;
+    size_t size;
     bool exists;
 
     Stats();

@@ -8,7 +8,7 @@ enum class Mode {
 };
 
 struct Context {
-    unsigned long flags;
+    size_t flags;
     enum Mode mode;
     const char* modestr;
     Rect bounds;

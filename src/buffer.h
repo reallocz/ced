@@ -23,28 +23,28 @@ public:
     // Members
 private:
     /*unique identifier of each buffer for debugging*/
-    unsigned int id;
+    size_t id;
     enum Type type;
     const char* name;
     Line* lines;
-    unsigned int linecount;
+    size_t linecount;
 
     // Member functions
 public:
     Buffer(enum Type type);
     //Buffer(enum Type type, const char* filename);
     Buffer(enum Type type, const char* name, Line* lines,
-           unsigned int linecount);
+           size_t linecount);
 
     void destroy();
 
     inline const char* getName() const { return name; }
-    inline unsigned int Id() const { return id; }
-    unsigned int lineCount() const { return linecount; };
+    inline size_t Id() const { return id; }
+    size_t lineCount() const { return linecount; };
 
     // Line
-    Line& getLine(unsigned int num);
-    const Line& getLine(unsigned int num) const;
+    Line& getLine(size_t num);
+    const Line& getLine(size_t num) const;
     /// Split line at cursor
     bool splitLine(const Cursor& cur);
 

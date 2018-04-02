@@ -4,7 +4,7 @@
 #define GAPSIZE 4
 #define TAG "LINE"
 
-static unsigned int uid = 0;
+static size_t uid = 0;
 
 Line::Line()
 {
@@ -16,7 +16,7 @@ Line::Line()
 }
 
 
-Line::Line(unsigned int len, char* data)
+Line::Line(size_t len, char* data)
     : Line()
 {
     this->len  = len;
@@ -24,7 +24,7 @@ Line::Line(unsigned int len, char* data)
 }
 
 
-bool Line::inGap(unsigned int i) const
+bool Line::inGap(size_t i) const
 {
     return (i >= gapcol) && (i < gapcol + gaplen);
 }
@@ -67,19 +67,19 @@ void Line::clear()
 
 bool Line::addGap()
 {
-    unsigned int newlinelen = Len() + GAPSIZE;
-    unsigned int newgaplen  = gaplen + GAPSIZE;
+    size_t newlinelen = Len() + GAPSIZE;
+    size_t newgaplen  = gaplen + GAPSIZE;
     auto* newdata           = new char[newlinelen];
     assert(newdata);
 
-    for (unsigned int i = 0; i < gapcol; ++i) {
+    for (size_t i = 0; i < gapcol; ++i) {
         newdata[i] = data[i];
     }
 
     // from end of gap to end of buffer
-    unsigned int aftergap    = gapcol + gaplen;
-    unsigned int aftergaplen = Len() - (gapcol + gaplen);
-    for (unsigned int i = 0; i < aftergaplen; ++i) {
+    size_t aftergap    = gapcol + gaplen;
+    size_t aftergaplen = Len() - (gapcol + gaplen);
+    for (size_t i = 0; i < aftergaplen; ++i) {
         newdata[gapcol + newgaplen + i] = data[aftergap + i];
     }
 
@@ -97,7 +97,7 @@ bool Line::addGap()
 bool Line::addGapOptional()
 {
     if (gaplen < 1) {
-        unsigned int oldgap = gaplen;
+        size_t oldgap = gaplen;
         addGap();
         log_l(TAG, "Gap resized %d -> %d", oldgap, gaplen);
         return true;
@@ -108,12 +108,12 @@ bool Line::addGapOptional()
 
 bool Line::deleteGap()
 {
-    unsigned int newlen = trueLen();
+    size_t newlen = trueLen();
     auto* newdata = new char[newlen];
     assert(newdata);
 
-    unsigned int j = 0;
-    for(unsigned int i = 0; i < Len(); ++i) {
+    size_t j = 0;
+    for(size_t i = 0; i < Len(); ++i) {
         if(!inGap(i)) {
             newdata[j++] = data[i];
         }
@@ -128,7 +128,7 @@ bool Line::deleteGap()
 }
 
 
-bool Line::clearToEnd(unsigned int from)
+bool Line::clearToEnd(size_t from)
 {
     moveGap(from);
     gaplen = Len() - gapcol;
@@ -136,19 +136,19 @@ bool Line::clearToEnd(unsigned int from)
 }
 
 
-bool Line::moveGap(const unsigned int col)
+bool Line::moveGap(const size_t col)
 {
     if (col == gapcol) {
         return false;
     }
 
-    unsigned int offset = 0;
+    size_t offset = 0;
     int diff            = col - gapcol;
 
     if (diff > 0) {
         // Cursor is ahead of the gap
         offset = diff;
-        for (unsigned int i = 0; i < offset; ++i) {
+        for (size_t i = 0; i < offset; ++i) {
             data[gapcol] = data[gapcol + gaplen];
             gapcol++;
         }
@@ -156,7 +156,7 @@ bool Line::moveGap(const unsigned int col)
     } else if (diff < 0) {
         // Cursor is behind the gap
         offset = -1 * diff;
-        for (unsigned int i = 0; i < offset; ++i) {
+        for (size_t i = 0; i < offset; ++i) {
             data[gapcol + gaplen - 1] = data[gapcol - 1];
             gapcol--;
         }
@@ -171,7 +171,7 @@ void Line::pprint() const
 {
     log_l(TAG, "Line{len: %d, gapcol: %d, gaplen: %d, data: ",
             len, gapcol, gaplen);
-    for(unsigned int i = 0; i < len; ++i) {
+    for(size_t i = 0; i < len; ++i) {
         log_lc("%c", data[i]);
     }
     log_lc("}\n");

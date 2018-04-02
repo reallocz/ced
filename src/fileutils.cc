@@ -95,11 +95,11 @@ Buffer loadBuffer(const char* path)
     FILE* f = fopen(path, "r");
     assert(f);
     fseek(f, 0, SEEK_END);
-    unsigned int size = ftell(f);
+    size_t size = ftell(f);
     rewind(f);
 
     // Count number of lines
-    unsigned int linecount = 0;
+    size_t linecount = 0;
     char ch;
     while (true) {
         ch = fgetc(f);
@@ -116,7 +116,7 @@ Buffer loadBuffer(const char* path)
     auto* lines = new Line[linecount];
     assert(lines);
 
-    unsigned int count = 0;
+    size_t count = 0;
     // getline allocates buffer if tmpdata and tmplen == 0
     int linelen   = 0;
     size_t wtfits = 0;
@@ -128,7 +128,7 @@ Buffer loadBuffer(const char* path)
             break;
         }
 
-        unsigned int finallen = linelen;
+        size_t finallen = linelen;
         char* finaldata = tmpdata;
 
         // Remove terminating '\0'
@@ -137,7 +137,7 @@ Buffer loadBuffer(const char* path)
 
             char* data = new char[finallen];
             assert(data);
-            for(unsigned int i = 0; i < finallen; ++i) {
+            for(size_t i = 0; i < finallen; ++i) {
                 data[i] = tmpdata[i];
             }
             delete[] tmpdata;
@@ -162,12 +162,12 @@ int saveBuffer(Buffer& buf, const char* path)
     log_l(TAG, "Saving buffer...");
     FILE* f = fopen(path, "w");
     assert(f);
-    unsigned int wbytes = 0; // Bytes written
-    unsigned int wlines = 0; // Lines return
-    for (unsigned int lnum = 0; lnum < buf.lineCount(); ++lnum) {
-        unsigned int checkbytes = 0;
+    size_t wbytes = 0; // Bytes written
+    size_t wlines = 0; // Lines return
+    for (size_t lnum = 0; lnum < buf.lineCount(); ++lnum) {
+        size_t checkbytes = 0;
         const Line& ln = buf.getLine(lnum);
-        for (unsigned int i = 0; i < ln.Len(); ++i) {
+        for (size_t i = 0; i < ln.Len(); ++i) {
             if (!ln.inGap(i)) {
                 fputc(ln[i], f);
                 wbytes++;
