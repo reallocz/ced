@@ -37,6 +37,33 @@ const char Line::operator[](std::size_t index) const
 }
 
 
+Line Line::split(size_t from)
+{
+    moveGap(from);
+
+    size_t newlen = trueLength() - from;
+    auto* newdata = new char[newlen];
+    assert(newdata);
+    log_l(TAG, "NEWLEN: %d", newlen);
+
+    unsigned int count = 0;
+    for(size_t i = from; i < length(); ++i) {
+        if(!inGap(i)) {
+            newdata[count++] = data[i];
+        }
+    }
+    assert(count == newlen); // count increments after write
+
+    // Create new line
+    Line newln = Line(newlen, newdata);
+
+    // Expand current gap
+    gaplen = length() - from;
+
+    return newln;
+}
+
+
 void Line::addCh(char ch, const Cursor& cur)
 {
     moveGap(cur.col);
@@ -67,7 +94,7 @@ void Line::clear()
 
 bool Line::addGap()
 {
-    size_t newlinelen = Len() + GAPSIZE;
+    size_t newlinelen = length() + GAPSIZE;
     size_t newgaplen  = gaplen + GAPSIZE;
     auto* newdata     = new char[newlinelen];
     assert(newdata);
@@ -78,7 +105,7 @@ bool Line::addGap()
 
     // from end of gap to end of buffer
     size_t aftergap    = gapcol + gaplen;
-    size_t aftergaplen = Len() - (gapcol + gaplen);
+    size_t aftergaplen = length() - (gapcol + gaplen);
     for (size_t i = 0; i < aftergaplen; ++i) {
         newdata[gapcol + newgaplen + i] = data[aftergap + i];
     }
@@ -103,36 +130,6 @@ bool Line::addGapOptional()
         return true;
     }
     return false;
-}
-
-
-bool Line::deleteGap()
-{
-    size_t newlen = trueLen();
-    auto* newdata = new char[newlen];
-    assert(newdata);
-
-    size_t j = 0;
-    for (size_t i = 0; i < Len(); ++i) {
-        if (!inGap(i)) {
-            newdata[j++] = data[i];
-        }
-    }
-    assert(j == newlen);
-    delete[] data;
-
-    len    = newlen;
-    gaplen = 0;
-    data   = newdata;
-    return true;
-}
-
-
-bool Line::clearToEnd(size_t from)
-{
-    moveGap(from);
-    gaplen = Len() - gapcol;
-    return true;
 }
 
 
@@ -172,7 +169,9 @@ void Line::pprint() const
     log_l(TAG, "Line{len: %d, gapcol: %d, gaplen: %d, data: ", len,
           gapcol, gaplen);
     for (size_t i = 0; i < len; ++i) {
-        log_lc("%c", data[i]);
+        if(!inGap(i)) {
+            log_lc("%c", data[i]);
+        }
     }
     log_lc("}\n");
 }

@@ -161,7 +161,7 @@ int saveBuffer(Buffer& buf, const char* path)
     for (size_t lnum = 0; lnum < buf.lineCount(); ++lnum) {
         size_t checkbytes = 0;
         const Line& ln    = buf.getLine(lnum);
-        for (size_t i = 0; i < ln.Len(); ++i) {
+        for (size_t i = 0; i < ln.length(); ++i) {
             if (!ln.inGap(i)) {
                 fputc(ln[i], f);
                 wbytes++;
@@ -169,7 +169,7 @@ int saveBuffer(Buffer& buf, const char* path)
             }
         }
         fputc('\n', f);
-        assert(checkbytes == ln.trueLen());
+        assert(checkbytes == ln.trueLength());
         wlines++;
     }
     log_l(TAG, "Buffer saved (%d lines, %d bytes): %s", wlines,

@@ -91,7 +91,10 @@ void Ced::insertCb(inpev ev)
         bview.currentLine().addCh(ev.key, cur);
         bview.cmovFwd(1);
     } else if (ev.key == k_enter) {
-        bview.getBuffer().splitLine(cur);
+        Line ln = bview.currentLine().split(cur.col);
+        bview.getBuffer().addLineAt(cur.line + 1, ln);
+        bview.cmovLnext(1);
+        bview.cmovLstart();
     } else if (ev.type == InputType::Special) {
         switch (ev.key) {
         case k_backspace:
@@ -141,7 +144,6 @@ void Ced::normalCb(inpev ev)
         // Toggle relative line numbers
         win.margin.relative = !win.margin.relative;
     } else if (ev.key == 'D') {
-        bview.currentLine().deleteGap();
         // bview.currentLine().clear();
     }
 }

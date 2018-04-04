@@ -67,40 +67,26 @@ const Line& Buffer::getLine(size_t num) const
 }
 
 
-bool Buffer::splitLine(const Cursor& cur)
+void Buffer::addLineAt(size_t idx, Line& ln)
 {
-    log_l(TAG, "Splitting line at cur: col:%d, line:%d", cur.col,
-          cur.line);
-    Line& ln = getLine(cur.line);
-    ln.deleteGap();
+    assert(idx <= lineCount());
+    size_t nlcount = linecount + 1;
+    auto* nlines = new Line[nlcount];
+    assert(nlines);
 
-    // create New line
-    size_t newlen = ln.Len() - cur.col;
-    auto* newdata = new char[newlen];
-    for (size_t i = cur.col, j = 0; i < ln.trueLen(); ++i, ++j) {
-        newdata[j] = ln[i];
+    for(unsigned int i = 0; i < nlcount; ++i) {
+        if(i < idx) {
+            nlines[i] = lines[i];
+        } else if (i == idx) {
+            nlines[i] = ln;
+        } else {
+            nlines[i] = lines[i - 1];
+        }
     }
 
-    // Clip old line
-    ln.clearToEnd(cur.col);
-    // Insert newline into lines
-    Line newline = Line(newlen, newdata);
-    newline.pprint();
-
-    size_t newlinecount = linecount + 1;
-    auto* newlinebuffer = new Line[newlinecount];
-
-    for (size_t i = 0; i <= cur.line; ++i) {
-        newlinebuffer[i] = lines[i];
-    }
-    newlinebuffer[cur.line + 1] = newline;
-    for (size_t i = cur.line + 2; i < linecount + 1; ++i) {
-        newlinebuffer[i] = lines[i - 1];
-    }
     delete[] lines;
-    lines     = newlinebuffer;
-    linecount = newlinecount;
-    return true;
+    lines = nlines;
+    linecount = nlcount;
 }
 
 
@@ -111,7 +97,7 @@ void Buffer::pprintLines() const
 {
     log_l(TAG, " -- line metadata --");
     for (size_t i = 0; i < linecount; ++i) {
-        log_l(TAG, "no: %d, len: %d", i, lines[i].Len());
+        log_l(TAG, "no: %d, len: %d", i, lines[i].length());
     }
     log_l(TAG, " --/ line metadata --");
 }

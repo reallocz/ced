@@ -45,9 +45,7 @@ public:
     // Line
     Line& getLine(size_t num);
     const Line& getLine(size_t num) const;
-    /// Split line at cursor
-    bool splitLine(const Cursor& cur);
-
+    void addLineAt(size_t idx, Line& ln);
 
     void pprint() const;
     void pprintLines() const;

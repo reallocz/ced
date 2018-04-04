@@ -38,7 +38,7 @@ void draw_bview(WINDOW* nwin, const BufferView& bv,
 
 
         linesdrawn++;
-        for (size_t j = 0; j < ln.Len(); ++j) {
+        for (size_t j = 0; j < ln.length(); ++j) {
             if (!ln.inGap(j)) {
                 mvwaddch(nwin, area.y, area.x++, ln[j]);
             }

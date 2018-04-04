@@ -18,8 +18,8 @@ public:
     const char operator[](std::size_t index) const;
 
     // Props
-    auto Len() const { return len; }
-    auto trueLen() const { return len - gaplen; }
+    auto length() const { return len; }
+    auto trueLength() const { return len - gaplen; }
     auto Id() const { return id; }
     auto gapCol() const { return gapcol; }
     auto gapLen() const { return gaplen; }
@@ -27,13 +27,13 @@ public:
     // Return true if i is inside the gap
     bool inGap(size_t i) const;
 
+    // Create a new line from 'from' char to end
+    Line split(size_t from);
 
     void addCh(char ch, const Cursor& cur);
     void delCh(const Cursor& cur);
 
-    bool deleteGap();
     void clear();
-    bool clearToEnd(size_t from);
 
     void pprint() const;
 

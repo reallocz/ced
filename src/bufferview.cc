@@ -64,7 +64,7 @@ void BufferView::cmovFwd(size_t n)
     const Line& ln = buffer.getLine(cur.line);
 
     size_t newcol = cur.col + n;
-    size_t maxcol = ln.trueLen();
+    size_t maxcol = ln.trueLength();
 
     if (newcol > maxcol) {
         cmovLend();
@@ -117,14 +117,14 @@ void BufferView::cmovLstart() { cur.col = 0; }
 void BufferView::cmovLend()
 {
     const Line& ln = buffer.getLine(cur.line);
-    cur.col        = ln.trueLen();
+    cur.col        = ln.trueLength();
 }
 
 
 void BufferView::cmovInline()
 {
     const Line& ln = buffer.getLine(cur.line);
-    if (cur.col >= ln.trueLen()) {
+    if (cur.col >= ln.trueLength()) {
         cmovLend();
     }
 }
