@@ -91,16 +91,17 @@ void Ced::insertCb(inpev ev)
         bview.currentLine().addCh(ev.key, cur);
         bview.cmovFwd(1);
     } else if (ev.key == k_enter) {
+        // New line
         Line ln = bview.currentLine().split(cur.col);
         bview.getBuffer().addLineAt(cur.line + 1, ln);
         bview.cmovLnext(1);
         bview.cmovLstart();
+    } else if (ev.key == k_backspace) {
+        // Backspace
+        bview.currentLine().delCh(cur);
+        bview.cmovBack(1);
     } else if (ev.type == InputType::Special) {
         switch (ev.key) {
-        case k_backspace:
-            bview.currentLine().delCh(cur);
-            bview.cmovBack(1);
-            break;
         case k_esc: context.setMode(Mode::Normal); break;
         default: break;
         }
@@ -200,5 +201,7 @@ void Ced::execCommand(const Command& cmd)
             // TODO(realloc): update buffer name to arg
         }
         return;
+    } else if (cmd.type == Command::Type::Quit) {
+        quit = 1;
     }
 }

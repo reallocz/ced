@@ -8,6 +8,7 @@ struct Command {
     enum class Type {
         Bufsave = 0,
         Bufopen,
+        Quit,
         Unknown,
         _count,    // Number of commands (last element)
     };

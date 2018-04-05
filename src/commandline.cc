@@ -11,6 +11,7 @@
 static const char* StringMap[] = {
     "BUFSAVE",
     "BUFOPEN",
+    "QUIT",
 };
 
 
@@ -18,6 +19,7 @@ static const char* StringMap[] = {
 static const char* Defs[] = {
     "w",    // BUFSAVE
     "e",    // BUFOPEN
+    "q",    // QUIT
 };
 
 Command::Command()
