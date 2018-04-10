@@ -19,7 +19,7 @@ void ced_init(struct cedopts opts);
  * NOTE: All the submodules must be initialized before calling
  * ced_run()
  */
-void ced_run();
+void ced_run(void);
 
 // Input callbacks
 /** Input callback for MODE_INSERT */

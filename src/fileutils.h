@@ -1,7 +1,5 @@
 #pragma once
 #include "buffer.h"
-#include <stdio.h>
-#include <stdlib.h>
 
 
 enum file_type {
@@ -43,7 +41,7 @@ int fu_mkdir(const char* path);
 void fu_abspath(const char* relpath, char* abspath);
 
 /** NULL on error */
-char* fu_cwd();
+char* fu_cwd(void);
 
 void fu_pprint_stats(const struct file_stats fs);
 

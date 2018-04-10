@@ -13,7 +13,10 @@ set(SRCDIR "src")
 
 include_directories(SRCDIR)
 
-add_compile_options(-g -Wall)
+#add_compile_options(-g -Wall -Weverything)
+add_compile_options(-g -Weverything -std=c11)
+add_compile_options(-Wno-padded -Wno-documentation-unknown-command 
+    -Wno-format-nonliteral -Wno-conversion -Wno-vla -Wno-reserved-id-macro)
 
 add_executable(debug
         ${SRCDIR}/log.c

@@ -9,6 +9,7 @@ struct context {
 };
 
 inline void ctx_pprint(struct context* ctx) {
-    // TODO
+    log_l("CONTEXT", "Context {mode: %d, flags: %d",
+            ctx->mode, ctx->flags);
 }
 

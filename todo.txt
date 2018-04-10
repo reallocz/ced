@@ -1,3 +1,23 @@
+Port cpp branch features:
+Create context.h
+Add Clang compiler warning flags
+- Run clang-tidy
+- typedef structs
+- create line.h
+- cleanup fileutils
+- convert unsigned int's to size_t's
+- CurLmove inconsistency
+- move command to commandline.h
+- highlight line number the cursor's on
+- relative line number
+- currentLine to bview
+- ln_clear()
+- gaplen and gapcol on statusline
+- remove '\n's in buffer
+- ln_split()
+- quit on ':q' 
+
+
 TODO: 
 - Prompt for path while saving file
 - Scroll buffer when cursor reaches the edge

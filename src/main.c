@@ -9,8 +9,10 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+void onexit(void);
+
 /** Cleanup submodules */
-void onexit()
+void onexit(void)
 {
     // Logs exit last
     term_exit();

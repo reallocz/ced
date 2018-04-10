@@ -63,7 +63,7 @@ struct buffer buf_create_file(enum buffer_type type,
         }
     }
 
-    struct buffer buf = {0};
+    struct buffer buf;
 
     buf.id   = generate_id();
     buf.type = type;
@@ -180,7 +180,7 @@ void buf_pprint_lines(const struct buffer* buf)
 
 /** buffer_internal.h **/
 
-static unsigned int generate_id()
+static unsigned int generate_id(void)
 {
     static unsigned int ids = 0;
     return ids++;
@@ -314,11 +314,11 @@ void buf_printline(const struct buffer* buf, unsigned int i)
     const struct line* ln = buf_line(buf, i);
     log_l("LINE", "no: %d, len: %d, has_gap: %d",
           i, ln->len, hasgap);
-    for (unsigned int i = 0; i < ln->len; ++i) {
-        if (INGAP(buf, i)) {
+    for (unsigned int j = 0; j < ln->len; ++j) {
+        if (INGAP(buf, j)) {
             log_lc("-");
         } else {
-            log_lc("%c", ln->data[i]);
+            log_lc("%c", ln->data[j]);
         }
     }
     log_lc("\n");

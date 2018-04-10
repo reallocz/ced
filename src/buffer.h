@@ -45,7 +45,7 @@ struct buffer* buf_create_empty(enum buffer_type type);
 struct buffer buf_create_file(enum buffer_type type,
                               const char* filename);
 /** buf_destroy destorys the buffer and free's the data*/
-void buf_destory(struct buffer* buf);
+void buf_destroy(struct buffer* buf);
 
 /** Adding and deleting characters **/
 /** Add a char at the cursor position */

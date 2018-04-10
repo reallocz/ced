@@ -5,14 +5,14 @@
  */
 
 /** Initialize terminal and its properties */
-int term_init();
+int term_init(void);
 
-void term_exit();
+void term_exit(void);
 
 /** Update terminal width and height */
-void term_update();
+void term_update(void);
 
 /** query terminal props */
-int term_rows();
-int term_cols();
+int term_rows(void);
+int term_cols(void);
 void term_size(unsigned int* rows, unsigned int* cols);

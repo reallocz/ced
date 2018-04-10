@@ -36,7 +36,7 @@ static int ced_parseopts(struct cedopts opts)
     } else {
         assert(opts.bviews);
         G.bcount = opts.bcount;
-        for (int i = 0; i < G.bcount; ++i) {
+        for (unsigned int i = 0; i < G.bcount; ++i) {
             G.bviews[i] = opts.bviews[i];
         }
     }
@@ -76,7 +76,7 @@ static struct buffer_view* next_bview()
     return &G.bviews[currentbview];
 }
 
-void ced_run()
+void ced_run(void)
 {
 
     // Create window and set buffer

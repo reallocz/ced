@@ -1,10 +1,14 @@
 #include "fileutils.h"
+#define _GNU_SOURCE // Required to use 'getline' function
 #include "log.h"
 #include <assert.h>
 #include <errno.h>
 #include <linux/limits.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <stdio.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #define TAG "FUTILS"
 
@@ -122,7 +126,7 @@ int fu_file_exists(const char* path)
         return 0;
     }
     // man 7 inode
-    if ((s.st_mode & S_IFMT) == S_IFREG) {    // S_IFREG = regular file
+    if (S_ISREG(s.st_mode)) {    // S_IFREG = regular file
         return 1;
     } else {
         return 0;
@@ -143,7 +147,7 @@ int fu_dir_exists(const char* path)
         return 0;
     }
     // man 7 inode
-    if ((s.st_mode & S_IFMT) == S_IFDIR) {    // S_IFDIR = directory
+    if (S_ISDIR(s.st_mode)) {    // S_IFDIR = directory
         return 1;
     } else {
         return 0;

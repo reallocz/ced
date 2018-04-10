@@ -1,5 +1,7 @@
 #include "log.h"
 #include "fileutils.h"
+#include <stdio.h>
+#include <stdlib.h>
 #include <assert.h>
 #include <stdarg.h>
 #include <stdio.h>

@@ -20,7 +20,6 @@ void draw_bview(WINDOW* nwin, const struct buffer_view* bv, const struct context
 
     struct rect area = bv_bounds(bv);
     unsigned int ox  = area.x;
-    unsigned int oy  = area.y;
 
     unsigned int linesdrawn = 0;
     unsigned int firstline  = bv_start(bv);
@@ -56,9 +55,10 @@ void draw_margin(WINDOW* nwin, struct margin mgn, struct rect area, const struct
 {
     wattron(nwin, A_BOLD);
 
-    int txtpadding = 1;
+    /*int txtpadding = 1;*/
     // line number to string
-    char lnstr[mgn.width + txtpadding];
+    /*char lnstr[mgn.width + txtpadding];*/
+    char lnstr[area.width]; // Arbitary
     for (unsigned int i = 0; i < area.height; ++i) {
         wmove(nwin, i, 0);
         wclrtoeol(nwin);
