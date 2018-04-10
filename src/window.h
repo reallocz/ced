@@ -2,6 +2,7 @@
 #include "buffer_view.h"
 #include "common.h"
 #include <ncurses.h>
+#include "context.h"
 
 #define CMDLINE_SIZE 256
 

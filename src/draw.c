@@ -1,6 +1,7 @@
 #include "draw.h"
 #include "common.h"
 #include "log.h"
+#include "context.h"
 
 #define TAG "DRAW"
 

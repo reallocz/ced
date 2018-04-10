@@ -1,6 +1,7 @@
 #include "window.h"
 #include "draw.h"
 #include "log.h"
+#include "context.h"
 #include <assert.h>
 #include <locale.h>
 #include <ncurses.h>

@@ -7,6 +7,7 @@
 #include "log.h"
 #include "term.h"
 #include "window.h"
+#include "context.h"
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
