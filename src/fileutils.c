@@ -1,14 +1,13 @@
 #include "fileutils.h"
-#define _GNU_SOURCE // Required to use 'getline' function
+#define _GNU_SOURCE    // Required to use 'getline' function
 #include "log.h"
 #include <assert.h>
 #include <errno.h>
 #include <linux/limits.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <stdio.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 #define TAG "FUTILS"
 
@@ -54,8 +53,7 @@ struct file_stats fu_stats(const char* path)
 }
 
 
-unsigned int fu_read_file_lines(const char* path,
-                                struct line** lines)
+unsigned int fu_read_file_lines(const char* path, struct line** lines)
 {
     FILE* f = fopen(path, "r");
     assert(f);
@@ -107,58 +105,6 @@ unsigned int fu_read_file_lines(const char* path,
 }
 
 
-void fu_abspath(const char* relpath, char* abspath)
-{
-    realpath(relpath, abspath);
-}
-
-int fu_file_exists(const char* path)
-{
-    struct stat s;
-    int err = 0;
-    char abspath[PATH_MAX];
-    realpath(path, abspath);
-    err = stat(abspath, &s);
-
-    if (err) {
-        /* Either it doesn't exist or we lack the permissions.
-         * Either way we failed */
-        return 0;
-    }
-    // man 7 inode
-    if (S_ISREG(s.st_mode)) {    // S_IFREG = regular file
-        return 1;
-    } else {
-        return 0;
-    }
-}
-
-int fu_dir_exists(const char* path)
-{
-    struct stat s;
-    int err = 0;
-    err     = stat(path, &s);
-
-    char abspath[PATH_MAX];
-    realpath(path, abspath);
-    if (err) {
-        // Either it doesn't exist or we lack the permissions. Either way
-        // we failed
-        return 0;
-    }
-    // man 7 inode
-    if (S_ISDIR(s.st_mode)) {    // S_IFDIR = directory
-        return 1;
-    } else {
-        return 0;
-    }
-}
-
-char* fu_cwd()
-{
-    return getcwd(NULL, PATH_MAX);
-}
-
 int fu_save_buffer(const struct buffer* buf, const char* path)
 {
     log_l(TAG, "Saving buffer...");
@@ -183,7 +129,8 @@ int fu_save_buffer(const struct buffer* buf, const char* path)
             }
         }
     }
-    log_l(TAG, "Buffer saved (%d lines, %d bytes): %s", lcount, wbytes, path);
+    log_l(TAG, "Buffer saved (%d lines, %d bytes): %s", lcount,
+          wbytes, path);
     fclose(f);
     return 0;
 }
