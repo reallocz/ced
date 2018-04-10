@@ -9,6 +9,8 @@
 #include <string.h>
 
 #define BUFFER_GAPSIZE 4
+/** Add gap if gap size is less than this limit */
+#define GAP_ADD_LIMIT 1
 
 /** Evals to 1 if i is inside buffer gap */
 #define INGAP(buf, i)          \
@@ -78,7 +80,6 @@ struct buffer buf_create_file(enum buffer_type type,
     buf.gap.line = 0;
     buf.gap.col  = 0;
     buf.gap.size = 0;    // Gap starts at 0
-    gap_add(&buf);
     buf_printline(&buf, 0);
 
     return buf;
@@ -106,7 +107,7 @@ void buf_destroy(struct buffer* buf)
 void buf_addch(struct buffer* buf, char ch, struct cursor cur)
 {
     gap_move(buf, cur);
-    gap_resize_optional(buf);
+    gap_add_optional(buf);
 
     struct line* ln        = buf_line(buf, cur.line);
     ln->data[buf->gap.col] = ch;
@@ -297,12 +298,12 @@ static void gap_move(struct buffer* buf, struct cursor cur)
 }
 
 
-static int gap_resize_optional(struct buffer* buf)
+static int gap_add_optional(struct buffer* buf)
 {
-    if (buf->gap.size < 1) {
+    if (buf->gap.size < GAP_ADD_LIMIT) {
         size_t oldgap = buf->gap.size;
         gap_add(buf);
-        log_l(TAG, "Gap resized %d -> %d", oldgap, buf->gap.size);
+        log_l(TAG, "Gap added %d -> %d", oldgap, buf->gap.size);
         return 1;
     }
     return 0;

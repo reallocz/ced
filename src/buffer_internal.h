@@ -9,8 +9,8 @@ static size_t generate_id(void);
 /** Increase buffer gap */
 static void gap_add(struct buffer* buf);
 
-/** Resize buffer gap if needed */
-static int gap_resize_optional(struct buffer* buf);
+/** Add gap if needed */
+static int gap_add_optional(struct buffer* buf);
 
 /** move gap to cursor */
 static void gap_move(struct buffer* buf, struct cursor cur);
