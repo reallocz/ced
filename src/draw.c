@@ -18,17 +18,17 @@ void draw_bview(WINDOW* nwin, const struct buffer_view* bv,
                 const struct context* context __attribute__((unused)))
 {
     /*log_l(TAG, "Drawing buffer %d (%d lines)...", bv->buffer.id,*/
-          /*bv->buffer.linecount);*/
+    /*bv->buffer.linecount);*/
 
     struct rect area = bv_bounds(bv);
-    size_t ox  = area.x;
+    size_t ox        = area.x;
 
     size_t linesdrawn = 0;
     size_t firstline  = bv_start(bv);
     for (size_t i = 0; i < area.height; ++i) {
 
         size_t linenumber = firstline + i;
-        struct line* ln         = buf_line(&bv->buffer, linenumber);
+        struct line* ln   = buf_line(&bv->buffer, linenumber);
         if (ln == NULL) {
             break;
         }    // No more lines in buffer
@@ -54,27 +54,31 @@ void draw_bview(WINDOW* nwin, const struct buffer_view* bv,
 
 
 void draw_margin(WINDOW* nwin, struct margin mgn, struct rect area,
+                 const struct cursor cur,
                  const struct context* context
                  __attribute__((unused)))
 {
-    wattron(nwin, A_BOLD);
 
-    /*int txtpadding = 1;*/
     // line number to string
-    /*char lnstr[mgn.width + txtpadding];*/
     char lnstr[area.width];    // Arbitary
     for (size_t i = 0; i < area.height; ++i) {
         wmove(nwin, i, 0);
         wclrtoeol(nwin);
-        size_t lnnumber = mgn.start + i;
+        size_t lnnumber = mgn.start + i;    // 0 indexed
         if (lnnumber < mgn.linecount) {
             sprintf(lnstr, "%3lu", lnnumber + 1);    // 1 indexed
         } else {
             sprintf(lnstr, "%3c", '~');
         }
-        waddstr(nwin, lnstr);
+
+        if (cur.line != lnnumber) {
+            waddstr(nwin, lnstr);
+        } else {
+            wattron(nwin, A_BOLD);
+            waddstr(nwin, lnstr);
+            wattroff(nwin, A_BOLD);
+        }
     }
-    wattroff(nwin, A_BOLD);
 }
 
 
@@ -84,7 +88,8 @@ void draw_statusline(WINDOW* nwin, struct statusline sline,
     // statusline string
     char stsstring[area.width];
     sprintf(stsstring,
-            "   %s | %s | CUR %lu:%lu | GAP: line: %lu col: %lu size: %lu",
+            "   %s | %s | CUR %lu:%lu | GAP: line: %lu col: %lu "
+            "size: %lu",
             mode_str[context->mode], sline.bufname, sline.cur.line,
             sline.cur.col, sline.gap.line, sline.gap.col,
             sline.gap.size);

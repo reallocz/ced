@@ -95,7 +95,8 @@ void win_draw(const struct window* win, const struct context* context)
     struct rect areamgn =
         RECT(0, 0, win->margin.width,
              area.height - STATUSLINE_HEIGHT - CMDLINE_HEIGHT);
-    draw_margin(win->nwin, win->margin, areamgn, context);
+    draw_margin(win->nwin, win->margin, areamgn, win->bview->cur,
+                context);
 
     // Cmdline
     struct rect areacmd = RECT(area.height - CMDLINE_HEIGHT, 0,
