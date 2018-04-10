@@ -1,6 +1,6 @@
 #include "ced.h"
 #include "buffer.h"
-#include "commands.h"
+#include "commandline.h"
 #include "common.h"
 #include "context.h"
 #include "input.h"
@@ -172,27 +172,22 @@ static void exec_command(struct command cmd);
 
 void ced_command_input_cb(inpev ev)
 {
-    static int i = 0;
+    struct cmdline* cl = &G.win->cmdline;
+
     if (ev.key == k_esc) {
         // Switch to normal mode
         G.context->mode = MODE_NORMAL;
     } else if (ev.key == k_enter) {
         // Execute command and clear cmdline buffer
-        exec_command(cmd_parse_string(G.win->cmdline.buffer));
+        exec_command(cmd_parse(cl));
         // Reset buffer
-        i                        = 0;
-        G.win->cmdline.buffer[i] = '\0';
+        cmd_clear(cl);
         G.context->mode          = MODE_NORMAL;
     } else if (ev.type == INP_ALPHA || ev.type == INP_NUM ||
                ev.type == INP_SYMBOL || ev.key == k_space) {
-        G.win->cmdline.buffer[i++] = ev.key;
-        G.win->cmdline.buffer[i]   = '\0';
+        cmd_addch(cl, ev.key);
     } else if (ev.key == k_backspace) {
-        i--;
-        if (i < 0) {
-            i = 0;
-        }
-        G.win->cmdline.buffer[i] = '\0';
+        cmd_delch(cl);
     } else {
         // Go back to MODE_NORMAL
         G.context->mode = MODE_NORMAL;

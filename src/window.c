@@ -35,6 +35,9 @@ struct window* win_create(struct buffer_view* bview)
     // Buffer view
     w->bview = bview;
 
+    // Commandline
+    w->cmdline = cmd_create();
+
     log_l(TAG, "Window created:");
     win_pprint(w);
     return w;
@@ -110,8 +113,7 @@ void win_draw(const struct window* win, const struct context* context)
         struct rect areabv = bv_bounds(win->bview);
         wmove(win->nwin, areabv.y + c.line, areabv.x + c.col);
     } else if (context->mode == MODE_COMMAND) {
-        int x =
-            strlen(win->cmdline.buffer) + 1;    // +1 for ':' prefix
+        int x = win->cmdline.cur + 1;    // +1 for ':' prefix
         wmove(win->nwin, areacmd.y, x);
     } else {
         // ERROR

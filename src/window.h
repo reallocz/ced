@@ -1,10 +1,10 @@
 #pragma once
 #include "buffer_view.h"
+#include "commandline.h"
 #include "common.h"
 #include "context.h"
 #include <ncurses.h>
 
-#define CMDLINE_SIZE 256
 
 /** window.h
  * A window is a rectangular division of the terminal.
@@ -35,9 +35,6 @@ struct margin {
     size_t linecount;
 };
 
-struct cmdline {
-    char buffer[CMDLINE_SIZE];
-};
 
 struct window {
     size_t id;

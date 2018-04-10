@@ -1,10 +1,49 @@
-#include "commands.h"
+#include "commandline.h"
 #include "log.h"
 #include <assert.h>
 #include <string.h>
 
 
 #define TAG "CMD"
+
+struct cmdline cmd_create(void)
+{
+    struct cmdline cl;
+    cmd_clear(&cl);
+    return cl;
+}
+
+void cmd_addch(struct cmdline* cl, char ch)
+{
+    assert(cl);
+    if(cl->cur < CMDLINE_SIZE) {
+        cl->buffer[cl->cur++] = ch;
+        cl->buffer[cl->cur] = '\0';
+    } else {
+        log_l(TAG, "OUT OF BOUNDS!!");
+    }
+}
+
+void cmd_delch(struct cmdline* cl)
+{
+    assert(cl);
+    if(cl->cur > 0) {
+        cl->buffer[--cl->cur]= '\0';
+    } else {
+        cmd_clear(cl);
+    }
+}
+
+void cmd_clear(struct cmdline* cl)
+{
+    assert(cl);
+    cl->cur = 0;
+    cl->buffer[cl->cur] = '\0';
+}
+
+struct command cmd_parse(struct cmdline* cl){
+    return cmd_parse_string(cl->buffer);
+}
 
 
 struct command cmd_parse_string(const char* cmdstr)

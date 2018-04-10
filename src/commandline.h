@@ -1,4 +1,6 @@
 #pragma once
+#include "common.h"
+#define CMDLINE_SIZE 256
 
 /** Each command has a unique id which corresponds to cmd_str[] */
 enum cmd_type {
@@ -39,6 +41,21 @@ struct command {
     char args[128];
 };
 
+
+/* Commandline is just a buffer for now */
+struct cmdline {
+    size_t cur;
+    char buffer[CMDLINE_SIZE];
+};
+
+
+struct cmdline cmd_create(void);
+
+/** Add ch to cmdline */
+void cmd_addch(struct cmdline* cl, char ch);
+void cmd_delch(struct cmdline* cl);
+void cmd_clear(struct cmdline* cl);
+struct command cmd_parse(struct cmdline* cl);
 
 /** Parse command string and return command */
 struct command cmd_parse_string(const char* cmdstr);

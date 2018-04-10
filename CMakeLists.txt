@@ -22,7 +22,7 @@ add_executable(debug
         ${SRCDIR}/log.c
         ${SRCDIR}/common.c
         ${SRCDIR}/fileutils.c
-        ${SRCDIR}/commands.c
+        ${SRCDIR}/commandline.c
         ${SRCDIR}/buffer.c
         ${SRCDIR}/buffer_view.c
         ${SRCDIR}/window.c
