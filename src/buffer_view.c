@@ -119,10 +119,11 @@ void bv_cmov_lprev(struct buffer_view* bv, size_t n)
     assert(bv);
     // Move to prev line
     if (n > bv->cur.line) {
-        bv_cmov_lstart(bv);
+        bv->cur.line = 0;
     } else {
         bv->cur.line -= n;
     }
+    // TODO Scroll buffer if out of bounds
     bv_cmov_inline(bv);
 }
 
