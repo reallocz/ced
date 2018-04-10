@@ -8,7 +8,7 @@
 
 static struct {
     const char* tag;
-    unsigned int rows, cols;    // Global width and height
+    size_t rows, cols;    // Global width and height
 
     WINDOW* stdscr;
 } G;
@@ -45,7 +45,7 @@ int term_rows() { return G.rows; }
 
 int term_cols() { return G.cols; }
 
-void term_size(unsigned int* rows, unsigned int* cols)
+void term_size(size_t* rows, size_t* cols)
 {
     *rows = G.rows;
     *cols = G.cols;

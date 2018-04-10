@@ -21,7 +21,7 @@ static struct {
     struct context* context;
 
     struct buffer_view bviews[BVIEW_LIMIT];
-    unsigned int bcount;
+    size_t bcount;
 } G;
 
 
@@ -36,7 +36,7 @@ static int ced_parseopts(struct cedopts opts)
     } else {
         assert(opts.bviews);
         G.bcount = opts.bcount;
-        for (unsigned int i = 0; i < G.bcount; ++i) {
+        for (size_t i = 0; i < G.bcount; ++i) {
             G.bviews[i] = opts.bviews[i];
         }
     }
@@ -66,7 +66,7 @@ void ced_init(struct cedopts opts)
     G.context = ctx;
 }
 
-static unsigned int currentbview = 0;
+static size_t currentbview = 0;
 static struct buffer_view* next_bview()
 {
     currentbview++;

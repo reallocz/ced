@@ -10,7 +10,7 @@
 
 struct cedopts {
     struct buffer_view bviews[BVIEW_LIMIT];
-    unsigned int bcount;
+    size_t bcount;
 };
 
 void ced_init(struct cedopts opts);

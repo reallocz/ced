@@ -1,11 +1,12 @@
 Port cpp branch features:
 Create context.h
 Add Clang compiler warning flags
-- Run clang-tidy
-- typedef structs
+cleanup fileutils
+Run clang-tidy and clang-format
+convert unsigned int's to size_t's
+
 - create line.h
-- cleanup fileutils
-- convert unsigned int's to size_t's
+- typedef structs
 - CurLmove inconsistency
 - move command to commandline.h
 - highlight line number the cursor's on

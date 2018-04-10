@@ -53,16 +53,16 @@ struct file_stats fu_stats(const char* path)
 }
 
 
-unsigned int fu_read_file_lines(const char* path, struct line** lines)
+size_t fu_read_file_lines(const char* path, struct line** lines)
 {
     FILE* f = fopen(path, "r");
     assert(f);
     fseek(f, 0, SEEK_END);
-    unsigned int size = ftell(f);
+    size_t size = ftell(f);
     rewind(f);
 
     // Count number of lines
-    unsigned int linecount = 0;
+    size_t linecount = 0;
     char ch;
     while (1) {
         ch = fgetc(f);
@@ -79,7 +79,7 @@ unsigned int fu_read_file_lines(const char* path, struct line** lines)
     struct line* mlines = malloc(linecount * sizeof(struct line));
     assert(mlines);
 
-    unsigned int count = 0;
+    size_t count = 0;
     // getline allocates buffer if tmpdata and tmplen == 0
     int linelen   = 0;
     size_t wtfits = 0;
@@ -110,12 +110,12 @@ int fu_save_buffer(const struct buffer* buf, const char* path)
     log_l(TAG, "Saving buffer...");
     FILE* f = fopen(path, "w");
     assert(f);
-    unsigned int wbytes = 0;
-    unsigned int lcount = 0;
-    for (unsigned int lnum = 0; lnum < buf->linecount; ++lnum) {
+    size_t wbytes = 0;
+    size_t lcount = 0;
+    for (size_t lnum = 0; lnum < buf->linecount; ++lnum) {
         struct line* ln = buf_line(buf, lnum);
         lcount++;
-        for (unsigned int i = 0; i < ln->len; ++i) {
+        for (size_t i = 0; i < ln->len; ++i) {
             if (buf->gap.line == lnum) {
                 // Line with the gap
                 if (!buf_ingap(buf, i)) {

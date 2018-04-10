@@ -8,15 +8,15 @@ struct file_stats {
     enum file_type type;
     const char* path;
     const char* abspath;
-    unsigned int size;
-    unsigned int linecount;
+    size_t size;
+    size_t linecount;
     int exists; /* 1 if it does */
 };
 
 
 /** Read's file contents into lines and returns number of lines
  * read */
-unsigned int fu_read_file_lines(const char* path,
+size_t fu_read_file_lines(const char* path,
                                 struct line** lines);
 
 struct file_stats fu_stats(const char* path);

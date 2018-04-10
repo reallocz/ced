@@ -1,5 +1,6 @@
 #pragma once
 #include "log.h"
+#include <stddef.h>
 
 #define TEXTPATH "../text/"
 
@@ -27,15 +28,15 @@ enum flags {
 
 /** Cursor.h */
 struct cursor {
-    unsigned int line;
-    unsigned int col;
+    size_t line;
+    size_t col;
 };
 
 
 /** struct rect represents area of the screen*/
 struct rect {
-    unsigned int y, x;    // Top left corner
-    unsigned int width, height;
+    size_t y, x;    // Top left corner
+    size_t width, height;
 };
 
 

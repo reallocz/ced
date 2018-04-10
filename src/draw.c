@@ -21,13 +21,13 @@ void draw_bview(WINDOW* nwin, const struct buffer_view* bv,
           bv->buffer.linecount);
 
     struct rect area = bv_bounds(bv);
-    unsigned int ox  = area.x;
+    size_t ox  = area.x;
 
-    unsigned int linesdrawn = 0;
-    unsigned int firstline  = bv_start(bv);
-    for (unsigned int i = 0; i < area.height; ++i) {
+    size_t linesdrawn = 0;
+    size_t firstline  = bv_start(bv);
+    for (size_t i = 0; i < area.height; ++i) {
 
-        unsigned int linenumber = firstline + i;
+        size_t linenumber = firstline + i;
         struct line* ln         = buf_line(&bv->buffer, linenumber);
         if (ln == NULL) {
             break;
@@ -35,13 +35,13 @@ void draw_bview(WINDOW* nwin, const struct buffer_view* bv,
 
         linesdrawn++;
         if (buf_line_hasgap(&bv->buffer, linenumber)) {
-            for (unsigned int j = 0; j < ln->len; ++j) {
+            for (size_t j = 0; j < ln->len; ++j) {
                 if (!buf_ingap(&bv->buffer, j)) {
                     mvwaddch(nwin, area.y, area.x++, ln->data[j]);
                 }
             }
         } else {
-            for (unsigned int j = 0; j < ln->len; ++j) {
+            for (size_t j = 0; j < ln->len; ++j) {
                 mvwaddch(nwin, area.y, area.x++, ln->data[j]);
             }
         }
@@ -63,12 +63,12 @@ void draw_margin(WINDOW* nwin, struct margin mgn, struct rect area,
     // line number to string
     /*char lnstr[mgn.width + txtpadding];*/
     char lnstr[area.width];    // Arbitary
-    for (unsigned int i = 0; i < area.height; ++i) {
+    for (size_t i = 0; i < area.height; ++i) {
         wmove(nwin, i, 0);
         wclrtoeol(nwin);
-        unsigned int lnnumber = mgn.start + i;
+        size_t lnnumber = mgn.start + i;
         if (lnnumber < mgn.linecount) {
-            sprintf(lnstr, "%3d", lnnumber + 1);    // 1 indexed
+            sprintf(lnstr, "%3lu", lnnumber + 1);    // 1 indexed
         } else {
             sprintf(lnstr, "%3c", '~');
         }
@@ -84,7 +84,7 @@ void draw_statusline(WINDOW* nwin, struct statusline sline,
     // statusline string
     char stsstring[area.width];
     sprintf(stsstring,
-            "   %s | %s | CUR %d:%d | GAP: line: %d col: %d size: %d",
+            "   %s | %s | CUR %lu:%lu | GAP: line: %lu col: %lu size: %lu",
             mode_str[context->mode], sline.bufname, sline.cur.line,
             sline.cur.col, sline.gap.line, sline.gap.col,
             sline.gap.size);

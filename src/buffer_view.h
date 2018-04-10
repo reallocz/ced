@@ -7,7 +7,7 @@
  * renders parts of a buffer */
 
 struct buffer_view {
-    unsigned int start;    // View starts from
+    size_t start;    // View starts from
     struct cursor cur;
     struct buffer buffer;
     struct rect bounds;
@@ -26,10 +26,10 @@ struct rect bv_bounds(const struct buffer_view* bv);
 
 /** CURSOR **/
 void bv_cset(struct buffer_view* bv, struct cursor cur);
-void bv_cmov_fwd(struct buffer_view* bv, unsigned int n);
-void bv_cmov_back(struct buffer_view* bv, unsigned int n);
-void bv_cmov_lnext(struct buffer_view* bv, unsigned int n);
-void bv_cmov_lprev(struct buffer_view* bv, unsigned int n);
+void bv_cmov_fwd(struct buffer_view* bv, size_t n);
+void bv_cmov_back(struct buffer_view* bv, size_t n);
+void bv_cmov_lnext(struct buffer_view* bv, size_t n);
+void bv_cmov_lprev(struct buffer_view* bv, size_t n);
 
 /** Move cursor to the start of the line */
 void bv_cmov_lstart(struct buffer_view* bv);
@@ -39,14 +39,14 @@ void bv_cmov_lend(struct buffer_view* bv);
 void bv_cmov_inline(struct buffer_view* bv);
 
 /** Sroll buffer view up by n lines. (LIKE PAGE UP) */
-void bv_scrollup(struct buffer_view* bv, unsigned int n);
+void bv_scrollup(struct buffer_view* bv, size_t n);
 /** Sroll buffer view down by n lines. (LIKE PAGE DOWN)*/
-void bv_scrolldown(struct buffer_view* bv, unsigned int n);
+void bv_scrolldown(struct buffer_view* bv, size_t n);
 
 /** Get bounds/extents of the view */
 /** Return's the number(0 indexed) of the first line of the
  * buffer_view */
-unsigned int bv_start(const struct buffer_view* bv);
+size_t bv_start(const struct buffer_view* bv);
 
 /** Return cursor relative to bview.start */
 struct cursor bv_relcur(const struct buffer_view* bv);

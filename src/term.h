@@ -1,4 +1,5 @@
 #pragma once
+#include <stddef.h>
 
 /** term.h
  * Manage curses and other terminal functions
@@ -15,4 +16,4 @@ void term_update(void);
 /** query terminal props */
 int term_rows(void);
 int term_cols(void);
-void term_size(unsigned int* rows, unsigned int* cols);
+void term_size(size_t* rows, size_t* cols);

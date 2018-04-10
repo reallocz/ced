@@ -30,9 +30,9 @@ struct statusline {
 };
 
 struct margin {
-    unsigned int width;
-    unsigned int start;    // First line number
-    unsigned int linecount;
+    size_t width;
+    size_t start;    // First line number
+    size_t linecount;
 };
 
 struct cmdline {
@@ -40,7 +40,7 @@ struct cmdline {
 };
 
 struct window {
-    unsigned int id;
+    size_t id;
     WINDOW* nwin;
 
     struct statusline sline;

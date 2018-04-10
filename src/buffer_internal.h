@@ -4,7 +4,7 @@
 /** Static method headers */
 
 /** return a new id for a buffer */
-static unsigned int generate_id(void);
+static size_t generate_id(void);
 
 /** Increase buffer gap */
 static void gap_add(struct buffer* buf);

@@ -14,8 +14,8 @@ struct command cmd_parse_string(const char* cmdstr)
 
     // Parse string into cmd and args
     {
-        unsigned int len = strlen(cmdstr);
-        unsigned int i   = 0;
+        size_t len = strlen(cmdstr);
+        size_t i   = 0;
         // cmd
         for (i = 0; i < len; ++i) {
             c.cmd[i] = cmdstr[i];
@@ -26,8 +26,8 @@ struct command cmd_parse_string(const char* cmdstr)
         }
 
         // Skip space
-        unsigned int space = 0;    // Whitespace b/w cmd and arg
-        unsigned int k;
+        size_t space = 0;    // Whitespace b/w cmd and arg
+        size_t k;
         for (k = i; k < len; ++k) {
             if (cmdstr[k] != ' ') {
                 break;
@@ -37,7 +37,7 @@ struct command cmd_parse_string(const char* cmdstr)
         }
 
         // args
-        unsigned int j;
+        size_t j;
         for (j = 0; k < len; ++k, ++j) {
             c.args[j] = cmdstr[k];
         }
@@ -46,7 +46,7 @@ struct command cmd_parse_string(const char* cmdstr)
 
 
     // Identify command
-    for (unsigned int i = 0; i < CMD_ENUMCOUNT; ++i) {
+    for (size_t i = 0; i < CMD_ENUMCOUNT; ++i) {
         if (strcmp(c.cmd, cmd_defs[i]) == 0) {
             log_l(TAG, "Recognized command: %s", c.cmd);
             c.valid = 1;

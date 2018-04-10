@@ -25,7 +25,7 @@ void bv_update(struct buffer_view* bv)
 {
     // Keep cursor on the screen
     struct rect bvarea     = bv_bounds(bv);
-    unsigned int firstline = bv_start(bv);
+    size_t firstline = bv_start(bv);
 
     if (bv->cur.line < firstline) {
         struct cursor cur = bv->cur;
@@ -71,14 +71,14 @@ void bv_cset(struct buffer_view* bv, struct cursor cur)
 }
 
 
-void bv_cmov_fwd(struct buffer_view* bv, unsigned int n)
+void bv_cmov_fwd(struct buffer_view* bv, size_t n)
 {
     assert(bv);
     const struct buffer* buf = &bv->buffer;
     const struct line* ln    = buf_line(buf, bv->cur.line);
 
-    unsigned int newcol = bv->cur.col + n;
-    unsigned int maxcol = buf_line_hasgap(buf, bv->cur.line)
+    size_t newcol = bv->cur.col + n;
+    size_t maxcol = buf_line_hasgap(buf, bv->cur.line)
                               ? (ln->len - buf->gap.size)
                               : ln->len;
 
@@ -90,7 +90,7 @@ void bv_cmov_fwd(struct buffer_view* bv, unsigned int n)
 }
 
 
-void bv_cmov_back(struct buffer_view* bv, unsigned int n)
+void bv_cmov_back(struct buffer_view* bv, size_t n)
 {
     assert(bv);
     if (n > bv->cur.col) {
@@ -101,7 +101,7 @@ void bv_cmov_back(struct buffer_view* bv, unsigned int n)
 }
 
 
-void bv_cmov_lnext(struct buffer_view* bv, unsigned int n)
+void bv_cmov_lnext(struct buffer_view* bv, size_t n)
 {
     assert(bv);
     // Move to next line
@@ -114,7 +114,7 @@ void bv_cmov_lnext(struct buffer_view* bv, unsigned int n)
 }
 
 
-void bv_cmov_lprev(struct buffer_view* bv, unsigned int n)
+void bv_cmov_lprev(struct buffer_view* bv, size_t n)
 {
     assert(bv);
     // Move to prev line
@@ -156,7 +156,7 @@ void bv_cmov_inline(struct buffer_view* bv)
 }
 
 
-void bv_scrollup(struct buffer_view* bv, unsigned int n)
+void bv_scrollup(struct buffer_view* bv, size_t n)
 {
     log_l(TAG, "SCROLLING UP!");
     if (n > bv->start) {
@@ -167,10 +167,10 @@ void bv_scrollup(struct buffer_view* bv, unsigned int n)
 }
 
 
-void bv_scrolldown(struct buffer_view* bv, unsigned int n)
+void bv_scrolldown(struct buffer_view* bv, size_t n)
 {
     log_l(TAG, "SCROLLING DOWN!");
-    unsigned int newstart = bv->start + n;
+    size_t newstart = bv->start + n;
     if (!(newstart < bv->buffer.linecount)) {
         // last line
         newstart = bv->buffer.linecount - 1;
@@ -179,7 +179,7 @@ void bv_scrolldown(struct buffer_view* bv, unsigned int n)
 }
 
 
-unsigned int bv_start(const struct buffer_view* bv)
+size_t bv_start(const struct buffer_view* bv)
 {
     return bv->start;
 }

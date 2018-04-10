@@ -87,8 +87,8 @@ struct buffer buf_create_file(enum buffer_type type,
 
 void buf_destroy(struct buffer* buf)
 {
-    unsigned int id = buf->id;
-    for (unsigned int i = 0; i < buf->linecount; ++i) {
+    size_t id = buf->id;
+    for (size_t i = 0; i < buf->linecount; ++i) {
         struct line* ln = &buf->lines[i];
         free(ln->data);
     }
@@ -129,7 +129,7 @@ void buf_delch(struct buffer* buf, struct cursor cur)
 
 /** Returns pointer to line in buffer. NULL if 'num' is out of
  * bounds*/
-struct line* buf_line(const struct buffer* buf, unsigned int num)
+struct line* buf_line(const struct buffer* buf, size_t num)
 {
     if (num >= buf->linecount) {
         /*log_e(TAG, "Invalid line request: buf: %d (%d lines),
@@ -140,12 +140,12 @@ struct line* buf_line(const struct buffer* buf, unsigned int num)
 }
 
 
-unsigned int buf_line_count(const struct buffer* buf)
+size_t buf_line_count(const struct buffer* buf)
 {
     return buf->linecount;
 }
 
-int buf_line_hasgap(const struct buffer* buf, unsigned int line)
+int buf_line_hasgap(const struct buffer* buf, size_t line)
 {
     return buf->gap.line == line;
 }
@@ -156,7 +156,7 @@ int buf_save_to_disk(const struct buffer* buf, const char* path)
     return fu_save_buffer(buf, path);
 }
 
-int buf_ingap(const struct buffer* b, unsigned int i)
+int buf_ingap(const struct buffer* b, size_t i)
 {
     return INGAP(b, i);
 }
@@ -174,7 +174,7 @@ void buf_pprint(const struct buffer* b)
 void buf_pprint_lines(const struct buffer* buf)
 {
     log_l(TAG, " -- line metadata --");
-    for (unsigned int i = 0; i < buf->linecount; ++i) {
+    for (size_t i = 0; i < buf->linecount; ++i) {
         const struct line* ln = buf_line(buf, i);
         log_l(TAG, "no: %d, len: %d", i, ln->len);
     }
@@ -183,9 +183,9 @@ void buf_pprint_lines(const struct buffer* buf)
 
 /** buffer_internal.h **/
 
-static unsigned int generate_id(void)
+static size_t generate_id(void)
 {
-    static unsigned int ids = 0;
+    static size_t ids = 0;
     return ids++;
 }
 
@@ -194,8 +194,8 @@ static void gap_add(struct buffer* buf)
     struct line* ln        = buf_line(buf, buf->gap.line);
     struct buffer_gap* gap = &buf->gap;
 
-    unsigned int newlinelen = ln->len + BUFFER_GAPSIZE;
-    unsigned int newgapsize = gap->size + BUFFER_GAPSIZE;
+    size_t newlinelen = ln->len + BUFFER_GAPSIZE;
+    size_t newgapsize = gap->size + BUFFER_GAPSIZE;
 
     char* newdata = calloc(newlinelen, sizeof(char));
     assert(newdata);
@@ -215,17 +215,17 @@ static void gap_add(struct buffer* buf)
 }
 
 /* NOTE: toline must NOT be same as gap.line! */
-static void gap_move_to_line(struct buffer* buf, unsigned int toline)
+static void gap_move_to_line(struct buffer* buf, size_t toline)
 {
     assert(buf->gap.line != toline);
     // Delete current gap
     {
         struct line* ln         = buf_line(buf, buf->gap.line);
-        unsigned int linelength = ln->len - buf->gap.size;
+        size_t linelength = ln->len - buf->gap.size;
         char* newdata           = malloc(linelength * sizeof(char));
         assert(newdata);
-        unsigned int count = 0;
-        for (unsigned int i = 0; i < ln->len; ++i) {
+        size_t count = 0;
+        for (size_t i = 0; i < ln->len; ++i) {
             if (!INGAP(buf, i)) {
                 newdata[count] = ln->data[i];
                 count++;
@@ -241,7 +241,7 @@ static void gap_move_to_line(struct buffer* buf, unsigned int toline)
     // Create gap on toline
     {
         struct line* ln        = buf_line(buf, toline);
-        unsigned int newlength = ln->len + buf->gap.size;
+        size_t newlength = ln->len + buf->gap.size;
         char* newdata          = malloc(newlength * sizeof(char));
         assert(newdata);
         memcpy(&newdata[buf->gap.size], ln->data, ln->len);
@@ -269,13 +269,13 @@ static void gap_move(struct buffer* buf, struct cursor cur)
     // Now, the cursor and the gap are on the same line
 
     struct line* ln     = buf_line(buf, cur.line);
-    unsigned int offset = 0;
+    size_t offset = 0;
     int diff            = cur.col - buf->gap.col;
 
     if (diff > 0) {
         // Cursor is ahead of the gap
         offset = diff;
-        for (unsigned int i = 0; i < offset; ++i) {
+        for (size_t i = 0; i < offset; ++i) {
             ln->data[buf->gap.col] =
                 ln->data[buf->gap.col + buf->gap.size];
             buf->gap.col++;
@@ -284,7 +284,7 @@ static void gap_move(struct buffer* buf, struct cursor cur)
     } else if (diff < 0) {
         // Cursor is behind the gap
         offset = -1 * diff;
-        for (unsigned int i = 0; i < offset; ++i) {
+        for (size_t i = 0; i < offset; ++i) {
             ln->data[buf->gap.col + buf->gap.size - 1] =
                 ln->data[buf->gap.col - 1];
             buf->gap.col--;
@@ -300,7 +300,7 @@ static void gap_move(struct buffer* buf, struct cursor cur)
 static int gap_resize_optional(struct buffer* buf)
 {
     if (buf->gap.size < 1) {
-        unsigned int oldgap = buf->gap.size;
+        size_t oldgap = buf->gap.size;
         gap_add(buf);
         log_l(TAG, "Gap resized %d -> %d", oldgap, buf->gap.size);
         return 1;
@@ -309,13 +309,13 @@ static int gap_resize_optional(struct buffer* buf)
 }
 
 
-void buf_printline(const struct buffer* buf, unsigned int i)
+void buf_printline(const struct buffer* buf, size_t i)
 {
     assert(i < buf->linecount);
     int hasgap            = i == buf->gap.line ? 1 : 0;
     const struct line* ln = buf_line(buf, i);
     log_l("LINE", "no: %d, len: %d, has_gap: %d", i, ln->len, hasgap);
-    for (unsigned int j = 0; j < ln->len; ++j) {
+    for (size_t j = 0; j < ln->len; ++j) {
         if (INGAP(buf, j)) {
             log_lc("-");
         } else {

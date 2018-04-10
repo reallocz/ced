@@ -14,9 +14,9 @@
 #define CMDLINE_HEIGHT 1
 
 /** return a new id for a window */
-static unsigned int generate_id()
+static size_t generate_id()
 {
-    static unsigned int ids = 0;
+    static size_t ids = 0;
     return ids++;
 }
 
