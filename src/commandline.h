@@ -6,7 +6,7 @@
 enum cmd_type {
     CMD_BUFSAVE = 0,
     CMD_BUFOPEN,
-
+    CMD_QUIT,
     CMD_ENUMCOUNT,    // Number of commands (last element)
 };
 
@@ -15,13 +15,15 @@ enum cmd_type {
 static const char* cmd_str[] = {
     "BUFSAVE",
     "BUFOPEN",
+    "QUIT",
 };
 
 
 /** Command definitions corresponding to cmd_type */
 static const char* cmd_defs[] = {
-    "w",    // BUFSAVE
-    "e",    // BUFOPEN
+    "w",    // CMD_BUFSAVE
+    "e",    // CMD_BUFOPEN
+    "q",    // CMD_QUIT
 };
 
 

@@ -6,17 +6,17 @@ Run clang-tidy and clang-format
 convert unsigned int's to size_t's
 move command to commandline.h
 highlight line number the cursor's on
+relative line number
+quit on ':q' 
 
 - create line.h
 - typedef structs
 - CurLmove inconsistency
-- relative line number
 - currentLine to bview
 - ln_clear()
 - gaplen and gapcol on statusline
 - remove '\n's in buffer
 - ln_split()
-- quit on ':q' 
 - Add ctx_setmode()
 
 

@@ -184,7 +184,7 @@ void ced_command_input_cb(inpev ev)
         exec_command(cmd_parse(cl));
         // Reset buffer
         cmd_clear(cl);
-        G.context->mode          = MODE_NORMAL;
+        G.context->mode = MODE_NORMAL;
     } else if (ev.type == INP_ALPHA || ev.type == INP_NUM ||
                ev.type == INP_SYMBOL || ev.key == k_space) {
         cmd_addch(cl, ev.key);
@@ -205,8 +205,9 @@ static void exec_command(struct command cmd)
         return;
     }
 
-
-    if (cmd.type == CMD_BUFSAVE) {
+    if (cmd.type == CMD_QUIT) {
+        G.quit = 1;
+    } else if (cmd.type == CMD_BUFSAVE) {
         if (strlen(cmd.args) == 0) {
             // Save
             buf_save_to_disk(&G.win->bview->buffer,
