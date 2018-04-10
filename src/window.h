@@ -26,7 +26,8 @@
 struct statusline {
     const char* bufname;
     struct cursor cur;
-    struct buffer_gap gap;
+    size_t gapcol;
+    size_t gapsize;
 };
 
 struct margin {

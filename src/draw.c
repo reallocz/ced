@@ -30,20 +30,14 @@ void draw_bview(WINDOW* nwin, const struct buffer_view* bv,
     for (size_t i = 0; i < area.height; ++i) {
 
         size_t linenumber = firstline + i;
-        struct line* ln   = buf_line(&bv->buffer, linenumber);
+        struct line* ln   = buf_getline(&bv->buffer, linenumber);
         if (ln == NULL) {
             break;
         }    // No more lines in buffer
 
         linesdrawn++;
-        if (buf_line_hasgap(&bv->buffer, linenumber)) {
-            for (size_t j = 0; j < ln->len; ++j) {
-                if (!buf_ingap(&bv->buffer, j)) {
-                    mvwaddch(nwin, area.y, area.x++, ln->data[j]);
-                }
-            }
-        } else {
-            for (size_t j = 0; j < ln->len; ++j) {
+        for (size_t j = 0; j < ln->len; ++j) {
+            if (!INGAP(ln, j)) {
                 mvwaddch(nwin, area.y, area.x++, ln->data[j]);
             }
         }
@@ -107,11 +101,9 @@ void draw_statusline(WINDOW* nwin, struct statusline sline,
     // statusline string
     char stsstring[area.width];
     sprintf(stsstring,
-            "   %s | %s | CUR %lu:%lu | GAP: line: %lu col: %lu "
-            "size: %lu",
+            "   %s | %s | CUR %lu:%lu | GAP: col: %lu size: %lu ",
             mode_str[context->mode], sline.bufname, sline.cur.line,
-            sline.cur.col, sline.gap.line, sline.gap.col,
-            sline.gap.size);
+            sline.cur.col, sline.gapcol, sline.gapsize);
 
     init_pair(1, COLOR_BLACK, COLOR_WHITE);
     wattron(nwin, COLOR_PAIR(1));

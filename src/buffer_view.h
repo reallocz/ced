@@ -19,6 +19,8 @@ struct buffer_view bv_create(enum buffer_type type,
 /** Update tick function */
 void bv_update(struct buffer_view* bv);
 
+Line* bv_curline(struct buffer_view* bv);
+
 /** Set buffer_views bounds */
 void bv_bounds_set(struct buffer_view* bv, struct rect bounds);
 /** Return a copy of bounds */

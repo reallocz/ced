@@ -41,6 +41,12 @@ void bv_update(struct buffer_view* bv)
 }
 
 
+Line* bv_curline(struct buffer_view* bv)
+{
+    return &(bv->buffer.lines[bv->cur.line]);
+}
+
+
 void bv_bounds_set(struct buffer_view* bv, struct rect bounds)
 {
     assert(bv);
@@ -75,12 +81,10 @@ void bv_cmov_fwd(struct buffer_view* bv, size_t n)
 {
     assert(bv);
     const struct buffer* buf = &bv->buffer;
-    const struct line* ln    = buf_line(buf, bv->cur.line);
+    const struct line* ln    = buf_getline(buf, bv->cur.line);
 
     size_t newcol = bv->cur.col + n;
-    size_t maxcol = buf_line_hasgap(buf, bv->cur.line)
-                              ? (ln->len - buf->gap.size)
-                              : ln->len;
+    size_t maxcol = ln_truelen(ln);
 
     if (newcol > maxcol) {
         bv_cmov_lend(bv);
@@ -138,19 +142,15 @@ void bv_cmov_lstart(struct buffer_view* bv)
 void bv_cmov_lend(struct buffer_view* bv)
 {
     assert(bv);
-    struct line* ln = buf_line(&bv->buffer, bv->cur.line);
-    if (buf_line_hasgap(&bv->buffer, bv->cur.line)) {
-        bv->cur.col = ln->len - bv->buffer.gap.size;
-    } else {
-        bv->cur.col = ln->len;
-    }
+    struct line* ln = buf_getline(&bv->buffer, bv->cur.line);
+    bv->cur.col = ln_truelen(ln);
 }
 
 
 void bv_cmov_inline(struct buffer_view* bv)
 {
     assert(bv);
-    struct line* ln = buf_line(&bv->buffer, bv->cur.line);
+    struct line* ln = buf_getline(&bv->buffer, bv->cur.line);
     if (bv->cur.col >= ln->len) {
         bv_cmov_lend(bv);
     }

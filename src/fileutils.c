@@ -1,6 +1,7 @@
 #include "fileutils.h"
 #define _GNU_SOURCE    // Required to use 'getline' function
 #include "log.h"
+#include "line.h"
 #include <assert.h>
 #include <errno.h>
 #include <linux/limits.h>
@@ -113,17 +114,10 @@ int fu_save_buffer(const struct buffer* buf, const char* path)
     size_t wbytes = 0;
     size_t lcount = 0;
     for (size_t lnum = 0; lnum < buf->linecount; ++lnum) {
-        struct line* ln = buf_line(buf, lnum);
+        struct line* ln = buf_getline(buf, lnum);
         lcount++;
         for (size_t i = 0; i < ln->len; ++i) {
-            if (buf->gap.line == lnum) {
-                // Line with the gap
-                if (!buf_ingap(buf, i)) {
-                    fputc(ln->data[i], f);
-                    wbytes++;
-                }
-            } else {
-                // Lines without the gap
+            if (!INGAP(ln, i)) {
                 fputc(ln->data[i], f);
                 wbytes++;
             }

@@ -8,16 +8,15 @@ move command to commandline.h
 highlight line number the cursor's on
 relative line number
 quit on ':q' 
+create line.h
+currentLine to bview
+ln_clear()
+remove '\n's in buffer
 
-- create line.h
 - typedef structs
-- CurLmove inconsistency
-- currentLine to bview
-- ln_clear()
-- gaplen and gapcol on statusline
-- remove '\n's in buffer
 - ln_split()
 - Add ctx_setmode()
+- CurLmove inconsistency?
 
 
 TODO: 

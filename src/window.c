@@ -39,7 +39,7 @@ struct window* win_create(struct buffer_view* bview)
     w->cmdline = cmd_create();
 
     // margin
-    w->margin.width = 3;
+    w->margin.width    = 3;
     w->margin.relative = 0;
 
 
@@ -69,7 +69,9 @@ void win_update(struct window* win, struct context* context)
     // statusline
     win->sline.bufname = bv->buffer.name;
     win->sline.cur     = bv->cur;
-    win->sline.gap     = bv->buffer.gap;
+    const Line* curln  = bv_curline(bv);
+    win->sline.gapcol  = curln->gapcol;
+    win->sline.gapsize = curln->gapsize;
 
     // Margin
     win->margin.start     = bv_start(bv);
