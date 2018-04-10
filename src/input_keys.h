@@ -38,7 +38,7 @@ enum inp_key {
     k_space     = 32,
     k_delete    = 330,
     k_insert    = 331,
-    k_backspace = KEY_BACKSPACE,    //263?
+    k_backspace = KEY_BACKSPACE,    // 263?
 
     // Arrow
     k_up    = KEY_UP,

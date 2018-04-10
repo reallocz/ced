@@ -2,12 +2,12 @@
 #include "buffer.h"
 #include "commands.h"
 #include "common.h"
+#include "context.h"
 #include "input.h"
 #include "input_keys.h"
 #include "log.h"
 #include "term.h"
 #include "window.h"
-#include "context.h"
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -47,7 +47,7 @@ void ced_init(struct cedopts opts)
 {
     if (ced_parseopts(opts) != 0) {
         log_l(TAG, "Invalid opts. quitting");
-        // TODO more diag
+        // TODO(realloc): more diag
         return;
     }
 
@@ -87,8 +87,9 @@ void ced_run(void)
         // Check for window resize
         {
             term_update();
-            struct rect newbounds = RECT(0, 0, term_cols(), term_rows());
-            G.context->bounds     = newbounds;
+            struct rect newbounds =
+                RECT(0, 0, term_cols(), term_rows());
+            G.context->bounds = newbounds;
         }
 
         win_update(G.win, G.context);
@@ -110,7 +111,9 @@ void ced_insert_input_cb(inpev ev)
     struct buffer* buf = &G.win->bview->buffer;
     struct cursor cur  = G.win->bview->cur;
 
-    if (ev.type == INP_ALPHA || ev.type == INP_NUM || ev.type == INP_SYMBOL || ev.key == k_space || ev.key == k_enter) {
+    if (ev.type == INP_ALPHA || ev.type == INP_NUM ||
+        ev.type == INP_SYMBOL || ev.key == k_space ||
+        ev.key == k_enter) {
         buf_addch(buf, ev.key, cur);
         bv_cmov_fwd(G.win->bview, 1);
     }
@@ -121,11 +124,8 @@ void ced_insert_input_cb(inpev ev)
             buf_delch(buf, cur);
             bv_cmov_back(G.win->bview, 1);
             break;
-        case k_esc:
-            G.context->mode = MODE_NORMAL;
-            break;
-        default:
-            break;
+        case k_esc: G.context->mode = MODE_NORMAL; break;
+        default: break;
         }
     }
 }
@@ -183,7 +183,8 @@ void ced_command_input_cb(inpev ev)
         i                        = 0;
         G.win->cmdline.buffer[i] = '\0';
         G.context->mode          = MODE_NORMAL;
-    } else if (ev.type == INP_ALPHA || ev.type == INP_NUM || ev.type == INP_SYMBOL || ev.key == k_space) {
+    } else if (ev.type == INP_ALPHA || ev.type == INP_NUM ||
+               ev.type == INP_SYMBOL || ev.key == k_space) {
         G.win->cmdline.buffer[i++] = ev.key;
         G.win->cmdline.buffer[i]   = '\0';
     } else if (ev.key == k_backspace) {
@@ -215,10 +216,9 @@ static void exec_command(struct command cmd)
                              G.win->bview->buffer.name);
         } else {
             // Save As arg
-            buf_save_to_disk(&G.win->bview->buffer,
-                             cmd.args);
-            // TODO add error checking
-            // TODO update buffer name to arg
+            buf_save_to_disk(&G.win->bview->buffer, cmd.args);
+            // TODO(realloc): add error checking
+            // TODO(realloc): update buffer name to arg
         }
         return;
     }

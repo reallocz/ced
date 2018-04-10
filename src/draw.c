@@ -1,7 +1,7 @@
 #include "draw.h"
 #include "common.h"
-#include "log.h"
 #include "context.h"
+#include "log.h"
 
 #define TAG "DRAW"
 
@@ -10,13 +10,15 @@
  *  1 - statusline
  *  2 - margin
  *  ... - cmdline, textarea etc
- * This is because drawing margin clear each line and drawing textarea does NOT!
+ * This is because drawing margin clear each line and drawing textarea
+ * does NOT!
  */
 
-void draw_bview(WINDOW* nwin, const struct buffer_view* bv, const struct context* context __attribute__((unused)))
+void draw_bview(WINDOW* nwin, const struct buffer_view* bv,
+                const struct context* context __attribute__((unused)))
 {
-    log_l(TAG, "Drawing buffer %d (%d lines)...",
-          bv->buffer.id, bv->buffer.linecount);
+    log_l(TAG, "Drawing buffer %d (%d lines)...", bv->buffer.id,
+          bv->buffer.linecount);
 
     struct rect area = bv_bounds(bv);
     unsigned int ox  = area.x;
@@ -51,14 +53,16 @@ void draw_bview(WINDOW* nwin, const struct buffer_view* bv, const struct context
 }
 
 
-void draw_margin(WINDOW* nwin, struct margin mgn, struct rect area, const struct context* context __attribute__((unused)))
+void draw_margin(WINDOW* nwin, struct margin mgn, struct rect area,
+                 const struct context* context
+                 __attribute__((unused)))
 {
     wattron(nwin, A_BOLD);
 
     /*int txtpadding = 1;*/
     // line number to string
     /*char lnstr[mgn.width + txtpadding];*/
-    char lnstr[area.width]; // Arbitary
+    char lnstr[area.width];    // Arbitary
     for (unsigned int i = 0; i < area.height; ++i) {
         wmove(nwin, i, 0);
         wclrtoeol(nwin);
@@ -74,14 +78,16 @@ void draw_margin(WINDOW* nwin, struct margin mgn, struct rect area, const struct
 }
 
 
-void draw_statusline(WINDOW* nwin, struct statusline sline, struct rect area, const struct context* context)
+void draw_statusline(WINDOW* nwin, struct statusline sline,
+                     struct rect area, const struct context* context)
 {
     // statusline string
     char stsstring[area.width];
     sprintf(stsstring,
             "   %s | %s | CUR %d:%d | GAP: line: %d col: %d size: %d",
-            mode_str[context->mode], sline.bufname, sline.cur.line, sline.cur.col,
-            sline.gap.line, sline.gap.col, sline.gap.size);
+            mode_str[context->mode], sline.bufname, sline.cur.line,
+            sline.cur.col, sline.gap.line, sline.gap.col,
+            sline.gap.size);
 
     init_pair(1, COLOR_BLACK, COLOR_WHITE);
     wattron(nwin, COLOR_PAIR(1));

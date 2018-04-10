@@ -4,7 +4,8 @@
 
 #define TAG "BVIEW"
 
-struct buffer_view bv_create(enum buffer_type type, const char* filename)
+struct buffer_view bv_create(enum buffer_type type,
+                             const char* filename)
 {
     assert(filename);
     struct buffer_view bv;
@@ -44,8 +45,9 @@ void bv_bounds_set(struct buffer_view* bv, struct rect bounds)
 {
     assert(bv);
     log_l(TAG, "bounds set: {%d, %d, %d, %d} -> {%d, %d, %d, %d}",
-          bv->bounds.y, bv->bounds.x, bv->bounds.width, bv->bounds.height,
-          bounds.y, bounds.x, bounds.width, bounds.height);
+          bv->bounds.y, bv->bounds.x, bv->bounds.width,
+          bv->bounds.height, bounds.y, bounds.x, bounds.width,
+          bounds.height);
     bv->bounds = bounds;
 }
 
@@ -185,8 +187,7 @@ unsigned int bv_start(const struct buffer_view* bv)
 
 struct cursor bv_relcur(const struct buffer_view* bv)
 {
-    struct cursor c = {
-        .line = bv->cur.line - bv->start,
-        .col  = bv->cur.col};
+    struct cursor c = {.line = bv->cur.line - bv->start,
+                       .col  = bv->cur.col};
     return c;
 }

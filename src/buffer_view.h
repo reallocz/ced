@@ -14,7 +14,8 @@ struct buffer_view {
 };
 
 /** Create a new buffer_view */
-struct buffer_view bv_create(enum buffer_type type, const char* filename);
+struct buffer_view bv_create(enum buffer_type type,
+                             const char* filename);
 /** Update tick function */
 void bv_update(struct buffer_view* bv);
 
@@ -43,7 +44,8 @@ void bv_scrollup(struct buffer_view* bv, unsigned int n);
 void bv_scrolldown(struct buffer_view* bv, unsigned int n);
 
 /** Get bounds/extents of the view */
-/** Return's the number(0 indexed) of the first line of the buffer_view */
+/** Return's the number(0 indexed) of the first line of the
+ * buffer_view */
 unsigned int bv_start(const struct buffer_view* bv);
 
 /** Return cursor relative to bview.start */

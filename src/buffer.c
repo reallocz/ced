@@ -11,11 +11,11 @@
 #define BUFFER_GAPSIZE 4
 
 /** Evals to 1 if i is inside buffer gap */
-#define INGAP(buf, i) \
-    (((i) >= (buf)->gap.col && (i) < (buf)->gap.col + (buf)->gap.size))
+#define INGAP(buf, i)          \
+    (((i) >= (buf)->gap.col && \
+      (i) < (buf)->gap.col + (buf)->gap.size))
 
-#define CURVALID(buf, cur) \
-    ((cur).line < (buf)->linecount)
+#define CURVALID(buf, cur) ((cur).line < (buf)->linecount)
 
 #define TAG "BUFFER"
 
@@ -54,8 +54,8 @@ struct buffer buf_create_file(enum buffer_type type,
             log_fatal(TAG, "%s: cannot open:%s. (Its a directory)",
                       __func__, filename);
         } else {
-            log_fatal(TAG, "%s: couldn't open:%s. exiting.",
-                      __func__, filename);
+            log_fatal(TAG, "%s: couldn't open:%s. exiting.", __func__,
+                      filename);
             /*// Return a new empty buffer;*/
             /*struct buffer* buf = buf_create_empty(type);*/
             /*buf->name = filename;*/
@@ -127,11 +127,13 @@ void buf_delch(struct buffer* buf, struct cursor cur)
     buf->gap.size++;
 }
 
-/** Returns pointer to line in buffer. NULL if 'num' is out of bounds*/
+/** Returns pointer to line in buffer. NULL if 'num' is out of
+ * bounds*/
 struct line* buf_line(const struct buffer* buf, unsigned int num)
 {
     if (num >= buf->linecount) {
-        /*log_e(TAG, "Invalid line request: buf: %d (%d lines), request: %d", buf->id, buf->linecount, num);*/
+        /*log_e(TAG, "Invalid line request: buf: %d (%d lines),
+         * request: %d", buf->id, buf->linecount, num);*/
         return NULL;
     }
     return &buf->lines[num];
@@ -162,8 +164,9 @@ int buf_ingap(const struct buffer* b, unsigned int i)
 
 void buf_pprint(const struct buffer* b)
 {
-    log_l(TAG, "Buffer{id=%d, gap.pos=%d, gap.size = %d"
-               ", lncount=%d}",
+    log_l(TAG,
+          "Buffer{id=%d, gap.pos=%d, gap.size = %d"
+          ", lncount=%d}",
           b->id, b->gap.col, b->gap.size, b->linecount);
 }
 
@@ -241,9 +244,7 @@ static void gap_move_to_line(struct buffer* buf, unsigned int toline)
         unsigned int newlength = ln->len + buf->gap.size;
         char* newdata          = malloc(newlength * sizeof(char));
         assert(newdata);
-        memcpy(&newdata[buf->gap.size],
-               ln->data,
-               ln->len);
+        memcpy(&newdata[buf->gap.size], ln->data, ln->len);
         free(ln->data);
 
         // Update line length and data
@@ -284,7 +285,8 @@ static void gap_move(struct buffer* buf, struct cursor cur)
         // Cursor is behind the gap
         offset = -1 * diff;
         for (unsigned int i = 0; i < offset; ++i) {
-            ln->data[buf->gap.col + buf->gap.size - 1] = ln->data[buf->gap.col - 1];
+            ln->data[buf->gap.col + buf->gap.size - 1] =
+                ln->data[buf->gap.col - 1];
             buf->gap.col--;
         }
         log_l(TAG, "%s: diff=%d offset=%d", __func__, diff, offset);
@@ -312,8 +314,7 @@ void buf_printline(const struct buffer* buf, unsigned int i)
     assert(i < buf->linecount);
     int hasgap            = i == buf->gap.line ? 1 : 0;
     const struct line* ln = buf_line(buf, i);
-    log_l("LINE", "no: %d, len: %d, has_gap: %d",
-          i, ln->len, hasgap);
+    log_l("LINE", "no: %d, len: %d, has_gap: %d", i, ln->len, hasgap);
     for (unsigned int j = 0; j < ln->len; ++j) {
         if (INGAP(buf, j)) {
             log_lc("-");

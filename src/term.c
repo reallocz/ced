@@ -27,8 +27,7 @@ int term_init()
     noecho();
     keypad(G.stdscr, TRUE);
     log_l(G.tag, "Init success");
-    log_lc("stdscr { rows: %d, cols %d }\n",
-           G.rows, G.cols);
+    log_lc("stdscr { rows: %d, cols %d }\n", G.rows, G.cols);
     return 0;
 }
 
@@ -40,20 +39,11 @@ void term_exit()
 }
 
 
-void term_update()
-{
-    getmaxyx(G.stdscr, G.rows, G.cols);
-}
+void term_update() { getmaxyx(G.stdscr, G.rows, G.cols); }
 
-int term_rows()
-{
-    return G.rows;
-}
+int term_rows() { return G.rows; }
 
-int term_cols()
-{
-    return G.cols;
-}
+int term_cols() { return G.cols; }
 
 void term_size(unsigned int* rows, unsigned int* cols)
 {

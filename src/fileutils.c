@@ -75,7 +75,7 @@ unsigned int fu_read_file_lines(const char* path, struct line** lines)
         }
     }
     rewind(f);
-
+    // TODO(realloc): Fix 0 line malloc case and return
     struct line* mlines = malloc(linecount * sizeof(struct line));
     assert(mlines);
 

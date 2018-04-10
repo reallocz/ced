@@ -4,8 +4,8 @@
 
 #define TAG "INPUT"
 
-void inp_poll(const char* name __attribute__((unused)), struct window* win,
-              void (*callback)(inpev))
+void inp_poll(const char* name __attribute__((unused)),
+              struct window* win, void (*callback)(inpev))
 {
 
     inpev ev;
@@ -29,11 +29,14 @@ enum inp_type inp_classify(int ch)
         return INP_NUM;
     }
 
-    if ((ch >= 33 && ch <= 47) || (ch >= 58 && ch <= 64) || (ch >= 91 && ch <= 96) || (ch >= 123 && ch <= 126)) {
+    if ((ch >= 33 && ch <= 47) || (ch >= 58 && ch <= 64) ||
+        (ch >= 91 && ch <= 96) || (ch >= 123 && ch <= 126)) {
         return INP_SYMBOL;
     }
 
-    if (ch == k_esc || ch == k_enter || ch == k_tab || ch == k_space || ch == k_delete || ch == k_insert || ch == k_backspace) {
+    if (ch == k_esc || ch == k_enter || ch == k_tab ||
+        ch == k_space || ch == k_delete || ch == k_insert ||
+        ch == k_backspace) {
         return INP_SPECIAL;
     }
 

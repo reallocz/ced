@@ -60,6 +60,6 @@ struct command cmd_parse_string(const char* cmdstr)
 
 void cmd_pprint(const struct command cmd)
 {
-    log_l(TAG, "Command {valid: %d, cmd: %s, args: %s}",
-          cmd.valid, cmd.cmd, cmd.args);
+    log_l(TAG, "Command {valid: %d, cmd: %s, args: %s}", cmd.valid,
+          cmd.cmd, cmd.args);
 }

@@ -8,8 +8,8 @@ struct context {
     unsigned long flags;
 };
 
-inline void ctx_pprint(struct context* ctx) {
-    log_l("CONTEXT", "Context {mode: %d, flags: %d",
-            ctx->mode, ctx->flags);
+inline void ctx_pprint(struct context* ctx)
+{
+    log_l("CONTEXT", "Context {mode: %d, flags: %d", ctx->mode,
+          ctx->flags);
 }
-

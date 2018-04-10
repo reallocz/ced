@@ -17,4 +17,5 @@ void log_e(const char* tag, const char* msg, ...);
 void log_ec(const char* msg, ...);
 
 /** Log error and exit */
-void log_fatal(const char* tag, const char* msg, ...) __attribute__((noreturn));
+void log_fatal(const char* tag, const char* msg, ...)
+    __attribute__((noreturn));
