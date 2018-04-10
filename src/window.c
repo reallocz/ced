@@ -38,6 +38,11 @@ struct window* win_create(struct buffer_view* bview)
     // Commandline
     w->cmdline = cmd_create();
 
+    // margin
+    w->margin.width = 3;
+    w->margin.relative = 0;
+
+
     log_l(TAG, "Window created:");
     win_pprint(w);
     return w;
@@ -67,7 +72,6 @@ void win_update(struct window* win, struct context* context)
     win->sline.gap     = bv->buffer.gap;
 
     // Margin
-    win->margin.width     = 3;
     win->margin.start     = bv_start(bv);
     win->margin.linecount = bv->buffer.linecount;
 

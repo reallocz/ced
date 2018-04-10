@@ -33,6 +33,7 @@ struct margin {
     size_t width;
     size_t start;    // First line number
     size_t linecount;
+    int relative;   // 1 if relative line number
 };
 
 

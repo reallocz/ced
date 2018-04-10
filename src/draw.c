@@ -5,6 +5,8 @@
 
 #define TAG "DRAW"
 
+#define EMPTY_MARGIN_CHAR '~'
+
 /**** IMPORTANT:
  * The drawing order must be:
  *  1 - statusline
@@ -62,16 +64,33 @@ void draw_margin(WINDOW* nwin, struct margin mgn, struct rect area,
     // line number to string
     char lnstr[area.width];    // Arbitary
     for (size_t i = 0; i < area.height; ++i) {
+        // Clear line
         wmove(nwin, i, 0);
         wclrtoeol(nwin);
-        size_t lnnumber = mgn.start + i;    // 0 indexed
+
+        // 0 indexed line number
+        size_t lnnumber   = mgn.start + i;
+        int iscurrentline = (cur.line == lnnumber);
+
+        // Format string
         if (lnnumber < mgn.linecount) {
-            sprintf(lnstr, "%3lu", lnnumber + 1);    // 1 indexed
+            int finalval;    // 1 indexed if not relative
+
+            if (mgn.relative == 1 && !iscurrentline) {
+                int relnum = cur.line - lnnumber;
+                finalval   = relnum > 0 ? relnum : -relnum;
+            } else {
+                finalval = lnnumber + 1;
+            }
+
+            sprintf(lnstr, "%3d", finalval);    // 1 indexed
         } else {
-            sprintf(lnstr, "%3c", '~');
+            // After eob
+            sprintf(lnstr, "%3c", EMPTY_MARGIN_CHAR);
         }
 
-        if (cur.line != lnnumber) {
+        // Highlight current line number
+        if (!iscurrentline) {
             waddstr(nwin, lnstr);
         } else {
             wattron(nwin, A_BOLD);

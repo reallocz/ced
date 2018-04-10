@@ -164,6 +164,8 @@ void ced_normal_input_cb(inpev ev)
         bv_cmov_lstart(G.win->bview);
     } else if (ev.key == '1') {
         win_setbview(G.win, next_bview());
+    } else if (ev.key == 'R') {
+        G.win->margin.relative = !G.win->margin.relative;
     }
 }
 
