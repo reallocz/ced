@@ -17,8 +17,8 @@
 void draw_bview(WINDOW* nwin, const struct buffer_view* bv,
                 const struct context* context __attribute__((unused)))
 {
-    log_l(TAG, "Drawing buffer %d (%d lines)...", bv->buffer.id,
-          bv->buffer.linecount);
+    /*log_l(TAG, "Drawing buffer %d (%d lines)...", bv->buffer.id,*/
+          /*bv->buffer.linecount);*/
 
     struct rect area = bv_bounds(bv);
     size_t ox  = area.x;
@@ -49,7 +49,7 @@ void draw_bview(WINDOW* nwin, const struct buffer_view* bv,
         area.x = ox;
     }
 
-    log_l(TAG, "%d lines drawn", linesdrawn);
+    /*log_l(TAG, "%d lines drawn", linesdrawn);*/
 }
 
 

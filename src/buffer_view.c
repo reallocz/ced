@@ -44,10 +44,10 @@ void bv_update(struct buffer_view* bv)
 void bv_bounds_set(struct buffer_view* bv, struct rect bounds)
 {
     assert(bv);
-    log_l(TAG, "bounds set: {%d, %d, %d, %d} -> {%d, %d, %d, %d}",
-          bv->bounds.y, bv->bounds.x, bv->bounds.width,
-          bv->bounds.height, bounds.y, bounds.x, bounds.width,
-          bounds.height);
+    /*log_l(TAG, "bounds set: {%d, %d, %d, %d} -> {%d, %d, %d, %d}",*/
+          /*bv->bounds.y, bv->bounds.x, bv->bounds.width,*/
+          /*bv->bounds.height, bounds.y, bounds.x, bounds.width,*/
+          /*bounds.height);*/
     bv->bounds = bounds;
 }
 
