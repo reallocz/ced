@@ -31,11 +31,8 @@ struct buffer buf_create_file(enum buffer_type type,
 /** buf_destroy destorys the buffer and free's the data*/
 void buf_destroy(struct buffer* buf);
 
-/** INTERNALAdd a new line at the cursor. Copy the portion after the
- * cursor on the newline and place it at the beginning of the
- * newline. NOTE: the '\n' (newline) character must be passed to
- * the addch function. */
-void buf_addline(struct buffer* b, struct cursor cur);
+/** Insert line after idx */
+void buf_addline(struct buffer* b, Line ln, size_t idx);
 
 /** Return pointer to the line number */
 Line* buf_getline(const struct buffer* buf, size_t num);

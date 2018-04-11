@@ -28,6 +28,9 @@ void ln_addch(Line* ln, char ch, struct cursor cur);
 void ln_delch(Line* ln, struct cursor cur);
 void ln_clear(Line* ln);
 
+/** Split line at cursor and return the remainder */
+Line ln_split(Line* ln, const struct cursor cur);
+
 void ln_addgap(Line* ln);
 int ln_addgap_optional(Line* ln);
 void ln_movegap(Line* ln, struct cursor cur);

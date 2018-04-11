@@ -69,6 +69,33 @@ void ln_clear(Line* ln)
 }
 
 
+Line ln_split(Line* ln, const struct cursor cur)
+{
+    assert(ln);
+    assert(cur.col < ln_truelen(ln));
+    ln_movegap(ln, cur);
+
+    size_t newlen = ln_truelen(ln) - cur.col;
+    char* newdata = malloc(newlen);
+    assert(newdata);
+    size_t count = 0;
+    for(size_t i = cur.col; i < ln->len; ++i) {
+        if(!INGAP(ln, i)) {
+            newdata[count++] = ln->data[i];
+        }
+    }
+    assert(count == newlen);
+
+    // Create new line
+    Line newline = ln_create(newlen, newdata);
+
+    // Update current line
+    ln->gapsize = ln->len - cur.col;
+
+    return newline;
+}
+
+
 void ln_addgap(Line* ln)
 {
 

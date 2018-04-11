@@ -108,16 +108,20 @@ void ced_run(void)
 
 void ced_insert_input_cb(inpev ev)
 {
-    struct cursor cur  = G.win->bview->cur;
+    struct cursor cur = G.win->bview->cur;
 
     if (ev.type == INP_ALPHA || ev.type == INP_NUM ||
-        ev.type == INP_SYMBOL || ev.key == k_space ||
-        ev.key == k_enter) {
+        ev.type == INP_SYMBOL || ev.key == k_space) {
+
         ln_addch(bv_curline(G.win->bview), ev.key, cur);
         bv_cmov_fwd(G.win->bview, 1);
-    }
 
-    if (ev.type == INP_SPECIAL) {
+    } else if (ev.key == k_enter) {
+        Line newline = ln_split(bv_curline(G.win->bview), cur);
+        buf_addline(&G.win->bview->buffer, newline, cur.line + 1);
+        bv_cmov_lnext(G.win->bview, 1);
+        bv_cmov_lstart(G.win->bview);
+    } else if (ev.type == INP_SPECIAL) {
         switch (ev.key) {
         case k_backspace:
             ln_delch(bv_curline(G.win->bview), cur);

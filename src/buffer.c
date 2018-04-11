@@ -79,14 +79,37 @@ void buf_destroy(struct buffer* buf)
 }
 
 
+void buf_addline(struct buffer* b, Line ln, size_t idx)
+{
+    assert(b);
+    assert(idx < b->linecount);
+    size_t nlcount = b->linecount + 1;
+
+    Line* nlines = malloc(nlcount * sizeof(Line));
+    assert(nlines);
+    for(size_t i = 0; i < nlcount; ++i) {
+        if(i < idx) {
+            nlines[i] = b->lines[i];
+        } else if (i == idx) {
+            nlines[i] = ln;
+        } else {
+            nlines[i] = b->lines[i - 1];
+        }
+    }
+
+    free(b->lines);
+    b->lines = nlines;
+    b->linecount = nlcount;
+}
+
+
 /** Returns pointer to line in buffer. NULL if 'num' is out of
  * bounds*/
 Line* buf_getline(const struct buffer* buf, size_t num)
 {
     if (num >= buf->linecount) {
-        /*log_e(TAG, "Invalid line request: buf: %d (%d lines),
-         * request: %d", buf->id, buf->linecount, num);*/
-        return NULL;
+        log_fatal(TAG, "Invalid line request: buf: %d (%d lines),"
+         "request: %d", buf->id, buf->linecount, num);
     }
     return &buf->lines[num];
 }
