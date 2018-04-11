@@ -1,7 +1,7 @@
 #include "fileutils.h"
 #define _GNU_SOURCE    // Required to use 'getline' function
-#include "log.h"
 #include "line.h"
+#include "log.h"
 #include <assert.h>
 #include <errno.h>
 #include <linux/limits.h>
@@ -88,10 +88,11 @@ size_t fu_read_file_lines(const char* path, struct line** lines)
     while (1) {
         linelen = getline(&tmpdata, &wtfits, f);
         if (linelen == -1) {
+            free(tmpdata);    // Recommended by getline
             break;
         }
         struct line* ln = &mlines[count++];    // First line
-        ln->len         = linelen;
+        ln->len         = linelen - 1;         // Ignore trailing \0
         ln->data        = tmpdata;
         /*log_l(TAG, "line: size=%d", ln->len, ln->data);*/
         tmpdata = 0;
@@ -122,6 +123,7 @@ int fu_save_buffer(const struct buffer* buf, const char* path)
                 wbytes++;
             }
         }
+        fputc('\n', f);
     }
     log_l(TAG, "Buffer saved (%d lines, %d bytes): %s", lcount,
           wbytes, path);
