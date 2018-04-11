@@ -27,13 +27,15 @@ void draw_bview(WINDOW* nwin, const struct buffer_view* bv,
 
     size_t linesdrawn = 0;
     size_t firstline  = bv_start(bv);
+    size_t linecount = bv->buffer.linecount;
     for (size_t i = 0; i < area.height; ++i) {
 
         size_t linenumber = firstline + i;
-        struct line* ln   = buf_getline(&bv->buffer, linenumber);
-        if (ln == NULL) {
+        if(linenumber >= linecount) {
             break;
-        }    // No more lines in buffer
+        }
+
+        struct line* ln   = buf_getline(&bv->buffer, linenumber);
 
         linesdrawn++;
         for (size_t j = 0; j < ln->len; ++j) {
